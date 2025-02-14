@@ -1,0 +1,60 @@
+{
+  "name": "mock-server-request",
+  "description": "",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "prepare": "git config core.hooksPath scripts/git-hooks",
+    "lint": "eslint .",
+    "tsc": "tsc",
+    "knip": "knip -c knip.config.ts",
+    "prettier": "prettier --check --ignore-unknown .",
+    "prettier:w": "prettier --write --ignore-unknown .",
+    "test": "vitest run",
+    "test:d": "DEBUG=playwright-network-cache npm test",
+    "toc": "md-magic --files README.md",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "release": "bash scripts/release.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^18.15.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-playwright": "^2.2.0",
+    "eslint-plugin-visual-complexity": "0.1.4",
+    "globals": "^15.14.0",
+    "knip": "^5.43.3",
+    "lint-staged": "^15.4.2",
+    "markdown-magic": "3.3.0",
+    "np": "^10.1.0",
+    "prettier": "^3.4.2",
+    "publint": "^0.3.2",
+    "typescript": "5.6",
+    "typescript-eslint": "^8.21.0",
+    "vitest": "^3.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vitalets/mock-server-request.git"
+  },
+  "keywords": [
+    "testing",
+    "e2e",
+    "mock",
+    "requests"
+  ],
+  "funding": "https://github.com/sponsors/vitalets",
+  "license": "MIT"
+}
