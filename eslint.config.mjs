@@ -6,7 +6,7 @@ import visualComplexity from 'eslint-plugin-visual-complexity';
 
 export default [
   {
-    ignores: ['dist'],
+    ignores: ['dist', 'examples'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

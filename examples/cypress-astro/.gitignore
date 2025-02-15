@@ -22,3 +22,11 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Cypress-related ignored files
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+cypress/fixtures/temp.json
+cypress/reports/
+
