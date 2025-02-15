@@ -3,6 +3,10 @@
   "description": "",
   "version": "0.0.1",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vitalets/mock-server-request.git"
+  },
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js"
@@ -22,10 +26,8 @@
     "knip": "knip -c knip.config.ts",
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
-    "test": "vitest run",
-    "test:d": "DEBUG=playwright-network-cache npm test",
-    "toc": "md-magic --files README.md",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run --dir ./test",
+    "build": "./scripts/build.sh",
     "release": "bash scripts/release.sh"
   },
   "devDependencies": {
@@ -44,10 +46,6 @@
     "typescript": "5.6",
     "typescript-eslint": "^8.21.0",
     "vitest": "^3.0.5"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/vitalets/mock-server-request.git"
   },
   "keywords": [
     "testing",
