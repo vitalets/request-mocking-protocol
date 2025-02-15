@@ -56,5 +56,9 @@
     "requests"
   ],
   "funding": "https://github.com/sponsors/vitalets",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/picomatch": "^3.0.2",
+    "picomatch": "^4.0.2"
+  }
 }
