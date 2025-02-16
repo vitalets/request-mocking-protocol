@@ -1,2 +1,2 @@
 export { MockServerRequest } from './mock-server-request';
-export { mockHandler } from './mock-handler';
+export { setupMockServerRequest } from './mock-handler';
