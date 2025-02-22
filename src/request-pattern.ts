@@ -4,6 +4,7 @@
  * See: https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
  *
  * todo: move to a separate package.
+ * maybe better name: request-matcher?
  */
 
 import picomatch from 'picomatch';

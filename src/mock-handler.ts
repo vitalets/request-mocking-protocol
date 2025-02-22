@@ -7,22 +7,25 @@ import { RequestPattern } from './request-pattern';
 
 const MOCKING_HEADER = 'x-mock-request';
 
-type HeadersLike = Headers | Record<string, string | string[] | undefined>;
-type GetHeadersFn = () => HeadersLike | undefined | Promise<HeadersLike | undefined>;
+type HeadersLike =
+  | Headers
+  | Record<string, string | string[] | undefined>
+  | Iterable<[string, string | string[] | undefined]>;
 
-export function setupMockServerRequest(getHeaders: GetHeadersFn) {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (input, init) => {
-    const outboundReq = new Request(input, init);
-    const mockedResponse = await tryMock(outboundReq, getHeaders);
-    // todo: debug
-    return mockedResponse || originalFetch(input, init);
-  };
-}
+// export function setupMockServerRequest(getHeaders: GetHeadersFn) {
+//   const originalFetch = globalThis.fetch;
+//   globalThis.fetch = async (input, init) => {
+//     const outboundReq = new Request(input, init);
+//     const mockedResponse = await tryMock(outboundReq, getHeaders);
+//     // todo: debug
+//     return mockedResponse || originalFetch(input, init);
+//   };
+// }
 
-export async function tryMock(outboundReq: Request, getHeaders: GetHeadersFn) {
-  const inboundHeaders = toHeaders(await getHeaders());
-  const mockSchemas = extractMockSchemas(inboundHeaders);
+export function tryMock(outboundReq: Request, inboundHeaders?: HeadersLike) {
+  if (!inboundHeaders) return;
+  const headers = toHeaders(inboundHeaders);
+  const mockSchemas = extractMockSchemas(headers);
   if (!mockSchemas?.length) return;
   return applySchemas(outboundReq, mockSchemas);
 }
@@ -53,11 +56,11 @@ function extractMockSchemas(headers: Headers) {
 /**
  * Convert object to Headers instance.
  */
-function toHeaders(incomingHeaders: HeadersLike = {}) {
-  if (incomingHeaders instanceof Headers) return incomingHeaders;
+function toHeaders(headersLike: HeadersLike) {
+  if (headersLike instanceof Headers) return headersLike;
 
   const headers = new Headers();
-  for (const [key, value] of Object.entries(incomingHeaders)) {
+  for (const [key, value] of Object.entries(headersLike)) {
     if (Array.isArray(value)) {
       value.forEach((val) => headers.append(key, val));
     } else if (value !== undefined) {

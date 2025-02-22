@@ -1,9 +1,9 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 import type { AstroIntegration } from 'astro';
 import node from '@astrojs/node';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingHttpHeaders } from 'node:http';
+import { tryMock } from 'mock-server-request';
 
 export default defineConfig({
   adapter: node({ mode: 'standalone' }),
@@ -16,14 +16,19 @@ function getMockServerRequest(): AstroIntegration {
     hooks: {
       'astro:server:setup': async ({ server }) => {
         if (process.env.NODE_ENV !== 'production') {
-          const { setupMockServerRequest } = await import('mock-server-request');
-
-          const headersStorage = new AsyncLocalStorage<IncomingHttpHeaders>();
+          // store inbound headers to be used in the fetch interceptor
+          const headersStore = new AsyncLocalStorage<IncomingHttpHeaders>();
           server.middlewares.use((req, _res, next) => {
-            headersStorage.run(req.headers, next);
+            headersStore.run(req.headers, next);
           });
 
-          setupMockServerRequest(() => headersStorage.getStore());
+          // intercept outbound fetch requests
+          const originalFetch = globalThis.fetch;
+          globalThis.fetch = async (input, init) => {
+            const outboundReq = new Request(input, init);
+            const mockedResponse = tryMock(outboundReq, headersStore.getStore());
+            return mockedResponse || originalFetch(input, init);
+          };
         }
       },
     },
