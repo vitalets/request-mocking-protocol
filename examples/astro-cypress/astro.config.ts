@@ -3,7 +3,8 @@ import type { AstroIntegration } from 'astro';
 import node from '@astrojs/node';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingHttpHeaders } from 'node:http';
-import { tryMock } from 'mock-server-request';
+import { setupServer } from 'msw/node';
+import { createHandler } from 'mock-server-request/msw';
 
 export default defineConfig({
   adapter: node({ mode: 'standalone' }),
@@ -22,13 +23,9 @@ function getMockServerRequest(): AstroIntegration {
             headersStore.run(req.headers, next);
           });
 
-          // intercept outbound fetch requests
-          const originalFetch = globalThis.fetch;
-          globalThis.fetch = async (input, init) => {
-            const outboundReq = new Request(input, init);
-            const mockedResponse = tryMock(outboundReq, headersStore.getStore());
-            return mockedResponse || originalFetch(input, init);
-          };
+          // setup MSW server
+          const mswServer = setupServer(createHandler(() => headersStore.getStore()));
+          mswServer.listen();
         }
       },
     },

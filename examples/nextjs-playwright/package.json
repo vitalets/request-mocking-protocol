@@ -1,5 +1,5 @@
 {
-  "name": "playwright-nextjs",
+  "name": "nextjs-playwright",
   "version": "0.1.0",
   "private": true,
   "scripts": {

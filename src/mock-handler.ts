@@ -26,39 +26,47 @@ type HeadersLike =
 
 export async function tryMock(outboundReq: Request, inboundHeaders?: HeadersLike) {
   if (!inboundHeaders) return;
+  // should return passthrough()
   if (outboundReq.headers.has(MOCKING_HEADER_BYPASS)) return;
 
   const headers = toHeaders(inboundHeaders);
   const mockSchemas = extractMockSchemas(headers);
   if (!mockSchemas?.length) return;
 
-  return applySchemas(outboundReq, mockSchemas);
+  const mockSchema = findMatchingSchema(outboundReq, mockSchemas);
+  if (!mockSchema) return;
+
+  return buildResponse(outboundReq, mockSchema);
 }
 
-async function applySchemas(outboundReq: Request, mockSchemas: MockSchema[]) {
+function findMatchingSchema(outboundReq: Request, mockSchemas: MockSchema[]) {
   for (const mockSchema of mockSchemas) {
-    const { reqSchema, resSchema } = mockSchema;
+    const { reqSchema } = mockSchema;
     const requestPattern = new RequestPattern(reqSchema);
-    if (!requestPattern.test(outboundReq)) continue;
-    const { bodyPatch } = resSchema;
-    // patch real response
-    if (bodyPatch) {
-      return patchResponse(outboundReq, bodyPatch);
-    } else {
-      return mockResponse(resSchema);
-    }
+    if (requestPattern.test(outboundReq)) return mockSchema;
+  }
+}
+
+async function buildResponse(outboundReq: Request, { resSchema }: MockSchema) {
+  const { bodyPatch } = resSchema;
+  if (bodyPatch) {
+    return patchResponse(outboundReq, bodyPatch);
+  } else {
+    return mockResponse(resSchema);
   }
 }
 
 async function patchResponse(outboundReq: Request, bodyPatch: Record<string, unknown>) {
   const headers = new Headers(outboundReq.headers);
-  // add custom header to bypass the mocking
   headers.set(MOCKING_HEADER_BYPASS, 'true');
   // outboundReq.headers.set(MOCKING_HEADER_BYPASS, 'true');
   // const newRequest = new Request(outboundReq.clone());
   // newRequest.headers.set(MOCKING_HEADER_BYPASS, 'true');
+  // const realResponse = await fetch(bypass(outboundReq));
   const realResponse = await fetch(outboundReq, { headers });
-  // todo: handle other parts of the response
+  // todo: if body is not json, return as is
+  // todo: support string replacement?
+  // todo: handle empty body
   const body = await realResponse.json();
   Object.keys(bodyPatch).forEach((keyPath) => {
     patchObject(body, keyPath, bodyPatch[keyPath]);
@@ -66,6 +74,7 @@ async function patchResponse(outboundReq: Request, bodyPatch: Record<string, unk
   const bodyStr = JSON.stringify(body);
 
   // w/o Content-Length header, there is an error: incorrect header check
+  // todo: use msw .json() method?
   const contentLength = bodyStr ? new Blob([bodyStr]).size.toString() : '0';
 
   return new Response(bodyStr, {

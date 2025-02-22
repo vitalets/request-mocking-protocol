@@ -1,12 +1,13 @@
 import { test, expect, beforeAll } from 'vitest';
-import { http, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
-import { MockServerRequest, tryMock } from '../../src';
+import { MockServerRequest } from '../../src';
+import { createHandler } from '../../src/msw';
 
 let inboundHeaders: Record<string, string> = {};
 
 beforeAll(() => {
-  setupMswHandler(() => inboundHeaders);
+  const server = setupServer(createHandler(() => inboundHeaders));
+  server.listen();
 });
 
 test('mock response', async () => {
@@ -34,14 +35,3 @@ test('patch response', async () => {
   const res = await fetch('https://jsonplaceholder.typicode.com/users').then((r) => r.json());
   expect(res[0].name).toEqual('John Smith');
 });
-
-function setupMswHandler(getHeaders: () => Record<string, string>) {
-  const server = setupServer(
-    http.get('*', async ({ request }) => {
-      const inboundHeaders = getHeaders();
-      const mockedResponse = await tryMock(request, inboundHeaders);
-      return mockedResponse || passthrough();
-    }),
-  );
-  server.listen();
-}

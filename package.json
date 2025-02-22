@@ -9,7 +9,9 @@
   },
   "main": "./dist/index.js",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./msw": "./dist/msw/index.js",
+    "./package.json": "./package.json"
   },
   "engines": {
     "node": ">=18"
@@ -29,6 +31,12 @@
     "test": "vitest run --dir ./test",
     "build": "./scripts/build.sh",
     "release": "bash scripts/release.sh"
+  },
+  "dependencies": {
+    "@types/picomatch": "^3.0.2",
+    "lodash.set": "^4.3.2",
+    "picomatch": "^4.0.2",
+    "undici-types": "^7.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -57,11 +65,5 @@
     "requests"
   ],
   "funding": "https://github.com/sponsors/vitalets",
-  "license": "MIT",
-  "dependencies": {
-    "@types/picomatch": "^3.0.2",
-    "lodash.set": "^4.3.2",
-    "picomatch": "^4.0.2",
-    "undici-types": "^7.3.0"
-  }
+  "license": "MIT"
 }
