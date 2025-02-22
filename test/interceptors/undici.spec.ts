@@ -1,17 +1,39 @@
-import { test, expect } from 'vitest';
+import { test, expect, beforeAll } from 'vitest';
 import { Dispatcher, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { MockServerRequest, tryMock } from '../../src';
 
-test('mock undici global dispatcher', async () => {
+let inboundHeaders: Record<string, string> = {};
+
+beforeAll(() => {
+  mockUndiciGlobalDispatcher(() => inboundHeaders);
+});
+
+test('mock response', async () => {
   const msr = new MockServerRequest();
+  msr.onChange = (headers) => (inboundHeaders = headers);
+
   await msr.addMock('https://jsonplaceholder.typicode.com/users', {
     body: JSON.stringify([{ id: 1, name: 'John Smith' }]),
   });
 
-  mockUndiciGlobalDispatcher(() => msr.headers);
-
   const res = await fetch('https://jsonplaceholder.typicode.com/users').then((r) => r.json());
   expect(res[0]).toEqual({ id: 1, name: 'John Smith' });
+});
+
+// Undici: patching does not work, as secondary fetch() does not attach bypass header
+// todo: investigate
+test.skip('patch response', async () => {
+  const msr = new MockServerRequest();
+  msr.onChange = (headers) => (inboundHeaders = headers);
+
+  await msr.addMock('https://jsonplaceholder.typicode.com/users', {
+    bodyPatch: {
+      '[0].name': 'John Smith',
+    },
+  });
+
+  const res = await fetch('https://jsonplaceholder.typicode.com/users').then((r) => r.json());
+  expect(res[0].name).toEqual('John Smith');
 });
 
 function mockUndiciGlobalDispatcher(getHeaders: () => Record<string, string>) {
@@ -19,14 +41,14 @@ function mockUndiciGlobalDispatcher(getHeaders: () => Record<string, string>) {
     const outboundReq = convertUndiciOptionsToRequest(opts);
     if (!outboundReq) return dispatch(opts, handler);
     const inboundHeaders = getHeaders();
+    // console.log('try mock', outboundReq.url, [...outboundReq.headers.entries()]);
+    tryMock(outboundReq, inboundHeaders).then((mockedResponse) => {
+      return mockedResponse
+        ? convertResponseToUndici(mockedResponse, handler)
+        : dispatch(opts, handler);
+    });
 
-    const mockedResponse = tryMock(outboundReq, inboundHeaders);
-    if (mockedResponse) {
-      convertResponseToUndici(mockedResponse, handler);
-      return true;
-    } else {
-      return dispatch(opts, handler);
-    }
+    return true;
   });
 
   setGlobalDispatcher(dispatcherWithMocks);
@@ -64,4 +86,5 @@ async function convertResponseToUndici(res: Response, handler: Dispatcher.Dispat
   handler.onHeaders?.(res.status, [], () => {}, 'getStatusText(statusCode)');
   handler.onData?.(Buffer.from(buffer));
   handler.onComplete?.([]);
+  return true;
 }
