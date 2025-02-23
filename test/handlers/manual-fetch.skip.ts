@@ -1,3 +1,5 @@
+// Keeping this file as a reference for global fetch interceptor implementation
+/*
 import { test, expect, beforeAll } from 'vitest';
 import { MockServerRequest, tryMock } from '../../src';
 
@@ -42,3 +44,4 @@ function mockGlobalFetch(getHeaders: () => Record<string, string>) {
     return mockedResponse || originalFetch(input, init);
   };
 }
+*/

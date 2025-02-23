@@ -1,3 +1,5 @@
+// Keeping this file as a reference for undici handler implementation
+/*
 import { test, expect, beforeAll } from 'vitest';
 import { Dispatcher, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { MockServerRequest, tryMock } from '../../src';
@@ -54,9 +56,6 @@ function mockUndiciGlobalDispatcher(getHeaders: () => Record<string, string>) {
   setGlobalDispatcher(dispatcherWithMocks);
 }
 
-/**
- * Convert undici dispatch optioins to Fetch Request
- */
 function convertUndiciOptionsToRequest(opts: Dispatcher.DispatchOptions) {
   const { origin, body } = opts;
   if (!origin) return;
@@ -73,9 +72,6 @@ function convertUndiciOptionsToRequest(opts: Dispatcher.DispatchOptions) {
   });
 }
 
-/**
- * Convert Fetch Response to undici response
- */
 async function convertResponseToUndici(res: Response, handler: Dispatcher.DispatchHandler) {
   const buffer = await res.arrayBuffer();
   // all handlers must be defined!
@@ -88,3 +84,4 @@ async function convertResponseToUndici(res: Response, handler: Dispatcher.Dispat
   handler.onComplete?.([]);
   return true;
 }
+*/

@@ -1,7 +1,7 @@
 import { test, expect, beforeAll } from 'vitest';
 import { setupServer } from 'msw/node';
 import { MockServerRequest } from '../../src';
-import { createHandler } from '../../src/msw';
+import { createHandler } from '../../src/handlers/msw';
 
 let inboundHeaders: Record<string, string> = {};
 
