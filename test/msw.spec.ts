@@ -37,11 +37,25 @@ test('patch response', async () => {
 });
 
 // todo: substitution
-test.skip('route params substitution', async () => {
+test.skip('route params substitution (URL pattern)', async () => {
   const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.addMock('https://jsonplaceholder.typicode.com/users/:id', {
+    body: [{ id: '{{ id }}', name: 'User {{ id }}' }],
+    debug: true,
+  });
+
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1').then((r) => r.json());
+  expect(res[0]).toEqual({ id: 1, name: 'User 1' });
+});
+
+// todo: substitution
+test.skip('route params substitution (regexp)', async () => {
+  const msr = new MockRemoteRequest();
+  msr.onChange = (headers) => (inboundHeaders = headers);
+
+  await msr.addMock(/https:\/\/[\w.-]+\/users\/(?<id>[^/]+)/, {
     body: [{ id: '{{ id }}', name: 'User {{ id }}' }],
     debug: true,
   });
