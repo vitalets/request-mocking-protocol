@@ -3,25 +3,20 @@
  */
 import {
   isPatchResponse,
-  MockResponseSchema,
-  MockResponseSchemaInit,
   PatchResponseSchema,
   ReplaceResponseSchema,
-  buildMockResponseSchema,
+  MockMatchResult,
 } from '../protocol';
 import { patchObject } from './utils';
 
 export abstract class BaseResponseBuilder {
-  protected schema: MockResponseSchema;
-
-  constructor(
-    protected req: Request,
-    schema: MockResponseSchemaInit,
-  ) {
-    this.schema = buildMockResponseSchema(schema);
-  }
+  constructor(protected matchResult: MockMatchResult) {}
 
   protected abstract bypassReq(req: Request): Promise<Response>;
+
+  protected get schema() {
+    return this.matchResult.mockSchema.resSchema;
+  }
 
   async build() {
     return isPatchResponse(this.schema)
@@ -30,7 +25,7 @@ export abstract class BaseResponseBuilder {
   }
 
   protected async patchResponse({ bodyPatch }: PatchResponseSchema) {
-    const realResponse = await this.bypassReq(this.req);
+    const realResponse = await this.bypassReq(this.matchResult.req);
     try {
       const body = await realResponse.clone().json();
       patchObject(body, bodyPatch);
@@ -45,6 +40,7 @@ export abstract class BaseResponseBuilder {
   }
 
   protected replaceResponse({ body, status, headers }: ReplaceResponseSchema) {
+    // substitute params
     const bodyStr = stringifyBody(body);
     return this.createResponse(bodyStr, { status, headers });
   }

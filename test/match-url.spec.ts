@@ -90,7 +90,7 @@ function createMatcher(url: string) {
 function match(matcher: RequestMatcher, url: string, shouldMatch = true) {
   const req = new Request(url);
   expect(
-    matcher.test(req),
+    Boolean(matcher.match(req)),
     `pattern: '${matcher.schema.url}' should ${shouldMatch ? '' : 'not '}match url: '${url}'`,
   ).toEqual(shouldMatch);
 }

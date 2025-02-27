@@ -3,16 +3,16 @@
  */
 import { http, bypass, HttpResponse } from 'msw';
 import { extractMockSchemas, GetHeaders } from '../transport';
-import { findMatchedSchema } from '../request-matcher/utils';
+import { matchSchemas } from '../request-matcher/utils';
 import { BaseResponseBuilder } from '../response-builder';
 
 // createMockHandler
 export function createHandler(getInboundHeaders: GetHeaders) {
   return http.all('*', async ({ request }) => {
     const mockSchemas = await extractMockSchemas(getInboundHeaders);
-    const matchedSchema = findMatchedSchema(request, mockSchemas);
-    if (matchedSchema) {
-      return new MswResponseBuilder(request, matchedSchema.resSchema).build();
+    const matchResult = matchSchemas(request, mockSchemas);
+    if (matchResult) {
+      return new MswResponseBuilder(matchResult).build();
     }
   });
 }

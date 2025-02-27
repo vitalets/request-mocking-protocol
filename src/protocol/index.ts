@@ -21,6 +21,12 @@ export type MockSchema = {
   resSchema: MockResponseSchema;
 };
 
+export type MockMatchResult = {
+  mockSchema: MockSchema;
+  req: Request;
+  params: Record<string, string>;
+};
+
 export function buildMockSchema(
   reqSchema: MockRequestSchemaInit,
   resSchema: MockResponseSchemaInit,

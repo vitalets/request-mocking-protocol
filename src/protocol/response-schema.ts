@@ -9,10 +9,12 @@ export type ReplaceResponseSchema = {
   status: number;
   headers?: Record<string, string>;
   body?: Record<string, unknown> | Array<unknown> | string | null;
+  debug?: boolean;
 };
 
 export type PatchResponseSchema = {
   bodyPatch: Record<string, string | number | boolean | null>;
+  debug?: boolean;
 };
 
 export type MockResponseSchemaInit =
@@ -21,9 +23,11 @@ export type MockResponseSchemaInit =
       status?: ReplaceResponseSchema['status'];
       headers?: ReplaceResponseSchema['headers'];
       body?: ReplaceResponseSchema['body'];
+      debug?: ReplaceResponseSchema['debug'];
     }
   | {
       bodyPatch: PatchResponseSchema['bodyPatch'];
+      debug?: PatchResponseSchema['debug'];
     };
 
 const defaults: Pick<ReplaceResponseSchema, 'status'> = {

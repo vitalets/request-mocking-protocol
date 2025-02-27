@@ -28,7 +28,7 @@
     "knip": "knip -c knip.config.ts",
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
-    "test": "vitest run --dir ./test",
+    "test": "vitest run --no-cache --dir ./test",
     "build": "./scripts/build.sh",
     "release": "bash scripts/release.sh"
   },

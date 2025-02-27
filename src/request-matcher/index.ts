@@ -10,65 +10,21 @@
 
 import 'urlpattern-polyfill';
 import { MockRequestSchema } from '../protocol';
-import { regexpFromString, trimSearchParams } from './utils';
-import { RequestMatcherLogger } from './logger';
-
-type MatchingContext = {
-  req: Request;
-  logger: RequestMatcherLogger;
-};
+import { regexpFromString } from './utils';
+import { RequestMatcherExecutor } from './executor';
 
 export class RequestMatcher {
-  private urlMatcher: (url: string) => boolean;
+  private urlMatcher: URLPattern | RegExp;
 
-  constructor(public schema: MockRequestSchema) {
+  constructor(
+    public schema: MockRequestSchema,
+    private debug?: boolean,
+  ) {
     this.urlMatcher = this.buildUrlMatcher();
   }
 
-  test(req: Request) {
-    const ctx = { req, logger: new RequestMatcherLogger() };
-    return (
-      this.matchMethod(ctx) &&
-      this.matchURL(ctx) &&
-      this.matchQuery(req) &&
-      this.matchHeaders(req) &&
-      this.matchBody(req)
-    );
-  }
-
-  private matchMethod({ req, logger }: MatchingContext) {
-    const result = this.schema.method === 'ALL' || req.method === this.schema.method;
-    logger.matchMethod(result, this.schema.method, req.method);
-    return result;
-  }
-
-  private matchURL({ req, logger }: MatchingContext) {
-    const url = this.schema.query ? trimSearchParams(req.url) : req.url;
-    const result = this.urlMatcher(url);
-    logger.matchURL(result, this.schema.method, req.method);
-    return result;
-  }
-
-  private matchQuery(req: Request) {
-    const expectedQuery = this.schema.query;
-    if (!expectedQuery) return true;
-    const keys = Object.keys(expectedQuery);
-    const { searchParams } = new URL(req.url);
-    return keys.every((key) => {
-      const expectedValue = expectedQuery[key];
-      // null - param should not exist in the request
-      if (isNullOrUndefined(expectedValue)) return !searchParams.has(key);
-      // todo: handle multi-value params
-      return searchParams.get(key) === String(expectedQuery[key]);
-    });
-  }
-
-  private matchHeaders(_req: Request) {
-    return true;
-  }
-
-  private matchBody(_req: Request) {
-    return true;
+  match(req: Request) {
+    return new RequestMatcherExecutor(this.schema, this.urlMatcher, req, this.debug).match();
   }
 
   private buildUrlMatcher() {
@@ -81,8 +37,7 @@ export class RequestMatcher {
     const { url } = this.schema;
     const hasQuery = url.includes('\\?');
     this.ensureSingleQuerySource(hasQuery);
-    const regexp = regexpFromString(url);
-    return (url: string) => regexp.test(url);
+    return regexpFromString(url);
   }
 
   private buildUrlPatternMatcher() {
@@ -90,7 +45,7 @@ export class RequestMatcher {
     const urlPattern = new URLPattern(url);
     const hasQuery = urlPattern.search !== '*';
     this.ensureSingleQuerySource(hasQuery);
-    return (url: string) => urlPattern.test(url);
+    return urlPattern;
   }
 
   private ensureSingleQuerySource(hasQuery: boolean) {
@@ -100,8 +55,4 @@ export class RequestMatcher {
       );
     }
   }
-}
-
-function isNullOrUndefined(value: unknown) {
-  return value === null || value === undefined;
 }

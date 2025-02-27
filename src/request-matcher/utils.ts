@@ -1,5 +1,5 @@
 import { RequestMatcher } from '.';
-import { MockSchema } from '../protocol';
+import { MockMatchResult, MockSchema } from '../protocol';
 
 /**
  * Creates RegExp instance from string.
@@ -21,6 +21,15 @@ export function trimSearchParams(url: string) {
   return urlObj.toString();
 }
 
-export function findMatchedSchema(req: Request, mockSchemas?: MockSchema[]) {
-  return mockSchemas?.find(({ reqSchema }) => new RequestMatcher(reqSchema).test(req));
+export function matchSchemas(
+  req: Request,
+  mockSchemas: MockSchema[] = [],
+): MockMatchResult | undefined {
+  for (const mockSchema of mockSchemas) {
+    const matcher = new RequestMatcher(mockSchema.reqSchema, mockSchema.resSchema.debug);
+    const result = matcher.match(req);
+    if (result) {
+      return { mockSchema, req: req, params: result };
+    }
+  }
 }
