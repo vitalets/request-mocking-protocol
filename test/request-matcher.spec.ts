@@ -66,6 +66,22 @@ test('match query', () => {
   expect(matcher.match(req)).toEqual(null);
 });
 
+test('match headers', () => {
+  const matcher = createMatcher({
+    url: 'https://example.com',
+    headers: { ['x-my-header']: 'foo' },
+  });
+
+  req = new Request('https://example.com', { headers: { ['x-my-header']: 'foo' } });
+  expect(matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com', { headers: { ['x-my-header']: 'bar' } });
+  expect(matcher.match(req)).toEqual(null);
+
+  req = new Request('https://example.com');
+  expect(matcher.match(req)).toEqual(null);
+});
+
 function createMatcher(inti: MockRequestSchemaInit) {
   return new RequestMatcher(buildMockRequestSchema(inti));
 }

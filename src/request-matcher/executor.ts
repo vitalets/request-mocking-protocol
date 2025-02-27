@@ -92,22 +92,28 @@ export class RequestMatcherExecutor {
     return keys.every((key) => this.matchQueryParam(key, expectedQuery));
   }
 
-  private matchQueryParam(name: string, expectedQuery: Record<string, string | number>) {
-    const expectedValue = expectedQuery[name];
-    const actualValue = this.searchParams.get(name);
-
-    // todo: handle multi-value params
-    const result = isNullOrUndefined(expectedValue)
-      ? actualValue === null
-      : actualValue === String(expectedValue);
-
-    this.log(result, `query param "${name}"`, expectedValue, actualValue);
-
+  private matchQueryParam(name: string, expectedQuery: Record<string, string | number | null>) {
+    // todo: handle multi-value params in expectedQuery
+    const expectedValue = expectedQuery[name]?.toString() ?? null;
+    const actualValues = this.searchParams.getAll(name);
+    const result =
+      expectedValue === null ? actualValues.length === 0 : actualValues.includes(expectedValue);
+    this.log(result, `query param "${name}"`, expectedValue, actualValues.join(','));
     return result;
   }
 
   private matchHeaders() {
-    return true;
+    const expectedHeaders = this.schema.headers || {};
+    const keys = Object.keys(expectedHeaders);
+    return keys.every((key) => this.matchHeader(key, expectedHeaders));
+  }
+
+  private matchHeader(name: string, expectedHeaders: Record<string, string | null>) {
+    const expectedValue = expectedHeaders[name] ?? null;
+    const actualValue = this.req.headers.get(name);
+    const result = actualValue === expectedValue;
+    this.log(result, `header "${name}"`, expectedValue, actualValue);
+    return result;
   }
 
   private matchBody() {
@@ -126,8 +132,4 @@ export class RequestMatcherExecutor {
     this.logs.push(`${icon} Expected ${entity}: ${expected}`);
     this.logs.push(`${' '.repeat(4)} Actual ${entity}: ${actual}`);
   }
-}
-
-function isNullOrUndefined(value: unknown) {
-  return value === null || value === undefined;
 }

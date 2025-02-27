@@ -7,8 +7,8 @@ export type MockRequestSchema = {
   url: string;
   method: HttpMethod | 'ALL';
   patternType: 'urlpattern' | 'regexp';
-  query?: Record<string, string | number>;
-  headers?: Record<string, string>;
+  query?: Record<string, string | number | null>;
+  headers?: Record<string, string | null>;
   body?: Record<string, unknown> | Array<unknown> | string;
 };
 
