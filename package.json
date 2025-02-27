@@ -1,11 +1,11 @@
 {
-  "name": "mock-server-request",
+  "name": "mock-remote-request",
   "description": "",
   "version": "0.0.1",
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git://github.com/vitalets/mock-server-request.git"
+    "url": "git://github.com/vitalets/mock-remote-request.git"
   },
   "main": "./dist/index.js",
   "exports": {
@@ -33,10 +33,8 @@
     "release": "bash scripts/release.sh"
   },
   "dependencies": {
-    "@types/picomatch": "^3.0.2",
     "lodash.set": "^4.3.2",
-    "picomatch": "^4.0.2",
-    "undici-types": "^7.3.0"
+    "urlpattern-polyfill": "^10.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

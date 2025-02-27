@@ -1,7 +1,7 @@
 import { test, expect, beforeAll } from 'vitest';
 import { setupServer } from 'msw/node';
-import { MockServerRequest } from '../../src';
-import { createHandler } from '../../src/handlers/msw';
+import { MockRemoteRequest } from '../src';
+import { createHandler } from '../src/interceptors/msw';
 
 let inboundHeaders: Record<string, string> = {};
 
@@ -11,11 +11,11 @@ beforeAll(() => {
 });
 
 test('mock response', async () => {
-  const msr = new MockServerRequest();
+  const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.addMock('https://jsonplaceholder.typicode.com/users', {
-    body: JSON.stringify([{ id: 1, name: 'John Smith' }]),
+    body: [{ id: 1, name: 'John Smith' }],
   });
 
   const res = await fetch('https://jsonplaceholder.typicode.com/users').then((r) => r.json());
@@ -23,7 +23,7 @@ test('mock response', async () => {
 });
 
 test('patch response', async () => {
-  const msr = new MockServerRequest();
+  const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.addMock('https://jsonplaceholder.typicode.com/users', {
