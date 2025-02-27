@@ -26,7 +26,8 @@ export function matchSchemas(
   mockSchemas: MockSchema[] = [],
 ): MockMatchResult | undefined {
   for (const mockSchema of mockSchemas) {
-    const matcher = new RequestMatcher(mockSchema.reqSchema, mockSchema.resSchema.debug);
+    const debug = mockSchema.reqSchema.debug || mockSchema.resSchema.debug;
+    const matcher = new RequestMatcher(mockSchema.reqSchema, debug);
     const result = matcher.match(req);
     if (result) {
       return { mockSchema, req: req, params: result };

@@ -4,6 +4,10 @@ import { buildMockRequestSchema, MockRequestSchemaInit } from '../src/protocol';
 
 let req: Request;
 
+function createMatcher(inti: MockRequestSchemaInit) {
+  return new RequestMatcher(buildMockRequestSchema(inti));
+}
+
 test('match method', () => {
   const matcher = createMatcher({ method: 'GET', url: 'https://example.com/' });
 
@@ -81,7 +85,3 @@ test('match headers', () => {
   req = new Request('https://example.com');
   expect(matcher.match(req)).toEqual(null);
 });
-
-function createMatcher(inti: MockRequestSchemaInit) {
-  return new RequestMatcher(buildMockRequestSchema(inti));
-}

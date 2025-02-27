@@ -21,6 +21,7 @@ export class RequestMatcher {
     private debug?: boolean,
   ) {
     this.urlMatcher = this.buildUrlMatcher();
+    if (schema.debug) this.debug = true;
   }
 
   match(req: Request) {

@@ -10,6 +10,7 @@ export type MockRequestSchema = {
   query?: Record<string, string | number | null>;
   headers?: Record<string, string | null>;
   body?: Record<string, unknown> | Array<unknown> | string;
+  debug?: boolean;
 };
 
 export type MockRequestSchemaInit =
@@ -22,6 +23,7 @@ export type MockRequestSchemaInit =
       query?: MockRequestSchema['query'];
       headers?: MockRequestSchema['headers'];
       body?: MockRequestSchema['body'];
+      debug?: MockRequestSchema['debug'];
     };
 
 const defaults: Pick<MockRequestSchema, 'method' | 'patternType'> = {

@@ -63,7 +63,7 @@ export class RequestMatcherExecutor {
         ? this.matchURLRegexp(url, this.urlMatcher)
         : this.matchURLPattern(url, this.urlMatcher);
 
-    this.log(result, `URL`, schema.url, `${url}${shouldTrimSearchParams ? ' (trimmed)' : ''}`);
+    this.log(result, `URL`, schema.url, `${url}${url !== req.url ? ' (query trimmed)' : ''}`);
     return result;
   }
 
