@@ -4,53 +4,54 @@
  * See: https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
  * See: https://developer.chrome.com/docs/web-platform/urlpattern
  *
- * todo: store matching info for debug
  * todo: move to a separate package.
  */
 
-import 'urlpattern-polyfill';
 import { MockRequestSchema } from '../protocol';
-import { regexpFromString } from './utils';
-import { RequestMatcherExecutor } from './executor';
+import { UrlMatcher } from './matchers/url';
+import { BodyMatcher } from './matchers/body';
+import { MatchingContext } from './context';
+import { MethodMatcher } from './matchers/method';
+import { QueryMatcher } from './matchers/query';
+import { HeadersMatcher } from './matchers/headers';
 
 export class RequestMatcher {
-  private urlMatcher: URLPattern | RegExp;
+  private methodMatcher = new MethodMatcher(this.schema);
+  private urlMatcher = new UrlMatcher(this.schema);
+  private queryMatcher = new QueryMatcher(this.schema);
+  private headersMatcher = new HeadersMatcher(this.schema);
+  private bodyMatcher = new BodyMatcher(this.schema);
 
   constructor(
     public schema: MockRequestSchema,
     private debug?: boolean,
   ) {
-    this.urlMatcher = this.buildUrlMatcher();
     if (schema.debug) this.debug = true;
+    this.ensureSingleQuerySource();
   }
 
+  // eslint-disable-next-line visual/complexity
   match(req: Request) {
-    return new RequestMatcherExecutor(this.schema, this.urlMatcher, req, this.debug).match();
+    const ctx = new MatchingContext(req);
+    try {
+      const matched =
+        this.methodMatcher.match(ctx) &&
+        this.urlMatcher.match(ctx) &&
+        this.queryMatcher.match(ctx) &&
+        this.headersMatcher.match(ctx) &&
+        this.bodyMatcher.match(ctx);
+
+      ctx.logDone(matched);
+
+      return matched ? ctx.params : null;
+    } finally {
+      // eslint-disable-next-line no-console
+      if (this.debug) console.log(ctx.logs.join('\n'));
+    }
   }
 
-  private buildUrlMatcher() {
-    return this.schema.patternType === 'regexp'
-      ? this.buildUrlRegexpMatcher()
-      : this.buildUrlPatternMatcher();
-  }
-
-  private buildUrlRegexpMatcher() {
-    const { url } = this.schema;
-    const hasQuery = url.includes('\\?');
-    this.ensureSingleQuerySource(hasQuery);
-    return regexpFromString(url);
-  }
-
-  private buildUrlPatternMatcher() {
-    const { url } = this.schema;
-    const urlPattern = new URLPattern(url);
-    const hasQuery = urlPattern.search !== '*';
-    this.ensureSingleQuerySource(hasQuery);
-    return urlPattern;
-  }
-
-  private ensureSingleQuerySource(hasQuery: boolean) {
-    if (hasQuery && this.schema.query) {
+  private ensureSingleQuerySource() {
+    if (this.urlMatcher.hasQuery && this.queryMatcher.hasQuery) {
       throw new Error(
         `Query parameters should be defined either in the URL pattern or in the 'query' field.`,
       );

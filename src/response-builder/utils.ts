@@ -2,7 +2,7 @@
  * Mock response utils.
  */
 
-import set from 'lodash.set';
+import set from 'lodash/set';
 
 /**
  * Patches object by provided set of keyPath and value pairs.
