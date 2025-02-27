@@ -7,7 +7,7 @@ import {
   ReplaceResponseSchema,
   MockMatchResult,
 } from '../protocol';
-import { patchObject } from './utils';
+import { patchObject, wait } from './utils';
 
 export abstract class BaseResponseBuilder {
   constructor(protected matchResult: MockMatchResult) {}
@@ -31,6 +31,7 @@ export abstract class BaseResponseBuilder {
       patchObject(body, bodyPatch);
       const bodyStr = stringifyBody(body);
       const { status } = realResponse;
+      await this.delayIfNeeded();
       // don't pass original headers, as they have incorrect content-length
       return this.createResponse(bodyStr, { status });
     } catch {
@@ -39,14 +40,20 @@ export abstract class BaseResponseBuilder {
     }
   }
 
-  protected replaceResponse({ body, status, headers }: ReplaceResponseSchema) {
+  protected async replaceResponse({ body, status, headers }: ReplaceResponseSchema) {
     // substitute params
     const bodyStr = stringifyBody(body);
+    await this.delayIfNeeded();
     return this.createResponse(bodyStr, { status, headers });
   }
 
   protected createResponse(body?: string | null, init?: ResponseInit) {
     return new Response(body, init);
+  }
+
+  protected async delayIfNeeded() {
+    const { delay } = this.schema;
+    if (delay) await wait(delay);
   }
 }
 

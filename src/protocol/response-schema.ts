@@ -9,11 +9,13 @@ export type ReplaceResponseSchema = {
   status: number;
   headers?: Record<string, string>;
   body?: Record<string, unknown> | Array<unknown> | string | null;
+  delay?: number;
   debug?: boolean;
 };
 
 export type PatchResponseSchema = {
   bodyPatch: Record<string, string | number | boolean | null>;
+  delay?: number;
   debug?: boolean;
 };
 
@@ -23,10 +25,12 @@ export type MockResponseSchemaInit =
       status?: ReplaceResponseSchema['status'];
       headers?: ReplaceResponseSchema['headers'];
       body?: ReplaceResponseSchema['body'];
+      delay?: ReplaceResponseSchema['delay'];
       debug?: ReplaceResponseSchema['debug'];
     }
   | {
       bodyPatch: PatchResponseSchema['bodyPatch'];
+      delay?: PatchResponseSchema['delay'];
       debug?: PatchResponseSchema['debug'];
     };
 
