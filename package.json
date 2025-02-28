@@ -1,11 +1,11 @@
 {
-  "name": "mock-remote-request",
+  "name": "request-mocking-protocol",
   "description": "",
   "version": "0.0.1",
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git://github.com/vitalets/mock-remote-request.git"
+    "url": "git://github.com/vitalets/request-mocking-protocol.git"
   },
   "main": "./dist/index.js",
   "exports": {
@@ -41,7 +41,6 @@
     "@types/lodash": "^4.17.15",
     "@types/node": "^18.15.0",
     "eslint": "^9.19.0",
-    "eslint-plugin-playwright": "^2.2.0",
     "eslint-plugin-visual-complexity": "0.1.4",
     "globals": "^15.14.0",
     "knip": "^5.43.3",

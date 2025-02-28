@@ -1,4 +1,4 @@
-# mock-server-request
+# request-mocking-protocol
 
 A library for mocking HTTP requests made by server-side code.
 Used in E2E testing and React Server Components.
