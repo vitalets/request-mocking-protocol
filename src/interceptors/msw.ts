@@ -9,7 +9,7 @@ import { BaseResponseBuilder } from '../response-builder';
 export function createHandler(getInboundHeaders: GetHeaders) {
   return http.all('*', async ({ request }) => {
     const mockSchemas = await extractMockSchemas(getInboundHeaders);
-    const matchResult = matchSchemas(request, mockSchemas);
+    const matchResult = await matchSchemas(request, mockSchemas);
     if (matchResult) return new MswResponseBuilder(matchResult).build();
   });
 }

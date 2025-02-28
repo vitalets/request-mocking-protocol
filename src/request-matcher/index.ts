@@ -31,7 +31,7 @@ export class RequestMatcher {
   }
 
   // eslint-disable-next-line visual/complexity
-  match(req: Request) {
+  async match(req: Request) {
     const ctx = new MatchingContext(req);
     try {
       const matched =
@@ -39,7 +39,7 @@ export class RequestMatcher {
         this.urlMatcher.match(ctx) &&
         this.queryMatcher.match(ctx) &&
         this.headersMatcher.match(ctx) &&
-        this.bodyMatcher.match(ctx);
+        (await this.bodyMatcher.match(ctx));
 
       ctx.logDone(matched);
 

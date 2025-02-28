@@ -8,49 +8,54 @@ import { MatchingContext } from '../context';
 export class BodyMatcher {
   constructor(private schema: MockRequestSchema) {}
 
-  match(ctx: MatchingContext) {
-    const expectedBody = this.schema.body;
-
-    if (!expectedBody) return true;
-
-    if (typeof expectedBody === 'string') {
-      return this.matchAsString(ctx, expectedBody);
-    } else {
-      return this.matchAsObject(ctx, expectedBody);
-    }
+  private get expectedBody() {
+    return this.schema.body;
   }
 
-  private matchAsString(ctx: MatchingContext, expectedBody: string) {
-    const actualBody = ctx.req.body;
+  private get expectedBodyStr() {
+    return typeof this.expectedBody === 'string'
+      ? this.expectedBody
+      : JSON.stringify(this.expectedBody);
+  }
 
-    if (typeof actualBody !== 'string') {
-      ctx.log(false, `body`, expectedBody, `(${typeof actualBody})`);
+  async match(ctx: MatchingContext) {
+    if (!this.expectedBody) return true;
+
+    const actualBodyStream = this.schema.body;
+    if (!actualBodyStream) {
+      ctx.log(false, `body`, this.expectedBodyStr, `null`);
       return false;
     }
 
+    if (typeof this.expectedBody === 'string') {
+      return this.matchAsString(ctx, this.expectedBody);
+    } else {
+      return this.matchAsObject(ctx, this.expectedBody);
+    }
+  }
+
+  private async matchAsString(ctx: MatchingContext, expectedBody: string) {
+    const actualBody = await ctx.req.clone().text();
     const result = actualBody === expectedBody;
     ctx.log(result, `body`, expectedBody, trimLongString(actualBody));
 
     return result;
   }
 
-  private matchAsObject(ctx: MatchingContext, expectedBody: Record<string, unknown> | unknown[]) {
-    const actualBody = ctx.req.body;
-    const expectedBodyStr = JSON.stringify(expectedBody);
-
-    if (typeof actualBody !== 'string') {
-      ctx.log(false, `body`, expectedBodyStr, `(${typeof actualBody})`);
-      return false;
-    }
-
+  private async matchAsObject(
+    ctx: MatchingContext,
+    expectedBody: Record<string, unknown> | unknown[],
+  ) {
+    const actualBody = await ctx.req.clone().text();
     const actualBodyParsed = jsonParseSafe(actualBody);
+
     if (!actualBodyParsed) {
-      ctx.log(false, `body`, expectedBodyStr, trimLongString(actualBody));
+      ctx.log(false, `body`, this.expectedBodyStr, trimLongString(actualBody));
       return false;
     }
 
     const result = isMatch(actualBodyParsed, expectedBody);
-    ctx.log(result, `body`, expectedBodyStr, trimLongString(actualBody));
+    ctx.log(result, `body`, this.expectedBodyStr, trimLongString(actualBody));
 
     return result;
   }

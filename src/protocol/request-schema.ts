@@ -35,20 +35,26 @@ export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequest
   const initObj = toMockRequestSchemaObject(init);
   const { url, ...rest } = initObj;
 
-  if (url instanceof RegExp) {
-    rest.patternType = 'regexp';
-  }
+  if (url instanceof RegExp) rest.patternType = 'regexp';
 
   // always convert url to string to handle regexp
   const urlStr = url.toString();
+  const schema = Object.assign({}, defaults, { url: urlStr }, rest);
+  assertBodyAllowed(schema);
 
-  return Object.assign({}, defaults, { url: urlStr }, rest);
+  return schema;
 }
 
 export function toMockRequestSchemaObject(init: MockRequestSchemaInit) {
-  if (!init) throw new Error('Request schema cannot be empty');
+  if (!init) throw new Error('Request schema cannot be empty.');
 
   return typeof init === 'string' || init instanceof RegExp ? { url: init } : init;
+}
+
+function assertBodyAllowed(schema: MockRequestSchema) {
+  if (['GET', 'HEAD'].includes(schema.method) && schema.body) {
+    throw new Error(`Request with GET/HEAD method cannot have body.`);
+  }
 }
 
 type HttpMethod =
