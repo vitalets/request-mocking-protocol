@@ -11,8 +11,8 @@ export class MethodMatcher {
     const expectedMethod = this.schema.method;
     const actualMethod = ctx.req.method;
 
-    const result = expectedMethod === 'ALL' || expectedMethod === actualMethod;
-    ctx.log(result, `method`, expectedMethod, actualMethod);
+    const result = !expectedMethod || expectedMethod === actualMethod;
+    ctx.log(result, `method`, expectedMethod || '*', actualMethod);
 
     return result;
   }

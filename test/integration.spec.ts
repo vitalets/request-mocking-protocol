@@ -14,7 +14,7 @@ test('mock response', async () => {
   const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
-  await msr.addMock('https://jsonplaceholder.typicode.com/users/1', {
+  await msr.GET('https://jsonplaceholder.typicode.com/users/1', {
     body: { id: 1, name: 'John Smith' },
   });
 
@@ -26,7 +26,7 @@ test('patch response', async () => {
   const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
-  await msr.addMock('https://jsonplaceholder.typicode.com/users', {
+  await msr.GET('https://jsonplaceholder.typicode.com/users', {
     bodyPatch: {
       '[0].name': 'John Smith',
     },
@@ -41,7 +41,7 @@ test.skip('route params substitution (URL pattern)', async () => {
   const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
-  await msr.addMock('https://jsonplaceholder.typicode.com/users/:id', {
+  await msr.GET('https://jsonplaceholder.typicode.com/users/:id', {
     body: [{ id: '{{ id }}', name: 'User {{ id }}' }],
     debug: true,
   });
@@ -55,7 +55,7 @@ test.skip('route params substitution (regexp)', async () => {
   const msr = new MockRemoteRequest();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
-  await msr.addMock(/https:\/\/[\w.-]+\/users\/(?<id>[^/]+)/, {
+  await msr.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
     body: [{ id: '{{ id }}', name: 'User {{ id }}' }],
     debug: true,
   });

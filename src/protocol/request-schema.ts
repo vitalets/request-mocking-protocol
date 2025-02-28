@@ -5,8 +5,8 @@
 // serializable
 export type MockRequestSchema = {
   url: string;
-  method: HttpMethod | 'ALL';
   patternType: 'urlpattern' | 'regexp';
+  method?: HttpMethod;
   query?: Record<string, string | number | null>;
   headers?: Record<string, string | null>;
   body?: Record<string, unknown> | Array<unknown> | string;
@@ -18,16 +18,15 @@ export type MockRequestSchemaInit =
   | RegExp
   | {
       url: string | RegExp;
-      method?: MockRequestSchema['method'];
       patternType?: MockRequestSchema['patternType'];
+      method?: MockRequestSchema['method'];
       query?: MockRequestSchema['query'];
       headers?: MockRequestSchema['headers'];
       body?: MockRequestSchema['body'];
       debug?: MockRequestSchema['debug'];
     };
 
-const defaults: Pick<MockRequestSchema, 'method' | 'patternType'> = {
-  method: 'GET',
+const defaults: Pick<MockRequestSchema, 'patternType'> = {
   patternType: 'urlpattern',
 };
 
@@ -39,22 +38,14 @@ export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequest
 
   // always convert url to string to handle regexp
   const urlStr = url.toString();
-  const schema = Object.assign({}, defaults, { url: urlStr }, rest);
-  assertBodyAllowed(schema);
 
-  return schema;
+  return Object.assign({}, defaults, { url: urlStr }, rest);
 }
 
 export function toMockRequestSchemaObject(init: MockRequestSchemaInit) {
   if (!init) throw new Error('Request schema cannot be empty.');
 
   return typeof init === 'string' || init instanceof RegExp ? { url: init } : init;
-}
-
-function assertBodyAllowed(schema: MockRequestSchema) {
-  if (['GET', 'HEAD'].includes(schema.method) && schema.body) {
-    throw new Error(`Request with GET/HEAD method cannot have body.`);
-  }
 }
 
 type HttpMethod =
