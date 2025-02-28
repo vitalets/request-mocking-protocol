@@ -16,16 +16,22 @@ import { QueryMatcher } from './matchers/query';
 import { HeadersMatcher } from './matchers/headers';
 
 export class RequestMatcher {
-  private methodMatcher = new MethodMatcher(this.schema);
-  private urlMatcher = new UrlMatcher(this.schema);
-  private queryMatcher = new QueryMatcher(this.schema);
-  private headersMatcher = new HeadersMatcher(this.schema);
-  private bodyMatcher = new BodyMatcher(this.schema);
+  private methodMatcher: MethodMatcher;
+  private urlMatcher: UrlMatcher;
+  private queryMatcher: QueryMatcher;
+  private headersMatcher: HeadersMatcher;
+  private bodyMatcher: BodyMatcher;
 
   constructor(
     public schema: MockRequestSchema,
     private debug?: boolean,
   ) {
+    this.methodMatcher = new MethodMatcher(this.schema);
+    this.urlMatcher = new UrlMatcher(this.schema);
+    this.queryMatcher = new QueryMatcher(this.schema);
+    this.headersMatcher = new HeadersMatcher(this.schema);
+    this.bodyMatcher = new BodyMatcher(this.schema);
+
     if (schema.debug) this.debug = true;
     this.ensureSingleQuerySource();
   }
