@@ -4,16 +4,16 @@ import node from '@astrojs/node';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingHttpHeaders } from 'node:http';
 import { setupServer } from 'msw/node';
-import { createHandler } from 'mock-server-request/msw';
+import { createHandler } from 'request-mocking-protocol/msw';
 
 export default defineConfig({
   adapter: node({ mode: 'standalone' }),
-  integrations: [getMockServerRequest()],
+  integrations: [requestMocking()],
 });
 
-function getMockServerRequest(): AstroIntegration {
+function requestMocking(): AstroIntegration {
   return {
-    name: 'mockServerRequest',
+    name: 'requestMocking',
     hooks: {
       'astro:server:setup': async ({ server }) => {
         if (process.env.NODE_ENV !== 'production') {

@@ -9,7 +9,7 @@ Used in E2E testing and React Server Components.
 
 ## Installation
 ```
-npm i -D mock-server-request
+npm i -D request-mocking-protocol
 ```
 
 ## Usage
@@ -27,4 +27,4 @@ npm i -D mock-server-request
 ### Astro
 
 ## License
-[MIT](https://github.com/vitalets/mock-server-request/blob/main/LICENSE)
+[MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)

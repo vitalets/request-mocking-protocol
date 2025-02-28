@@ -1,14 +1,14 @@
 import { browser, $, expect } from '@wdio/globals';
-import { MockServerRequest } from 'mock-server-request';
+import { mockRemoteRequest } from 'request-mocking-protocol';
 
 describe('homepage', () => {
   it('should show users', async () => {
-    const mockServerRequest = new MockServerRequest();
-    mockServerRequest.addMock('https://jsonplaceholder.typicode.com/users', {
+    const mockRemoteRequest = new mockRemoteRequest();
+    mockRemoteRequest.addMock('https://jsonplaceholder.typicode.com/users', {
       body: JSON.stringify([{ id: 1, name: 'John Smith' }]),
     });
 
-    await browser.url('/', { headers: mockServerRequest.headers });
+    await browser.url('/', { headers: mockRemoteRequest.headers });
 
     await expect($('li')).toHaveText('John Smith');
   });

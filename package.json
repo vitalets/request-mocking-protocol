@@ -10,7 +10,7 @@
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./msw": "./dist/handlers/msw.js",
+    "./msw": "./dist/interceptors/msw.js",
     "./package.json": "./package.json"
   },
   "engines": {

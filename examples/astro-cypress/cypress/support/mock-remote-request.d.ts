@@ -1,11 +1,12 @@
+import type { MockRequestSchemaInit, MockResponseSchemaInit } from 'request-mocking-protocol';
+
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {
-      /**
-       * Custom command to mock server-side requests.
-       * @example cy.mockServerRequest('GET', 'https://example.com/api/users')
-       */
-      mockServerRequest(method: string, url: string): Chainable<any>;
+      mockRemoteRequest(
+        reqSchema: MockRequestSchemaInit,
+        resSchema: MockResponseSchemaInit,
+      ): Chainable<any>;
     }
 
     interface cy {
