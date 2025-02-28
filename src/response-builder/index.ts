@@ -8,6 +8,7 @@ import {
   MockMatchResult,
 } from '../protocol';
 import { patchObject, wait } from './utils';
+import { replacePlaceholders } from './placeholders';
 
 export abstract class BaseResponseBuilder {
   constructor(protected matchResult: MockMatchResult) {}
@@ -24,16 +25,21 @@ export abstract class BaseResponseBuilder {
       : this.replaceResponse(this.schema);
   }
 
+  // can be overwritten in child classes
+  protected createResponse(body?: string | null, init?: ResponseInit) {
+    return new Response(body, init);
+  }
+
   protected async patchResponse({ bodyPatch }: PatchResponseSchema) {
     const realResponse = await this.bypassReq(this.matchResult.req);
     try {
       const body = await realResponse.clone().json();
       patchObject(body, bodyPatch);
-      const bodyStr = stringifyBody(body);
+      const mockBody = this.buildResponseBody(body);
       const { status } = realResponse;
       await this.delayIfNeeded();
       // don't pass original headers, as they have incorrect content-length
-      return this.createResponse(bodyStr, { status });
+      return this.createResponse(mockBody, { status });
     } catch {
       // todo: log error
       return realResponse;
@@ -41,22 +47,30 @@ export abstract class BaseResponseBuilder {
   }
 
   protected async replaceResponse({ body, status, headers }: ReplaceResponseSchema) {
-    // substitute params
-    const bodyStr = stringifyBody(body);
+    const mockBody = this.buildResponseBody(body);
     await this.delayIfNeeded();
-    return this.createResponse(bodyStr, { status, headers });
+    return this.createResponse(mockBody, { status, headers });
   }
 
-  protected createResponse(body?: string | null, init?: ResponseInit) {
-    return new Response(body, init);
+  /**
+   * Builds stringified response body with inserted params.
+   */
+  protected buildResponseBody(body: ReplaceResponseSchema['body'] = null) {
+    if (body === null) return null;
+
+    if (typeof body === 'string') {
+      return String(replacePlaceholders(body, this.matchResult.params));
+    }
+
+    return JSON.stringify(body, (_, value) => {
+      return typeof value === 'string'
+        ? replacePlaceholders(value, this.matchResult.params)
+        : value;
+    });
   }
 
   protected async delayIfNeeded() {
     const { delay } = this.schema;
     if (delay) await wait(delay);
   }
-}
-
-function stringifyBody(body: ReplaceResponseSchema['body']) {
-  return body && typeof body === 'object' ? JSON.stringify(body) : body;
 }

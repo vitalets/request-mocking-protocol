@@ -1,40 +1,42 @@
 /**
- * A module to replace placeholders in the JSON object.
+ * A module to replace placeholders {{var}} in the string.
+ * Can be also used for objects within JSON.stringify replacer.
  * Supports type hints, see tests.
  */
 
 /* eslint-disable visual/complexity */
 
-import cloneDeepWith from 'lodash/cloneDeepWith';
+export function replacePlaceholders(value: string, variables: Record<string, string> = {}) {
+  if (Object.keys(variables).length === 0) return value;
 
-export function replacePlaceholders(obj: object, variables: Record<string, string>) {
-  return cloneDeepWith(obj, (value: unknown) => {
-    if (typeof value !== 'string') return;
+  // Find all placeholder matches
+  const matches = [...value.matchAll(/\{\{\s*(\w+)(?::\s*(number|boolean))?\s*\}\}/g)];
+  const firstMatch = matches[0];
 
-    // Find all placeholder matches
-    const matches = [...value.matchAll(/\{\{\s*(\w+)(?::(number|boolean))?\s*\}\}/g)];
-    const firstMatch = matches[0];
+  // No placeholders found
+  if (!firstMatch) return value;
 
-    // No placeholders found
-    if (!firstMatch) return;
+  // Example: { value: '{{id}}' }
+  const isOnlyPlaceholder = matches.length === 1 && value.trim() === firstMatch[0];
 
-    const isSinglePlaceholder = matches.length === 1 && value.trim() === firstMatch[0];
-
-    if (isSinglePlaceholder) {
-      // If the whole value is a single placeholder, apply type conversion
-      return replaceSinglePlaceholder(firstMatch, variables);
-    } else {
-      // Multiple placeholders -> always replace with string
-      return replaceMultiplePlaceholders(matches, value, variables);
-    }
-  });
+  // If the whole value is a single placeholder, apply type conversion
+  // Multiple placeholders -> always replace with string
+  return isOnlyPlaceholder
+    ? replaceSinglePlaceholder(firstMatch, value, variables)
+    : replaceMultiplePlaceholders(matches, value, variables);
 }
 
-function replaceSinglePlaceholder(match: RegExpExecArray, variables: Record<string, string>) {
+function replaceSinglePlaceholder(
+  match: RegExpExecArray,
+  value: string,
+  variables: Record<string, string | undefined>,
+) {
   const [, key, typeHint] = match;
 
-  if (!key || !Object.hasOwn(variables, key)) return;
+  if (!key) return value;
+
   const replacement = variables[key];
+  if (replacement === undefined) return value;
 
   if (typeHint === 'number') {
     const number = Number(replacement);
@@ -42,10 +44,11 @@ function replaceSinglePlaceholder(match: RegExpExecArray, variables: Record<stri
   }
 
   if (typeHint === 'boolean') {
-    return Boolean(replacement && replacement.toLowerCase() !== 'false');
+    if (replacement === '' || replacement.toLowerCase() === 'false') return false;
+    return true;
   }
 
-  return replacement;
+  return replacement ?? value;
 }
 
 function replaceMultiplePlaceholders(
@@ -54,9 +57,8 @@ function replaceMultiplePlaceholders(
   variables: Record<string, string>,
 ) {
   for (const [match, key] of matches) {
-    if (!key || !Object.hasOwn(variables, key)) continue;
-    const replacement = variables[key];
-    value = value.replaceAll(match, replacement ?? '');
+    if (!key || variables[key] === undefined) continue;
+    value = value.replaceAll(match, variables[key]);
   }
   return value;
 }

@@ -1,77 +1,55 @@
 import { it, expect } from 'vitest';
 import { replacePlaceholders } from '../src/response-builder/placeholders';
+import { describe } from 'node:test';
 
-it('replaces single placeholder with type hint (number)', () => {
-  expect(replacePlaceholders({ id: '{{id:number}}' }, { id: '123' })).toEqual({ id: 123 });
-});
+describe('only placeholder', () => {
+  it('string', () => {
+    expect(replacePlaceholders('{{id}}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholders('{{ id  }}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholders('{{id}}', { id: '' })).toEqual('');
+    expect(replacePlaceholders('{{id}}', {})).toEqual('{{id}}');
+  });
 
-it('replaces single placeholder with type hint (boolean, true)', () => {
-  expect(replacePlaceholders({ active: '{{isActive:boolean}}' }, { isActive: 'true' })).toEqual({
-    active: true,
+  it('number', () => {
+    expect(replacePlaceholders('{{id:number}}', { id: '123' })).toEqual(123);
+    expect(replacePlaceholders('{{ id: number  }}', { id: '123' })).toEqual(123);
+    expect(replacePlaceholders('{{id:number}}', { id: '0' })).toEqual(0);
+    expect(replacePlaceholders('{{id:number}}', { id: 'bar' })).toEqual('bar');
+    expect(replacePlaceholders('{{id:number}}', {})).toEqual('{{id:number}}');
+  });
+
+  it('boolean', () => {
+    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'true' })).toEqual(true);
+    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'false' })).toEqual(false);
+    expect(replacePlaceholders('{{foo:boolean}}', { foo: '' })).toEqual(false);
+    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'bar' })).toEqual(true);
+    expect(replacePlaceholders('{{foo:boolean}}', {})).toEqual('{{foo:boolean}}');
   });
 });
 
-it('replaces single placeholder with type hint (boolean, false)', () => {
-  expect(replacePlaceholders({ active: '{{isActive:boolean}}' }, { isActive: 'false' })).toEqual({
-    active: false,
+describe('not only placeholder', () => {
+  it('replace all types as strings', () => {
+    expect(replacePlaceholders('User {{id}}', { id: '123' })).toEqual('User 123');
+    expect(replacePlaceholders('User {{id:number}}', { id: '123' })).toEqual('User 123');
+    expect(replacePlaceholders('User {{foo:boolean}}', { foo: 'true' })).toEqual('User true');
   });
-});
 
-it('fallbacks to string when type hint conversion fails (number)', () => {
-  expect(replacePlaceholders({ id: '{{id:number}}' }, { id: 'notANumber' })).toEqual({
-    id: 'notANumber',
+  it('multiple placeholders', () => {
+    expect(
+      replacePlaceholders('User {{id}} {{ id }} {{id:number}} {{foo:boolean}}', {
+        id: '42',
+        foo: 'true',
+      }),
+    ).toEqual('User 42 42 42 true');
   });
-});
 
-it('fallbacks to true when type hint conversion fails (boolean)', () => {
-  expect(replacePlaceholders({ flag: '{{flag:boolean}}' }, { flag: 'maybe' })).toEqual({
-    flag: true,
+  it('missing variables', () => {
+    expect(replacePlaceholders('User {{id}}', {})).toEqual('User {{id}}');
+    // @ts-expect-error for non-ts cases
+    expect(replacePlaceholders('User {{id}}', { id: undefined })).toEqual('User {{id}}');
   });
-});
 
-it('replaces inline placeholders as strings', () => {
-  expect(replacePlaceholders({ title: 'User {{id:number}} {{id}}' }, { id: '42' })).toEqual({
-    title: 'User 42 42',
-  });
-});
-
-it('handles missing variables gracefully', () => {
-  expect(replacePlaceholders({ title: 'User {{id}}' }, {})).toEqual({ title: 'User {{id}}' });
-});
-
-it('supports nested objects', () => {
-  expect(
-    replacePlaceholders(
-      {
-        user: {
-          id: '{{id:number}}',
-          name: '{{username}}',
-          active: '{{isActive:boolean}}',
-        },
-      },
-      { id: '123', username: 'Alice', isActive: 'true' },
-    ),
-  ).toEqual({
-    user: {
-      id: 123,
-      name: 'Alice',
-      active: true,
-    },
-  });
-});
-
-it('supports arrays', () => {
-  expect(
-    replacePlaceholders(['{{id:number}}', 'Hello {{username}}'], { id: '100', username: 'Bob' }),
-  ).toEqual([100, 'Hello Bob']);
-});
-
-it('handles multiple replacements in an array', () => {
-  expect(replacePlaceholders(['User {{id:number}} {{id}}'], { id: '99' })).toEqual(['User 99 99']);
-});
-
-it('does not replace non-matching values', () => {
-  expect(replacePlaceholders({ key: 'static text' }, { id: '42' })).toEqual({
-    key: 'static text',
+  it('does not replace non-matching values', () => {
+    expect(replacePlaceholders('static text', { id: '42' })).toEqual('static text');
   });
 });
