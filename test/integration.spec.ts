@@ -1,6 +1,6 @@
 import { test, expect, beforeAll } from 'vitest';
 import { setupServer } from 'msw/node';
-import { MockRemoteRequest } from '../src';
+import { MockClient } from '../src';
 import { createHandler } from '../src/interceptors/msw';
 
 let inboundHeaders: Record<string, string> = {};
@@ -11,7 +11,7 @@ beforeAll(() => {
 });
 
 test('mock response', async () => {
-  const msr = new MockRemoteRequest();
+  const msr = new MockClient();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.GET('https://jsonplaceholder.typicode.com/users/1', {
@@ -23,7 +23,7 @@ test('mock response', async () => {
 });
 
 test('patch response', async () => {
-  const msr = new MockRemoteRequest();
+  const msr = new MockClient();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.GET('https://jsonplaceholder.typicode.com/users', {
@@ -37,7 +37,7 @@ test('patch response', async () => {
 });
 
 test('route params substitution (URL pattern)', async () => {
-  const msr = new MockRemoteRequest();
+  const msr = new MockClient();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.GET('https://jsonplaceholder.typicode.com/users/:id', {
@@ -49,7 +49,7 @@ test('route params substitution (URL pattern)', async () => {
 });
 
 test('route params substitution (regexp)', async () => {
-  const msr = new MockRemoteRequest();
+  const msr = new MockClient();
   msr.onChange = (headers) => (inboundHeaders = headers);
 
   await msr.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {

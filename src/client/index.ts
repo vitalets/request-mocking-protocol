@@ -1,5 +1,5 @@
 /**
- * MockRemoteRequest class.
+ * MockClient class.
  */
 import {
   MockRequestSchema,
@@ -13,19 +13,19 @@ import {
 import { buildMockHeaders } from '../transport';
 import { mergeOptions } from './utils';
 
-export type MockRemoteRequestOptions = {
+export type MockClientOptions = {
   debug?: boolean;
   defaultMethod?: MockRequestSchema['method'];
 };
 
 export type MockRequestSchemaNoMethod = Omit<MockRequestSchemaInit, 'method'>;
 
-export class MockRemoteRequest {
+export class MockClient {
   private mockSchemas = new Map<MockRequestSchemaInit, MockSchema>();
   public headers: Record<string, string> = {};
   public onChange?: (headers: Record<string, string>) => unknown;
 
-  constructor(protected options?: MockRemoteRequestOptions) {}
+  constructor(protected options?: MockClientOptions) {}
 
   async addMock(reqSchema: MockRequestSchemaInit, resSchema: MockResponseSchemaInit) {
     const mockSchema = {
