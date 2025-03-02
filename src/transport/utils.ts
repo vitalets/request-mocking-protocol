@@ -6,7 +6,7 @@ export type HeadersLike =
 /**
  * Convert object to Headers instance.
  */
-export function toHeaders(headersLike: HeadersLike): Headers {
+export function toHeaders(headersLike: HeadersLike = {}): Headers {
   if (headersLike instanceof Headers) return headersLike;
 
   const headers = new Headers();

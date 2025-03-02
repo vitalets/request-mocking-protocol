@@ -1,6 +1,5 @@
-import { it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { replacePlaceholders } from '../src/response-builder/placeholders';
-import { describe } from 'node:test';
 
 describe('only placeholder', () => {
   it('string', () => {

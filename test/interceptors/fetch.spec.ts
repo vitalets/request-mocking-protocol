@@ -14,11 +14,11 @@ beforeEach(() => {
 
 test('mock response', async () => {
   await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
-    body: { id: 1, name: 'John Smith' },
+    body: [{ id: 1, name: 'John Smith' }],
   });
 
   const res = await fetch('https://jsonplaceholder.typicode.com/users/1').then((r) => r.json());
-  expect(res).toEqual({ id: 1, name: 'John Smith' });
+  expect(res).toEqual([{ id: 1, name: 'John Smith' }]);
 });
 
 test('patch response', async () => {

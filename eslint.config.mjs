@@ -1,7 +1,6 @@
 import globals from 'globals';
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import playwright from 'eslint-plugin-playwright';
 import visualComplexity from 'eslint-plugin-visual-complexity';
 
 export default [
@@ -42,16 +41,12 @@ export default [
   },
   {
     files: ['test/**/*.{ts,js}'],
-    plugins: {
-      playwright,
-    },
     rules: {
       'max-params': 0,
       'max-statements': 0,
       'no-empty-pattern': 0,
       complexity: 0,
       '@typescript-eslint/no-empty-function': 0,
-      'playwright/no-focused-test': 'error',
     },
   },
 ];

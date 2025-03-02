@@ -27,6 +27,10 @@ export class MockClient {
 
   constructor(protected options?: MockClientOptions) {}
 
+  get schemas() {
+    return [...this.mockSchemas.values()];
+  }
+
   async addMock(reqSchema: MockRequestSchemaInit, resSchema: MockResponseSchemaInit) {
     const mockSchema = {
       reqSchema: this.buildRequestSchema(reqSchema),
@@ -76,8 +80,7 @@ export class MockClient {
   }
 
   private buildHeaders() {
-    const mockSchemas = [...this.mockSchemas.values()];
-    this.headers = buildMockHeaders(mockSchemas);
+    this.headers = buildMockHeaders(this.schemas);
   }
 
   private buildRequestSchema(init: MockRequestSchemaInit) {

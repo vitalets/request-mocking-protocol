@@ -4,22 +4,18 @@
 import { http, bypass, HttpResponse } from 'msw';
 import { extractMockSchemas, GetHeaders } from '../transport';
 import { matchSchemas } from '../request-matcher/utils';
-import { BaseResponseBuilder } from '../response-builder';
+import { buildMockResponse } from '../response-builder';
 
 export function createHandler(getInboundHeaders: GetHeaders) {
   return http.all('*', async ({ request }) => {
     const mockSchemas = await extractMockSchemas(getInboundHeaders);
     const matchResult = await matchSchemas(request, mockSchemas);
-    if (matchResult) return new MswResponseBuilder(matchResult).build();
+    if (!matchResult) return;
+
+    const { body, status, headers } = await buildMockResponse(matchResult, {
+      bypass: (req) => fetch(bypass(req)),
+    });
+
+    return new HttpResponse(body, { status, headers });
   });
-}
-
-class MswResponseBuilder extends BaseResponseBuilder {
-  protected bypassReq(req: Request) {
-    return fetch(bypass(req));
-  }
-
-  protected createResponse(body?: string | null, init?: ResponseInit) {
-    return new HttpResponse(body, init);
-  }
 }
