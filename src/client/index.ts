@@ -61,6 +61,11 @@ export class MockClient {
     return this.addMockWithMethod(undefined, reqSchema, resSchema);
   }
 
+  reset() {
+    this.mockSchemas.clear();
+    this.buildHeaders();
+  }
+
   private addMockWithMethod(
     method: MockRequestSchema['method'],
     reqSchema: MockRequestSchemaNoMethod,

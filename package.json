@@ -11,6 +11,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./msw": "./dist/interceptors/msw.js",
+    "./fetch": "./dist/interceptors/fetch.js",
     "./package.json": "./package.json"
   },
   "engines": {

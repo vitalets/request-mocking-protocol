@@ -1,5 +1,5 @@
 /**
- * MSW adapter for matching and resolving requests on the remote end (server).
+ * MSW interceptor.
  */
 import { http, bypass, HttpResponse } from 'msw';
 import { extractMockSchemas, GetHeaders } from '../transport';

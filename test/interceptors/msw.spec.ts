@@ -1,20 +1,21 @@
-import { test, expect, beforeAll } from 'vitest';
+import { test, expect, beforeAll, beforeEach } from 'vitest';
 import { setupServer } from 'msw/node';
-import { MockClient } from '../src';
-import { createHandler } from '../src/interceptors/msw';
+import { MockClient } from '../../src';
+import { createHandler } from '../../src/interceptors/msw';
 
-let inboundHeaders: Record<string, string> = {};
+const mockClient = new MockClient();
 
 beforeAll(() => {
-  const server = setupServer(createHandler(() => inboundHeaders));
+  const server = setupServer(createHandler(() => mockClient.headers));
   server.listen();
 });
 
-test('mock response', async () => {
-  const msr = new MockClient();
-  msr.onChange = (headers) => (inboundHeaders = headers);
+beforeEach(() => {
+  mockClient.reset();
+});
 
-  await msr.GET('https://jsonplaceholder.typicode.com/users/1', {
+test('mock response', async () => {
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
     body: { id: 1, name: 'John Smith' },
   });
 
@@ -23,10 +24,7 @@ test('mock response', async () => {
 });
 
 test('patch response', async () => {
-  const msr = new MockClient();
-  msr.onChange = (headers) => (inboundHeaders = headers);
-
-  await msr.GET('https://jsonplaceholder.typicode.com/users', {
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users', {
     bodyPatch: {
       '[0].name': 'John Smith',
     },
@@ -37,10 +35,7 @@ test('patch response', async () => {
 });
 
 test('route params substitution (URL pattern)', async () => {
-  const msr = new MockClient();
-  msr.onChange = (headers) => (inboundHeaders = headers);
-
-  await msr.GET('https://jsonplaceholder.typicode.com/users/:id', {
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
     body: { id: '{{ id:number }}', name: 'User {{ id }}' },
   });
 
@@ -49,10 +44,7 @@ test('route params substitution (URL pattern)', async () => {
 });
 
 test('route params substitution (regexp)', async () => {
-  const msr = new MockClient();
-  msr.onChange = (headers) => (inboundHeaders = headers);
-
-  await msr.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
+  await mockClient.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
     body: { id: '{{ id:number }}', name: 'User {{ id }}' },
   });
 
