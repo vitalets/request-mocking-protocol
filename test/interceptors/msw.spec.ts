@@ -51,14 +51,14 @@ test('patch request', async () => {
   expect((await res.json()).name).toEqual('Leanne Graham');
 });
 
-test('route params substitution (URL pattern)', async () => {
+test('params substitution (URL pattern)', async () => {
   await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+    headers: {
+      'x-custom-header': '{{ id }}',
+    },
     body: {
       id: '{{ id:number }}',
       name: 'User {{ id }}',
-    },
-    headers: {
-      'x-custom-header': '{{ id }}',
     },
   });
 
@@ -67,11 +67,25 @@ test('route params substitution (URL pattern)', async () => {
   expect(res.headers.get('x-custom-header')).toEqual('1');
 });
 
-test('route params substitution (regexp)', async () => {
+test('params substitution (regexp)', async () => {
   await mockClient.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
-    body: { id: '{{ id:number }}', name: 'User {{ id }}' },
+    body: {
+      id: '{{ id:number }}',
+      name: 'User {{ id }}',
+    },
   });
 
   const res = await fetch('https://jsonplaceholder.typicode.com/users/1').then((r) => r.json());
   expect(res).toEqual({ id: 1, name: 'User 1' });
+});
+
+test('params substitution (request)', async () => {
+  await mockClient.GET('https://example.com/:id', {
+    request: {
+      url: 'https://jsonplaceholder.typicode.com/users/{{id}}',
+    },
+  });
+
+  const res = await fetch('https://example.com/1');
+  expect((await res.json()).name).toEqual('Leanne Graham');
 });
