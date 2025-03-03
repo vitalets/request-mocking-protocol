@@ -6,6 +6,12 @@
 
 /* eslint-disable visual/complexity */
 
+export function stringifyWithPlaceholders(obj: object, variables: Record<string, string> = {}) {
+  return JSON.stringify(obj, (_, value) => {
+    return typeof value === 'string' ? replacePlaceholders(value, variables) : value;
+  });
+}
+
 export function replacePlaceholders(value: string, variables: Record<string, string> = {}) {
   if (Object.keys(variables).length === 0) return value;
 

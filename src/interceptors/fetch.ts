@@ -3,7 +3,7 @@
  */
 
 import { matchSchemas } from '../request-matcher/utils';
-import { buildMockResponse } from '../response-builder';
+import { ResponseBuilder } from '../response-builder';
 import { extractMockSchemas, GetHeaders } from '../transport';
 
 export function setupFetchInterceptor(getInboundHeaders: GetHeaders) {
@@ -14,9 +14,9 @@ export function setupFetchInterceptor(getInboundHeaders: GetHeaders) {
     const matchResult = await matchSchemas(request, mockSchemas);
     if (!matchResult) return originalFetch(input, init);
 
-    const { body, status, headers } = await buildMockResponse(matchResult, {
+    const { body, status, headers } = await new ResponseBuilder(matchResult, {
       bypass: (req) => originalFetch(req),
-    });
+    }).build();
 
     return new Response(body, { status, headers });
   };

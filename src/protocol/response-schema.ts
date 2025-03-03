@@ -3,48 +3,31 @@
  */
 
 // serializable
-export type MockResponseSchema = ReplaceResponseSchema | PatchResponseSchema;
-
-export type ReplaceResponseSchema = {
-  status: number;
+export type MockResponseSchema = {
+  status?: number; // default is 200
   headers?: Record<string, string>;
   body?: Record<string, unknown> | Array<unknown> | string | null;
+  bodyPatch?: Record<string, string | number | boolean | null>;
+  request?: {
+    url?: string;
+    query?: Record<string, string | number | null>;
+    headers?: Record<string, string | null>;
+    body?: Record<string, unknown> | Array<unknown> | string | null;
+    bodyPatch?: Record<string, string | number | boolean | null>;
+  };
   delay?: number;
   debug?: boolean;
 };
 
-export type PatchResponseSchema = {
-  bodyPatch: Record<string, string | number | boolean | null>;
-  delay?: number;
-  debug?: boolean;
-};
-
-export type MockResponseSchemaInit =
-  | number
-  | {
-      status?: ReplaceResponseSchema['status'];
-      headers?: ReplaceResponseSchema['headers'];
-      body?: ReplaceResponseSchema['body'];
-      delay?: ReplaceResponseSchema['delay'];
-      debug?: ReplaceResponseSchema['debug'];
-    }
-  | {
-      bodyPatch: PatchResponseSchema['bodyPatch'];
-      delay?: PatchResponseSchema['delay'];
-      debug?: PatchResponseSchema['debug'];
-    };
-
-const defaults: Pick<ReplaceResponseSchema, 'status'> = {
-  status: 200,
-};
+export type MockRequestOverrides = NonNullable<MockResponseSchema['request']>;
+export type MockResponseSchemaInit = number | MockResponseSchema;
 
 export function buildMockResponseSchema(init: MockResponseSchemaInit): MockResponseSchema {
   const initObj = toMockResponseSchemaObject(init);
-  return Object.assign({}, defaults, initObj);
-}
 
-export function isPatchResponse(schema: MockResponseSchema): schema is PatchResponseSchema {
-  return Boolean('bodyPatch' in schema && schema.bodyPatch);
+  // check both body and bodyPatch: throw error
+
+  return Object.assign({}, initObj);
 }
 
 export function toMockResponseSchemaObject(init: MockResponseSchemaInit) {

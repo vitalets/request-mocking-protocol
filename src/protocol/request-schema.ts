@@ -5,7 +5,7 @@
 // serializable
 export type MockRequestSchema = {
   url: string;
-  patternType: 'urlpattern' | 'regexp';
+  patternType?: 'urlpattern' | 'regexp'; // default is 'urlpattern'
   method?: HttpMethod;
   query?: Record<string, string | number | null>;
   headers?: Record<string, string | null>;
@@ -26,10 +26,6 @@ export type MockRequestSchemaInit =
       debug?: MockRequestSchema['debug'];
     };
 
-const defaults: Pick<MockRequestSchema, 'patternType'> = {
-  patternType: 'urlpattern',
-};
-
 export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequestSchema {
   const initObj = toMockRequestSchemaObject(init);
   const { url, ...rest } = initObj;
@@ -39,7 +35,7 @@ export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequest
   // always convert url to string to handle regexp
   const urlStr = url.toString();
 
-  return Object.assign({}, defaults, { url: urlStr }, rest);
+  return Object.assign({ url: urlStr }, rest);
 }
 
 export function toMockRequestSchemaObject(init: MockRequestSchemaInit) {

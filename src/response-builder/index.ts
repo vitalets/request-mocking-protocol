@@ -1,151 +1,138 @@
 /**
- * Base abstract class to mock response
+ * Response builder class.
  */
-import {
-  isPatchResponse,
-  PatchResponseSchema,
-  ReplaceResponseSchema,
-  MockMatchResult,
-} from '../protocol';
+import { MockMatchResult } from '../protocol';
 import { patchObject, wait } from './utils';
-import { replacePlaceholders } from './placeholders';
+import { replacePlaceholders, stringifyWithPlaceholders } from './placeholders';
 import { toHeaders } from '../transport/utils';
+import { RequestPatcher } from '../request-patcher';
 
 // Universal shape for response object.
 export type ResponseLike = {
   status: number;
   headers: Headers;
+  arrayBuffer: () => Promise<ArrayBuffer>;
   json: () => Promise<Record<string, unknown>>;
 };
 
-export type ResponseCallbacks = {
+export type ResponseBuilderCallbacks = {
   bypass: (req: Request) => Promise<ResponseLike>;
 };
 
-export async function buildMockResponse(
-  { mockSchema, req, params }: MockMatchResult,
-  callbacks: ResponseCallbacks,
-) {
-  const { resSchema } = mockSchema;
+export type ResponseBuilderResult = {
+  status: number;
+  headers: Headers;
+  body: string | ArrayBuffer | null;
+};
 
-  const { body, status, headers } = isPatchResponse(resSchema)
-    ? await patchRealResponse(resSchema, req, callbacks)
-    : resSchema;
+export class ResponseBuilder {
+  private status = 200;
+  private headers = new Headers();
+  private body: string | ArrayBuffer | null = null;
 
-  const newHeaders = toHeaders(headers);
-  const newBody = buildResponseBody(body, params, newHeaders);
+  constructor(
+    private matchResult: MockMatchResult,
+    private callbacks: ResponseBuilderCallbacks,
+  ) {}
 
-  if (resSchema.delay) await wait(resSchema.delay);
-
-  return { body: newBody, status, headers: newHeaders };
-}
-
-async function patchRealResponse(
-  resSchema: PatchResponseSchema,
-  req: Request,
-  callbacks: ResponseCallbacks,
-) {
-  const res = await callbacks.bypass(req);
-  // todo: match status? If response status is not 200, should we patch it?
-  // todo: handle parse error
-  const body = await res.json();
-  patchObject(body, resSchema.bodyPatch);
-
-  const { status, headers } = res;
-  const newHeaders = new Headers(headers);
-  newHeaders.delete('content-length');
-
-  return { body, status, headers: newHeaders };
-}
-
-function buildResponseBody(
-  body: ReplaceResponseSchema['body'],
-  params: Record<string, string>,
-  headers: Headers,
-) {
-  if (typeof body === 'string') {
-    return String(replacePlaceholders(body, params));
+  private get resSchema() {
+    return this.matchResult.mockSchema.resSchema;
   }
 
-  if (!body) return null;
-
-  if (!headers.has('content-type')) {
-    headers.set('content-type', 'application/json');
+  private get params() {
+    return this.matchResult.params;
   }
 
-  return JSON.stringify(body, (_, value) => {
-    return typeof value === 'string' ? replacePlaceholders(value, params) : value;
-  });
+  private get req() {
+    return this.matchResult.req;
+  }
+
+  async build(): Promise<ResponseBuilderResult> {
+    if (this.needsRealRequest()) {
+      const res = await this.sendRealRequest();
+      await this.setPatchedResponse(res);
+    } else {
+      this.setStaticResponse();
+    }
+
+    await this.wait();
+
+    return {
+      status: this.status,
+      headers: this.headers,
+      body: this.body,
+    };
+  }
+
+  private needsRealRequest() {
+    return this.resSchema.request || this.resSchema.bodyPatch;
+  }
+
+  private async sendRealRequest() {
+    const { request: requestOverrides } = this.resSchema;
+    const req = requestOverrides
+      ? await new RequestPatcher(this.req, requestOverrides, this.params).patch()
+      : this.req;
+
+    return this.callbacks.bypass(req);
+  }
+
+  private async setPatchedResponse(res: ResponseLike) {
+    this.status = res.status;
+    this.headers = new Headers(res.headers);
+
+    const { bodyPatch, headers } = this.resSchema;
+
+    // todo: move to separate method
+    if (headers) {
+      Object.entries(headers).forEach(([key, value]) => {
+        if (value) {
+          this.headers.set(key, value);
+        } else {
+          this.headers.delete(key);
+        }
+      });
+    }
+
+    if (bodyPatch) {
+      // todo: match status? If response status is not 200, should we patch it?
+      // todo: handle parse error
+      const actualBody = await res.json();
+      const bodyPatchFinal = JSON.parse(stringifyWithPlaceholders(bodyPatch, this.params));
+      patchObject(actualBody, bodyPatchFinal);
+      this.body = JSON.stringify(actualBody);
+      // todo: set correct content length
+      this.headers.delete('content-length');
+    } else {
+      this.body = await res.arrayBuffer();
+    }
+  }
+
+  private setStaticResponse() {
+    const { status, headers } = this.resSchema;
+    if (status) this.status = status;
+    if (headers) this.headers = toHeaders(headers);
+    this.setStaticResponseBody();
+  }
+
+  private setStaticResponseBody() {
+    const { body } = this.resSchema;
+    if (!body) return;
+
+    if (typeof body === 'string') {
+      this.body = String(replacePlaceholders(body, this.params));
+      return;
+    }
+
+    if (!this.headers.has('content-type')) {
+      this.headers.set('content-type', 'application/json');
+    }
+
+    this.body = stringifyWithPlaceholders(body, this.params);
+  }
+
+  private async wait() {
+    const { delay } = this.resSchema;
+    if (delay) await wait(delay);
+  }
 }
-
-// export class BaseResponseBuilder<T extends ResponseLike> {
-//   constructor(
-//     protected options: ResponseBuilderOptions<T>,
-//     protected matchResult: MockMatchResult,
-//   ) {}
-
-//   protected abstract bypassReq(req: Request): Promise<Response>;
-
-//   protected get schema() {
-//     return this.matchResult.mockSchema.resSchema;
-//   }
-
-//   async build() {
-//     return isPatchResponse(this.schema)
-//       ? this.patchResponse(this.schema)
-//       : this.replaceResponse(this.schema);
-//   }
-
-//   // can be overwritten in child classes
-//   // protected createResponse(body?: string | null, init?: ResponseInit) {
-//   //   return new Response(body, init);
-//   // }
-
-//   protected async patchResponse({ bodyPatch }: PatchResponseSchema) {
-//     const realResponse = await this.bypassReq(this.matchResult.req);
-//     let body: Record<string, unknown>;
-//     try {
-//       body = await realResponse.clone().json();
-//     } catch {
-//       // todo: log error
-//       return realResponse;
-//     }
-//     patchObject(body, bodyPatch);
-//     const { status, headers } = realResponse;
-//     headers.delete('content-length');
-
-//     return this.replaceResponse({ body, status, headers });
-//     // const mockBody = this.buildResponseBody(body);
-//     // await this.delayIfNeeded();
-//     // return this.createResponse(mockBody, { status, headers });
-//   }
-
-//   protected async replaceResponse({ body, status, headers }: ReplaceResponseSchema) {
-//     const mockBody = this.buildResponseBody(body);
-//     await this.delayIfNeeded();
-//     return this.createResponse(mockBody, { status, headers });
-//   }
-
-//   /**
-//    * Builds stringified response body with inserted params.
-//    */
-//   protected buildResponseBody(body: ReplaceResponseSchema['body'] = null) {
-//     if (body === null) return null;
-
-//     if (typeof body === 'string') {
-//       return String(replacePlaceholders(body, this.matchResult.params));
-//     }
-
-//     // todo: set content type for json
-//     return JSON.stringify(body, (_, value) => {
-//       return typeof value === 'string'
-//         ? replacePlaceholders(value, this.matchResult.params)
-//         : value;
-//     });
-//   }
-
-//   protected async delayIfNeeded() {
-//     const { delay } = this.schema;
-//     if (delay) await wait(delay);
-//   }
-// }

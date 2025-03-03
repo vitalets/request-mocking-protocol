@@ -13,25 +13,25 @@ beforeEach(() => {
 });
 
 test('mock response', async () => {
-  await mockClient.GET('https://jsonplaceholder.typicode.com/users', {
-    body: [{ id: 1, name: 'John Smith' }],
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
+    body: { id: 1, name: 'John Smith' },
   });
 
-  const res = await fetch('https://jsonplaceholder.typicode.com/users');
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
 
-  expect(await res.json()).toEqual([{ id: 1, name: 'John Smith' }]);
+  expect(await res.json()).toEqual({ id: 1, name: 'John Smith' });
   expect(res.headers.get('content-type')).toContain('application/json');
 });
 
 test('patch response', async () => {
-  await mockClient.GET('https://jsonplaceholder.typicode.com/users', {
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
     bodyPatch: {
-      '[0].name': 'John Smith',
+      'address.city': 'New York',
     },
   });
 
-  const res = await fetch('https://jsonplaceholder.typicode.com/users');
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
 
-  expect((await res.json())[0].name).toEqual('John Smith');
+  expect((await res.json()).address.city).toEqual('New York');
   expect(res.headers.get('content-type')).toContain('application/json');
 });
