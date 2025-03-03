@@ -4,7 +4,6 @@
 import { MockMatchResult } from '../protocol';
 import { patchObject, wait } from './utils';
 import { replacePlaceholders, stringifyWithPlaceholders } from './placeholders';
-import { toHeaders } from '../transport/utils';
 import { RequestPatcher } from '../request-patcher';
 
 // Universal shape for response object.
@@ -49,8 +48,7 @@ export class ResponseBuilder {
 
   async build(): Promise<ResponseBuilderResult> {
     if (this.needsRealRequest()) {
-      const res = await this.sendRealRequest();
-      await this.setPatchedResponse(res);
+      await this.setPatchedResponse();
     } else {
       this.setStaticResponse();
     }
@@ -68,6 +66,19 @@ export class ResponseBuilder {
     return this.resSchema.request || this.resSchema.bodyPatch;
   }
 
+  private async setPatchedResponse() {
+    const res = await this.sendRealRequest();
+    this.status = res.status;
+    this.setHeaders(res.headers);
+    await this.setPatchedBody(res);
+  }
+
+  private setStaticResponse() {
+    if (this.resSchema.status) this.status = this.resSchema.status;
+    this.setHeaders();
+    this.setStaticBody();
+  }
+
   private async sendRealRequest() {
     const { request: requestOverrides } = this.resSchema;
     const req = requestOverrides
@@ -77,23 +88,23 @@ export class ResponseBuilder {
     return this.callbacks.bypass(req);
   }
 
-  private async setPatchedResponse(res: ResponseLike) {
-    this.status = res.status;
-    this.headers = new Headers(res.headers);
+  private setHeaders(origHeaders?: Headers) {
+    this.headers = new Headers(origHeaders);
+    const { headers } = this.resSchema;
+    if (!headers) return;
 
-    const { bodyPatch, headers } = this.resSchema;
+    Object.entries(headers).forEach(([key, value]) => {
+      if (value) {
+        value = String(replacePlaceholders(value, this.params));
+        this.headers.set(key, value);
+      } else {
+        this.headers.delete(key);
+      }
+    });
+  }
 
-    // todo: move to separate method
-    if (headers) {
-      Object.entries(headers).forEach(([key, value]) => {
-        if (value) {
-          this.headers.set(key, value);
-        } else {
-          this.headers.delete(key);
-        }
-      });
-    }
-
+  private async setPatchedBody(res: ResponseLike) {
+    const { bodyPatch } = this.resSchema;
     if (bodyPatch) {
       // todo: match status? If response status is not 200, should we patch it?
       // todo: handle parse error
@@ -108,14 +119,7 @@ export class ResponseBuilder {
     }
   }
 
-  private setStaticResponse() {
-    const { status, headers } = this.resSchema;
-    if (status) this.status = status;
-    if (headers) this.headers = toHeaders(headers);
-    this.setStaticResponseBody();
-  }
-
-  private setStaticResponseBody() {
+  private setStaticBody() {
     const { body } = this.resSchema;
     if (!body) return;
 

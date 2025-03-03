@@ -53,11 +53,18 @@ test('patch request', async () => {
 
 test('route params substitution (URL pattern)', async () => {
   await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
-    body: { id: '{{ id:number }}', name: 'User {{ id }}' },
+    body: {
+      id: '{{ id:number }}',
+      name: 'User {{ id }}',
+    },
+    headers: {
+      'x-custom-header': '{{ id }}',
+    },
   });
 
-  const res = await fetch('https://jsonplaceholder.typicode.com/users/1').then((r) => r.json());
-  expect(res).toEqual({ id: 1, name: 'User 1' });
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+  expect(await res.json()).toEqual({ id: 1, name: 'User 1' });
+  expect(res.headers.get('x-custom-header')).toEqual('1');
 });
 
 test('route params substitution (regexp)', async () => {
