@@ -53,11 +53,8 @@ export class RequestPatcher {
   }
 
   private patchHeaders() {
-    const { headers } = this.overrides;
-    if (!headers) return;
-
-    Object.keys(headers).forEach((key) => {
-      const value = headers[key];
+    this.headers.set('content-encoding', 'identity');
+    Object.entries(this.overrides.headers || {}).forEach(([key, value]) => {
       if (value) {
         this.headers.set(key, String(value));
       } else {
@@ -70,22 +67,30 @@ export class RequestPatcher {
     const { body, bodyPatch } = this.overrides;
 
     if (body) {
-      this.body =
-        typeof body === 'string'
-          ? String(replacePlaceholders(body, this.params))
-          : stringifyWithPlaceholders(body, this.params);
-      this.headers.delete('content-length');
-      return;
-    }
-
-    if (bodyPatch) {
+      if (typeof body === 'string') {
+        const newBody = String(replacePlaceholders(body, this.params));
+        this.setBodyAsString(newBody, 'text/plain');
+      } else {
+        const newBody = stringifyWithPlaceholders(body, this.params);
+        this.setBodyAsString(newBody, 'application/json');
+      }
+    } else if (bodyPatch) {
       const actualBody = await this.req.json();
       const bodyPatchFinal = JSON.parse(stringifyWithPlaceholders(bodyPatch, this.params));
       patchObject(actualBody, bodyPatchFinal);
-      this.body = JSON.stringify(actualBody);
-      // todo: set correct content length
-      this.headers.delete('content-length');
+      this.setBodyAsString(JSON.stringify(actualBody), 'application/json');
     }
+  }
+
+  private setBodyAsString(body: string, contentType: string) {
+    this.body = body;
+
+    if (!this.headers.has('content-type')) {
+      this.headers.set('content-type', contentType);
+    }
+
+    const contentLength = body ? new Blob([body]).size.toString() : '0';
+    this.headers.set('content-length', contentLength);
   }
 
   private buildRequest() {

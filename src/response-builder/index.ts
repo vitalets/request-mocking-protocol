@@ -89,11 +89,12 @@ export class ResponseBuilder {
   }
 
   private setHeaders(origHeaders?: Headers) {
-    this.headers = new Headers(origHeaders);
-    const { headers } = this.resSchema;
-    if (!headers) return;
+    // Important to use Object.fromEntries(), otherwise headers become empty inside msw.
+    // See: https://github.com/mswjs/msw/blob/main/src/core/utils/HttpResponse/decorators.ts#L20
+    this.headers = new Headers(Object.fromEntries(origHeaders?.entries() || []));
+    this.headers.set('content-encoding', 'identity');
 
-    Object.entries(headers).forEach(([key, value]) => {
+    Object.entries(this.resSchema.headers || {}).forEach(([key, value]) => {
       if (value) {
         value = String(replacePlaceholders(value, this.params));
         this.headers.set(key, value);
@@ -111,9 +112,7 @@ export class ResponseBuilder {
       const actualBody = await res.json();
       const bodyPatchFinal = JSON.parse(stringifyWithPlaceholders(bodyPatch, this.params));
       patchObject(actualBody, bodyPatchFinal);
-      this.body = JSON.stringify(actualBody);
-      // todo: set correct content length
-      this.headers.delete('content-length');
+      this.setBodyAsString(JSON.stringify(actualBody), 'application/json');
     } else {
       this.body = await res.arrayBuffer();
     }
@@ -122,17 +121,24 @@ export class ResponseBuilder {
   private setStaticBody() {
     const { body } = this.resSchema;
     if (!body) return;
-
     if (typeof body === 'string') {
-      this.body = String(replacePlaceholders(body, this.params));
-      return;
+      const newBody = String(replacePlaceholders(body, this.params));
+      this.setBodyAsString(newBody, 'text/plain');
+    } else {
+      const newBody = stringifyWithPlaceholders(body, this.params);
+      this.setBodyAsString(newBody, 'application/json');
     }
+  }
+
+  private setBodyAsString(body: string, contentType: string) {
+    this.body = body;
 
     if (!this.headers.has('content-type')) {
-      this.headers.set('content-type', 'application/json');
+      this.headers.set('content-type', contentType);
     }
 
-    this.body = stringifyWithPlaceholders(body, this.params);
+    const contentLength = body ? new Blob([body]).size.toString() : '0';
+    this.headers.set('content-length', contentLength);
   }
 
   private async wait() {

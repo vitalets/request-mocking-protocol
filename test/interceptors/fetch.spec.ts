@@ -33,5 +33,21 @@ test('patch response', async () => {
   const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
 
   expect((await res.json()).address.city).toEqual('New York');
-  expect(res.headers.get('content-type')).toContain('application/json');
+  expect(res.headers.get('content-type') || '').toContain('application/json');
+});
+
+test('params substitution (URL pattern)', async () => {
+  await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+    headers: {
+      'x-custom-header': '{{ id }}',
+    },
+    body: {
+      id: '{{ id:number }}',
+      name: 'User {{ id }}',
+    },
+  });
+
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+  expect(await res.json()).toEqual({ id: 1, name: 'User 1' });
+  expect(res.headers.get('x-custom-header')).toEqual('1');
 });
