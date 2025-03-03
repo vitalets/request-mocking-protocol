@@ -24,12 +24,20 @@ export type MockResponseSchemaInit = number | MockResponseSchema;
 
 export function buildMockResponseSchema(init: MockResponseSchemaInit): MockResponseSchema {
   const initObj = toMockResponseSchemaObject(init);
-
-  // check both body and bodyPatch: throw error
+  assertSchema(initObj);
 
   return Object.assign({}, initObj);
 }
 
 export function toMockResponseSchemaObject(init: MockResponseSchemaInit) {
   return typeof init === 'number' ? { status: init } : init;
+}
+
+function assertSchema(schema: MockResponseSchema) {
+  const isStaticResponse = schema.status || schema.body;
+  const isPatchedResponse = schema.request || schema.bodyPatch;
+
+  if (isStaticResponse && isPatchedResponse) {
+    throw new Error('Ambiguous schema: is it static mock or patched response?');
+  }
 }
