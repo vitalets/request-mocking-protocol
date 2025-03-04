@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, afterAll } from 'vitest';
 import { Browser, BrowserContext, chromium, Page } from 'playwright';
-import { MockClient } from '../../src';
-import { setupPlaywrightInterceptor } from '../../src/interceptors/playwright';
+import { MockClient } from '../src';
+import { setupPlaywrightInterceptor } from '../src/interceptors/playwright';
 import { createTestCases, MakeRequestResult, SimpleRequestInit } from './test-cases';
 
 const mockClient = new MockClient();

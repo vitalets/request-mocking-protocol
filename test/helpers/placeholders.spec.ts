@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { replacePlaceholders } from '../src/response-builder/placeholders';
+import { replacePlaceholders } from '../../src/response-builder/placeholders';
 
 function replacePlaceholdersWithTypes(str: string, params: Record<string, string>) {
   return replacePlaceholders(str, params, { useTypes: true });

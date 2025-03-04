@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { RequestMatcher } from '../src/request-matcher';
-import { buildMockRequestSchema, MockRequestSchemaInit } from '../src/protocol';
+import { RequestMatcher } from '../../src/request-matcher';
+import { buildMockRequestSchema, MockRequestSchemaInit } from '../../src/protocol';
 
 let req: Request;
 

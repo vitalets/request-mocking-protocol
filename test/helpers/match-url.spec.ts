@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { RequestMatcher } from '../src/request-matcher';
-import { buildMockRequestSchema } from '../src/protocol';
+import { RequestMatcher } from '../../src/request-matcher';
+import { buildMockRequestSchema } from '../../src/protocol';
 
 test('no hostname slash', async () => {
   const matcher = createMatcher('https://example.com');

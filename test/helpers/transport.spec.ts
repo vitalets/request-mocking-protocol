@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { buildMockHeaders, extractMockSchemas } from '../src/transport';
-import { MockSchema } from '../src/protocol';
+import { buildMockHeaders, extractMockSchemas } from '../../src/transport';
+import { MockSchema } from '../../src/protocol';
 
 test('buildMockHeaders', () => {
   const headers = buildMockHeaders([

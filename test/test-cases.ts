@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { MockClient } from '../../src';
+import { MockClient } from '../src';
 
 export type SimpleRequestInit = {
   method?: string;
