@@ -1,36 +1,48 @@
 import { describe, it, expect } from 'vitest';
 import { replacePlaceholders } from '../src/response-builder/placeholders';
 
-describe('only placeholder', () => {
+function replacePlaceholdersWithTypes(str: string, params: Record<string, string>) {
+  return replacePlaceholders(str, params, { useTypes: true });
+}
+
+describe('replacePlaceholdersWithTypes', () => {
   it('string', () => {
-    expect(replacePlaceholders('{{id}}', { id: '123' })).toEqual('123');
-    expect(replacePlaceholders('{{ id  }}', { id: '123' })).toEqual('123');
-    expect(replacePlaceholders('{{id}}', { id: '' })).toEqual('');
-    expect(replacePlaceholders('{{id}}', {})).toEqual('{{id}}');
+    expect(replacePlaceholdersWithTypes('{{id}}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholdersWithTypes('{{ id  }}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholdersWithTypes('{{id}}', { id: '' })).toEqual('');
+    expect(replacePlaceholdersWithTypes('{{id}}', {})).toEqual('{{id}}');
   });
 
   it('number', () => {
-    expect(replacePlaceholders('{{id:number}}', { id: '123' })).toEqual(123);
-    expect(replacePlaceholders('{{ id: number  }}', { id: '123' })).toEqual(123);
-    expect(replacePlaceholders('{{id:number}}', { id: '0' })).toEqual(0);
-    expect(replacePlaceholders('{{id:number}}', { id: 'bar' })).toEqual('bar');
-    expect(replacePlaceholders('{{id:number}}', {})).toEqual('{{id:number}}');
+    expect(replacePlaceholdersWithTypes('{{id:number}}', { id: '123' })).toEqual(123);
+    expect(replacePlaceholdersWithTypes('{{ id: number  }}', { id: '123' })).toEqual(123);
+    expect(replacePlaceholdersWithTypes('{{id:number}}', { id: '0' })).toEqual(0);
+    expect(replacePlaceholdersWithTypes('{{id:number}}', { id: 'bar' })).toEqual('bar');
+    expect(replacePlaceholdersWithTypes('{{id:number}}', {})).toEqual('{{id:number}}');
   });
 
   it('boolean', () => {
-    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'true' })).toEqual(true);
-    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'false' })).toEqual(false);
-    expect(replacePlaceholders('{{foo:boolean}}', { foo: '' })).toEqual(false);
-    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'bar' })).toEqual(true);
-    expect(replacePlaceholders('{{foo:boolean}}', {})).toEqual('{{foo:boolean}}');
+    expect(replacePlaceholdersWithTypes('{{foo:boolean}}', { foo: 'true' })).toEqual(true);
+    expect(replacePlaceholdersWithTypes('{{foo:boolean}}', { foo: 'false' })).toEqual(false);
+    expect(replacePlaceholdersWithTypes('{{foo:boolean}}', { foo: '' })).toEqual(false);
+    expect(replacePlaceholdersWithTypes('{{foo:boolean}}', { foo: 'bar' })).toEqual(true);
+    expect(replacePlaceholdersWithTypes('{{foo:boolean}}', {})).toEqual('{{foo:boolean}}');
+  });
+
+  it('not only placeholder', () => {
+    expect(replacePlaceholdersWithTypes('User {{id}}', { id: '123' })).toEqual('User 123');
+    expect(replacePlaceholdersWithTypes('User {{id:number}}', { id: '123' })).toEqual('User 123');
+    expect(replacePlaceholdersWithTypes('User {{foo:boolean}}', { foo: 'true' })).toEqual(
+      'User true',
+    );
   });
 });
 
-describe('not only placeholder', () => {
-  it('replace all types as strings', () => {
-    expect(replacePlaceholders('User {{id}}', { id: '123' })).toEqual('User 123');
-    expect(replacePlaceholders('User {{id:number}}', { id: '123' })).toEqual('User 123');
-    expect(replacePlaceholders('User {{foo:boolean}}', { foo: 'true' })).toEqual('User true');
+describe('replacePlaceholders', () => {
+  it('always string', () => {
+    expect(replacePlaceholders('{{id}}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholders('{{id:number}}', { id: '123' })).toEqual('123');
+    expect(replacePlaceholders('{{foo:boolean}}', { foo: 'true' })).toEqual('true');
   });
 
   it('multiple placeholders', () => {

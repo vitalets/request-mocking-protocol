@@ -96,7 +96,7 @@ export class ResponseBuilder {
 
     Object.entries(this.resSchema.headers || {}).forEach(([key, value]) => {
       if (value) {
-        value = String(replacePlaceholders(value, this.params));
+        value = replacePlaceholders(value, this.params);
         this.headers.set(key, value);
       } else {
         this.headers.delete(key);
@@ -122,7 +122,7 @@ export class ResponseBuilder {
     const { body } = this.resSchema;
     if (!body) return;
     if (typeof body === 'string') {
-      const newBody = String(replacePlaceholders(body, this.params));
+      const newBody = replacePlaceholders(body, this.params);
       this.setBodyAsString(newBody, 'text/plain');
     } else {
       const newBody = stringifyWithPlaceholders(body, this.params);

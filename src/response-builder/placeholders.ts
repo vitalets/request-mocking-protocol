@@ -6,13 +6,27 @@
 
 /* eslint-disable visual/complexity */
 
+export function cloneWithPlaceholders<T extends object>(
+  obj: T,
+  variables: Record<string, string> = {},
+) {
+  return JSON.parse(stringifyWithPlaceholders(obj, variables)) as T;
+}
+
 export function stringifyWithPlaceholders(obj: object, variables: Record<string, string> = {}) {
   return JSON.stringify(obj, (_, value) => {
-    return typeof value === 'string' ? replacePlaceholders(value, variables) : value;
+    return typeof value === 'string'
+      ? replacePlaceholders(value, variables, { useTypes: true })
+      : value;
   });
 }
 
-export function replacePlaceholders(value: string, variables: Record<string, string> = {}) {
+type Result<T extends boolean> = T extends true ? string | number | boolean : string;
+export function replacePlaceholders<T extends boolean = false>(
+  value: string,
+  variables: Record<string, string>,
+  opts?: { useTypes?: T },
+): Result<T> {
   if (Object.keys(variables).length === 0) return value;
 
   // Find all placeholder matches
@@ -27,8 +41,8 @@ export function replacePlaceholders(value: string, variables: Record<string, str
 
   // If the whole value is a single placeholder, apply type conversion
   // Multiple placeholders -> always replace with string
-  return isOnlyPlaceholder
-    ? replaceSinglePlaceholder(firstMatch, value, variables)
+  return opts?.useTypes && isOnlyPlaceholder
+    ? (replaceSinglePlaceholder(firstMatch, value, variables) as Result<T>)
     : replaceMultiplePlaceholders(matches, value, variables);
 }
 

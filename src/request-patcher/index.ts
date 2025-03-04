@@ -3,7 +3,11 @@
  */
 
 import { MockRequestOverrides } from '../protocol';
-import { replacePlaceholders, stringifyWithPlaceholders } from '../response-builder/placeholders';
+import {
+  cloneWithPlaceholders,
+  replacePlaceholders,
+  stringifyWithPlaceholders,
+} from '../response-builder/placeholders';
 import { patchObject } from '../response-builder/utils';
 
 export class RequestPatcher {
@@ -34,7 +38,7 @@ export class RequestPatcher {
     const { url } = this.overrides;
     if (!url) return;
 
-    const newUrl = String(replacePlaceholders(url, this.params));
+    const newUrl = replacePlaceholders(url, this.params);
     this.url = new URL(newUrl);
   }
 
@@ -68,7 +72,7 @@ export class RequestPatcher {
 
     if (body) {
       if (typeof body === 'string') {
-        const newBody = String(replacePlaceholders(body, this.params));
+        const newBody = replacePlaceholders(body, this.params);
         this.setBodyAsString(newBody, 'text/plain');
       } else {
         const newBody = stringifyWithPlaceholders(body, this.params);
@@ -76,7 +80,7 @@ export class RequestPatcher {
       }
     } else if (bodyPatch) {
       const actualBody = await this.req.json();
-      const bodyPatchFinal = JSON.parse(stringifyWithPlaceholders(bodyPatch, this.params));
+      const bodyPatchFinal = cloneWithPlaceholders(bodyPatch, this.params);
       patchObject(actualBody, bodyPatchFinal);
       this.setBodyAsString(JSON.stringify(actualBody), 'application/json');
     }
