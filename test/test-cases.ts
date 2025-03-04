@@ -39,6 +39,7 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
   });
 
   test('patch response', async () => {
+    // use real server to get real-world headers
     await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
       bodyPatch: {
         'address.city': 'New York',
