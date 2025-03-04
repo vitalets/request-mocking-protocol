@@ -19,27 +19,44 @@ async function makeRequestDefault(input: string, init?: SimpleRequestInit) {
 
 export function createTestCases(mockClient: MockClient, makeRequest = makeRequestDefault) {
   test('mock response', async () => {
-    await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
-      body: { id: 1, name: 'John Smith' },
-    });
-
-    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
-
-    expect(body).toEqual({ id: 1, name: 'John Smith' });
-    // expect(res.headers.get('content-type')).toEqual('application/json');
-  });
-
-  test('patch response', async () => {
-    await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
-      bodyPatch: {
-        'address.city': 'New York',
+    await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+      body: {
+        id: 1,
+        name: 'John Smith',
+        username: 'User {{ id }}',
+        phone: '{{ id:number }}',
+      },
+      headers: {
+        'x-custom-header': '{{ id }}',
       },
     });
 
-    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
+    const { body, headers } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
+
+    expect(body).toEqual({ id: 1, name: 'John Smith', username: 'User 1', phone: 1 });
+    expect(headers['content-type']).toEqual('application/json');
+    expect(headers['x-custom-header']).toEqual('1');
+  });
+
+  test('patch response', async () => {
+    await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+      bodyPatch: {
+        'address.city': 'New York',
+        username: 'User {{ id }}',
+        phone: '{{ id:number }}',
+      },
+      headers: {
+        'x-custom-header': '{{ id }}',
+      },
+    });
+
+    const { body, headers } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
+
     expect(body.address.city).toEqual('New York');
-    // for some reason msw strips headers :(
-    // expect(res.headers.get('content-type')).toEqual('application/json; charset=utf-8');
+    expect(body.username).toEqual('User 1');
+    expect(body.phone).toEqual(1);
+    expect(headers['content-type']).toEqual('application/json; charset=utf-8');
+    expect(headers['x-custom-header']).toEqual('1');
   });
 
   test('patch request', async () => {
@@ -49,29 +66,13 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
       },
     });
 
-    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/2');
+    const { body, headers } = await makeRequest('https://jsonplaceholder.typicode.com/users/2');
 
     expect(body.name).toEqual('Leanne Graham');
-    // expect(res.headers.get('content-type')).toEqual('application/json; charset=utf-8');
+    expect(headers['content-type']).toEqual('application/json; charset=utf-8');
   });
 
-  test('params substitution (URL pattern)', async () => {
-    await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
-      headers: {
-        'x-custom-header': '{{ id }}',
-      },
-      body: {
-        id: '{{ id:number }}',
-        name: 'User {{ id }}',
-      },
-    });
-
-    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
-    expect(body).toEqual({ id: 1, name: 'User 1' });
-    // expect(res.headers.get('x-custom-header')).toEqual('1');
-  });
-
-  test('params substitution (regexp)', async () => {
+  test('url as regexp', async () => {
     await mockClient.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
       body: {
         id: '{{ id:number }}',

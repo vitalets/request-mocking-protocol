@@ -21,10 +21,11 @@ export async function setupPlaywrightInterceptor(
       bypass: (req) => bypass(req, route),
     }).build();
 
-    const headersObj = Object.fromEntries(headers.entries());
-    const finalBody = body instanceof ArrayBuffer ? Buffer.from(body) : body;
-
-    await route.fulfill({ body: finalBody ?? undefined, status, headers: headersObj });
+    await route.fulfill({
+      status,
+      headers: Object.fromEntries(headers),
+      body: body instanceof ArrayBuffer ? Buffer.from(body) : (body ?? undefined),
+    });
   });
 }
 

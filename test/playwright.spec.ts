@@ -29,11 +29,14 @@ afterAll(async () => {
 createTestCases(mockClient, makeRequestFromPage);
 
 async function makeRequestFromPage(input: string, init?: SimpleRequestInit) {
-  await page.goto('https://example.com');
+  // important to open the same origin, otherwise PW does not pass custom headers
+  await page.goto('https://jsonplaceholder.typicode.com');
+  // for debug
+  // page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
   return page.evaluate<MakeRequestResult, [string, SimpleRequestInit | undefined]>(
     async ([input, init]) => {
       const res = await fetch(input, init);
-      const headers = Object.fromEntries(res.headers.entries());
+      const headers = Object.fromEntries(res.headers);
       const bodyStr = await res.text();
       const body = bodyStr ? JSON.parse(bodyStr) : undefined;
       return { status: res.status, headers, body, bodyStr };

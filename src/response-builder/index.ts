@@ -3,7 +3,11 @@
  */
 import { MockMatchResult } from '../protocol';
 import { patchObject, wait } from './utils';
-import { replacePlaceholders, stringifyWithPlaceholders } from './placeholders';
+import {
+  cloneWithPlaceholders,
+  replacePlaceholders,
+  stringifyWithPlaceholders,
+} from './placeholders';
 import { RequestPatcher } from '../request-patcher';
 
 // Universal shape for response object.
@@ -70,6 +74,10 @@ export class ResponseBuilder {
     const res = await this.sendRealRequest();
     this.status = res.status;
     this.setHeaders(res.headers);
+
+    // remove content-encoding header, otherwise error: Decompression failed
+    this.headers.delete('content-encoding');
+
     await this.setPatchedBody(res);
   }
 
@@ -92,7 +100,6 @@ export class ResponseBuilder {
     // Important to use Object.fromEntries(), otherwise headers become empty inside msw.
     // See: https://github.com/mswjs/msw/blob/main/src/core/utils/HttpResponse/decorators.ts#L20
     this.headers = new Headers(Object.fromEntries(origHeaders?.entries() || []));
-    this.headers.set('content-encoding', 'identity');
 
     Object.entries(this.resSchema.headers || {}).forEach(([key, value]) => {
       if (value) {
@@ -110,7 +117,7 @@ export class ResponseBuilder {
       // todo: match status? If response status is not 200, should we patch it?
       // todo: handle parse error
       const actualBody = await res.json();
-      const bodyPatchFinal = JSON.parse(stringifyWithPlaceholders(bodyPatch, this.params));
+      const bodyPatchFinal = cloneWithPlaceholders(bodyPatch, this.params);
       patchObject(actualBody, bodyPatchFinal);
       this.setBodyAsString(JSON.stringify(actualBody), 'application/json');
     } else {
