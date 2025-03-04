@@ -99,7 +99,7 @@ export class ResponseBuilder {
   private setHeaders(origHeaders?: Headers) {
     // Important to use Object.fromEntries(), otherwise headers become empty inside msw.
     // See: https://github.com/mswjs/msw/blob/main/src/core/utils/HttpResponse/decorators.ts#L20
-    this.headers = new Headers(Object.fromEntries(origHeaders?.entries() || []));
+    this.headers = new Headers(Object.fromEntries(origHeaders || []));
 
     Object.entries(this.resSchema.headers || {}).forEach(([key, value]) => {
       if (value) {

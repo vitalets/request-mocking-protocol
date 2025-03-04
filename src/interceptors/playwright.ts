@@ -40,7 +40,7 @@ function buildFetchRequest(pwRequest: PwRequest) {
 async function bypass(req: Request, route: Route) {
   const pwResponse = await route.fetch({
     url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
+    headers: Object.fromEntries(req.headers),
     postData: req.body ? Buffer.from(await req.arrayBuffer()) : undefined,
   });
 
