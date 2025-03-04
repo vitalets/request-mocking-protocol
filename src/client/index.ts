@@ -37,8 +37,7 @@ export class MockClient {
       resSchema: this.buildResponseSchema(resSchema),
     };
     this.mockSchemas.set(reqSchema, mockSchema);
-    this.buildHeaders();
-    await this.onChange?.(this.headers);
+    await this.rebuildHeaders();
   }
 
   async GET(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
@@ -65,9 +64,9 @@ export class MockClient {
     return this.addMockWithMethod(undefined, reqSchema, resSchema);
   }
 
-  reset() {
+  async reset() {
     this.mockSchemas.clear();
-    this.buildHeaders();
+    await this.rebuildHeaders();
   }
 
   private addMockWithMethod(
@@ -79,8 +78,9 @@ export class MockClient {
     return this.addMock({ ...initObj, method }, resSchema);
   }
 
-  private buildHeaders() {
+  private async rebuildHeaders() {
     this.headers = buildMockHeaders(this.schemas);
+    await this.onChange?.(this.headers);
   }
 
   private buildRequestSchema(init: MockRequestSchemaInit) {

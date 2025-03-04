@@ -1,6 +1,7 @@
-import { test, expect, beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach } from 'vitest';
 import { MockClient } from '../../src';
 import { setupFetchInterceptor } from '../../src/interceptors/fetch';
+import { createTestCases } from './test-cases';
 
 const mockClient = new MockClient();
 
@@ -8,46 +9,8 @@ beforeAll(() => {
   setupFetchInterceptor(() => mockClient.headers);
 });
 
-beforeEach(() => {
-  mockClient.reset();
+beforeEach(async () => {
+  await mockClient.reset();
 });
 
-test('mock response', async () => {
-  await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
-    body: { id: 1, name: 'John Smith' },
-  });
-
-  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
-
-  expect(await res.json()).toEqual({ id: 1, name: 'John Smith' });
-  expect(res.headers.get('content-type')).toContain('application/json');
-});
-
-test('patch response', async () => {
-  await mockClient.GET('https://jsonplaceholder.typicode.com/users/1', {
-    bodyPatch: {
-      'address.city': 'New York',
-    },
-  });
-
-  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
-
-  expect((await res.json()).address.city).toEqual('New York');
-  expect(res.headers.get('content-type') || '').toContain('application/json');
-});
-
-test('params substitution (URL pattern)', async () => {
-  await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
-    headers: {
-      'x-custom-header': '{{ id }}',
-    },
-    body: {
-      id: '{{ id:number }}',
-      name: 'User {{ id }}',
-    },
-  });
-
-  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
-  expect(await res.json()).toEqual({ id: 1, name: 'User 1' });
-  expect(res.headers.get('x-custom-header')).toEqual('1');
-});
+createTestCases(mockClient);

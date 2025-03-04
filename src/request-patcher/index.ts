@@ -13,7 +13,7 @@ import { patchObject } from '../response-builder/utils';
 export class RequestPatcher {
   private url: URL;
   private headers: Headers;
-  private body: RequestInit['body'] = null;
+  private body?: RequestInit['body'];
 
   constructor(
     private req: Request,
@@ -22,7 +22,6 @@ export class RequestPatcher {
   ) {
     this.url = new URL(req.url);
     this.headers = new Headers(req.headers);
-    this.body = req.body;
   }
 
   async patch() {
@@ -67,8 +66,14 @@ export class RequestPatcher {
     });
   }
 
+  // eslint-disable-next-line max-statements
   private async patchBody() {
     const { body, bodyPatch } = this.overrides;
+
+    if (body === null) {
+      this.body = null;
+      return;
+    }
 
     if (body) {
       if (typeof body === 'string') {
@@ -98,10 +103,19 @@ export class RequestPatcher {
   }
 
   private buildRequest() {
+    const { req } = this;
     return new Request(this.url, {
-      method: this.req.method,
       headers: this.headers,
       body: this.body,
+      method: req.method,
+      mode: req.mode,
+      credentials: req.credentials,
+      cache: req.cache,
+      redirect: req.redirect,
+      referrer: req.referrer,
+      integrity: req.integrity,
+      keepalive: req.keepalive,
+      signal: req.signal,
     });
   }
 }

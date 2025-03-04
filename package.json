@@ -30,7 +30,6 @@
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
     "test": "vitest run --no-cache --dir ./test",
-    "test:all": "SLOW=1 npm t",
     "build": "./scripts/build.sh",
     "release": "bash scripts/release.sh"
   },

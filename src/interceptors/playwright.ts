@@ -3,9 +3,9 @@
  * Used in Playwright tests to mock page requests with the same syntax as for server requests.
  */
 
-import { Page, BrowserContext, Request as PwRequest, APIResponse } from '@playwright/test';
+import { Page, BrowserContext, Request as PwRequest, Route } from '@playwright/test';
 import { matchSchemas } from '../request-matcher/utils';
-import { ResponseBuilder, ResponseLike } from '../response-builder';
+import { ResponseBuilder } from '../response-builder';
 import { MockClient } from '../client';
 
 export async function setupPlaywrightInterceptor(
@@ -18,7 +18,7 @@ export async function setupPlaywrightInterceptor(
     if (!matchResult) return route.fallback();
 
     const { body, status, headers } = await new ResponseBuilder(matchResult, {
-      bypass: async () => buildResponseLike(await route.fetch()),
+      bypass: (req) => bypass(req, route),
     }).build();
 
     const headersObj = Object.fromEntries(headers.entries());
@@ -36,7 +36,13 @@ function buildFetchRequest(pwRequest: PwRequest) {
   });
 }
 
-function buildResponseLike(pwResponse: APIResponse): ResponseLike {
+async function bypass(req: Request, route: Route) {
+  const pwResponse = await route.fetch({
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries()),
+    postData: req.body ? Buffer.from(await req.arrayBuffer()) : undefined,
+  });
+
   return {
     status: pwResponse.status(),
     headers: new Headers(pwResponse.headers()),
