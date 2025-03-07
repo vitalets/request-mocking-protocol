@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+* Support `statusText`.
+* Handle types for moduleResolution: node.
+
 ## [0.1.0] - 2025-03-07
 
 * Initial release.
