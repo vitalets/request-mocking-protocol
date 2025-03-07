@@ -1,6 +1,7 @@
 /**
  * Response builder class.
  */
+import { STATUS_CODES } from 'node:http';
 import { MockMatchResult } from '../protocol';
 import { patchObject, wait } from './utils';
 import {
@@ -13,6 +14,7 @@ import { RequestPatcher } from '../request-patcher';
 // Universal shape for response object.
 export type ResponseLike = {
   status: number;
+  statusText: string;
   headers: Headers;
   arrayBuffer: () => Promise<ArrayBuffer>;
   json: () => Promise<Record<string, unknown>>;
@@ -24,12 +26,14 @@ export type ResponseBuilderCallbacks = {
 
 export type ResponseBuilderResult = {
   status: number;
+  statusText: string;
   headers: Headers;
   body: string | ArrayBuffer | null;
 };
 
 export class ResponseBuilder {
   private status = 200;
+  private statusText = 'OK';
   private headers = new Headers();
   private body: string | ArrayBuffer | null = null;
 
@@ -61,6 +65,7 @@ export class ResponseBuilder {
 
     return {
       status: this.status,
+      statusText: this.statusText,
       headers: this.headers,
       body: this.body,
     };
@@ -72,7 +77,8 @@ export class ResponseBuilder {
 
   private async setPatchedResponse() {
     const res = await this.sendRealRequest();
-    this.status = res.status;
+
+    this.setStatus(res.status, res.statusText);
     this.setHeaders(res.headers);
 
     // remove content-encoding header, otherwise error: Decompression failed
@@ -82,9 +88,14 @@ export class ResponseBuilder {
   }
 
   private setStaticResponse() {
-    if (this.resSchema.status) this.status = this.resSchema.status;
+    if (this.resSchema.status) this.setStatus(this.resSchema.status);
     this.setHeaders();
     this.setStaticBody();
+  }
+
+  private setStatus(status: number, statusText?: string) {
+    this.status = status;
+    this.statusText = statusText || STATUS_CODES[status] || 'Unknown';
   }
 
   private async sendRealRequest() {

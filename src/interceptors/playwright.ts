@@ -17,7 +17,7 @@ export async function setupPlaywrightInterceptor(
     const matchResult = await matchSchemas(request, mockClient.schemas);
     if (!matchResult) return route.fallback();
 
-    const { body, status, headers } = await new ResponseBuilder(matchResult, {
+    const { body, headers, status } = await new ResponseBuilder(matchResult, {
       bypass: (req) => bypass(req, route),
     }).build();
 
@@ -25,6 +25,7 @@ export async function setupPlaywrightInterceptor(
       status,
       headers: Object.fromEntries(headers),
       body: body instanceof ArrayBuffer ? Buffer.from(body) : (body ?? undefined),
+      // route.fulfill() doesn't accept statusText
     });
   });
 }
@@ -46,6 +47,7 @@ async function bypass(req: Request, route: Route) {
 
   return {
     status: pwResponse.status(),
+    statusText: pwResponse.statusText(),
     headers: new Headers(pwResponse.headers()),
     arrayBuffer: () => pwResponse.body(),
     json: () => pwResponse.json(),

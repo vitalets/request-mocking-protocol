@@ -14,10 +14,10 @@ export function setupFetchInterceptor(getInboundHeaders: GetHeaders) {
     const matchResult = await matchSchemas(request, mockSchemas);
     if (!matchResult) return originalFetch(input, init);
 
-    const { body, status, headers } = await new ResponseBuilder(matchResult, {
+    const { body, headers, status, statusText } = await new ResponseBuilder(matchResult, {
       bypass: (req) => originalFetch(req),
     }).build();
 
-    return new Response(body, { status, headers });
+    return new Response(body, { status, statusText, headers });
   };
 }

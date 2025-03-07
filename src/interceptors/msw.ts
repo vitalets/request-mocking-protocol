@@ -12,10 +12,10 @@ export function createHandler(getInboundHeaders: GetHeaders) {
     const matchResult = await matchSchemas(request, mockSchemas);
     if (!matchResult) return;
 
-    const { body, status, headers } = await new ResponseBuilder(matchResult, {
+    const { body, headers, status, statusText } = await new ResponseBuilder(matchResult, {
       bypass: (req) => fetch(bypass(req)),
     }).build();
 
-    return new HttpResponse(body, { status, headers });
+    return new HttpResponse(body, { status, statusText, headers });
   });
 }
