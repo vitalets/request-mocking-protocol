@@ -4,6 +4,7 @@ A protocol for declarative mocking of HTTP requests.
 Useful in E2E testing when you need to mock API calls made on the server (e.g., in React Server Components).
 
 ## Index
+
 <!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
 - [How it works](#how-it-works)
 - [Concepts](#concepts)
@@ -15,7 +16,7 @@ Useful in E2E testing when you need to mock API calls made on the server (e.g., 
 - [App Integration](#app-integration)
   - [Next.js](#nextjs)
   - [Astro](#astro)
-- [Test-Runners Integration](#test-runners-integration)
+- [Test-runners Integration](#test-runners-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
 - [API](#api)
@@ -23,6 +24,7 @@ Useful in E2E testing when you need to mock API calls made on the server (e.g., 
   - [MockClient](#mockclient)
 - [License](#license)
 <!-- end-doc-gen -->
+
 
 ## How it works
 
@@ -34,9 +36,9 @@ flowchart LR;
     C -.-> B;
 ```    
 
-1. The mock is defined as request and response schemas in a serializable JSON format.
-2. When opening a webpage, mocks are attached to the navigation request as a custom HTTP header.
-3. On the server, an interceptor reads the mock headers and applies mocks to the outbound API request.
+1. The mock defines a request and response in a serializable JSON format.
+2. When opening a webpage, the mock is attached to the navigation request as a custom HTTP header.
+3. On the server, an interceptor reads the mock header and applies mock to the outbound API requests.
 4. The application server renders the page using data from the mocked response.
 
 ## Concepts
@@ -97,8 +99,10 @@ npm i -D request-mocking-protocol
 
 To mock requests with RMP, you need to perform two actions:
 
-1. Set up a request interceptor in the application.
-2. Define request mocks in your test using the `MockClient` class.
+1. Setup a request interceptor in the application.
+2. Define mocks in your test using the `MockClient` class.
+
+Check out the sections below for integration with varios frameworks and test-runners.
 
 ## App Integration
 
@@ -119,7 +123,7 @@ export async function register() {
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
 
-## Test-Runners Integration
+## Test-runners Integration
 
 On the test runner side, you can define request mocks via the `MockClient` class.
 
