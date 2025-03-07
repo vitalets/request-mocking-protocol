@@ -14,6 +14,10 @@ export default {
       'npm test',
     ],
   },
+  github: {
+    release: true,
+    web: true,
+  },
   plugins: {
     '@release-it/keep-a-changelog': {
       filename: 'CHANGELOG.md',
