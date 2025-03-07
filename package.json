@@ -1,6 +1,6 @@
 {
   "name": "request-mocking-protocol",
-  "description": "",
+  "description": "A protocol for declarative mocking of HTTP requests",
   "version": "0.0.1",
   "type": "commonjs",
   "repository": {
@@ -30,6 +30,7 @@
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
     "test": "vitest run --no-cache --dir ./test",
+    "toc": "md-magic --files README.md",
     "build": "./scripts/build.sh",
     "release": "bash scripts/release.sh"
   },
@@ -57,9 +58,10 @@
     "vitest": "^3.0.5"
   },
   "keywords": [
+    "mocking",
     "testing",
     "e2e",
-    "mock",
+    "network",
     "requests"
   ],
   "funding": "https://github.com/sponsors/vitalets",
