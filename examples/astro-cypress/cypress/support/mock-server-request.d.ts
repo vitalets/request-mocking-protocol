@@ -3,7 +3,7 @@ import type { MockRequestSchemaInit, MockResponseSchemaInit } from 'request-mock
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {
-      mockRemoteRequest(
+      mockServerRequest(
         reqSchema: MockRequestSchemaInit,
         resSchema: MockResponseSchemaInit,
       ): Chainable<any>;
