@@ -31,7 +31,7 @@
     "test": "vitest run --no-cache --dir ./test",
     "toc": "md-magic --files README.md",
     "build": "./scripts/build.sh",
-    "release": "bash scripts/release.sh"
+    "release": "release-it"
   },
   "dependencies": {
     "lodash": "^4.17.21",
