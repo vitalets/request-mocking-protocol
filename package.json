@@ -12,7 +12,21 @@
     ".": "./dist/index.js",
     "./msw": "./dist/interceptors/msw.js",
     "./fetch": "./dist/interceptors/fetch.js",
+    "./playwright": "./dist/interceptors/playwright.js",
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "fetch": [
+        "./dist/interceptors/fetch.d.ts"
+      ],
+      "msw": [
+        "./dist/interceptors/msw.d.ts"
+      ],
+      "playwright": [
+        "./dist/interceptors/playwright.d.ts"
+      ]
+    }
   },
   "engines": {
     "node": ">=18"
