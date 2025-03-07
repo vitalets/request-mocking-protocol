@@ -28,6 +28,7 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
       },
       headers: {
         'x-custom-header': '{{ id }}',
+        'access-control-expose-headers': 'x-custom-header',
       },
     });
 
@@ -48,6 +49,7 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
       },
       headers: {
         'x-custom-header': '{{ id }}',
+        'access-control-expose-headers': 'x-custom-header',
       },
     });
 

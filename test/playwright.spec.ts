@@ -3,6 +3,7 @@ import { Browser, BrowserContext, chromium, Page } from 'playwright';
 import { MockClient } from '../src';
 import { setupPlaywrightInterceptor } from '../src/interceptors/playwright';
 import { createTestCases, MakeRequestResult, SimpleRequestInit } from './test-cases';
+import { pathToFileURL } from 'url';
 
 const mockClient = new MockClient();
 
@@ -30,7 +31,11 @@ createTestCases(mockClient, makeRequestFromPage);
 
 async function makeRequestFromPage(input: string, init?: SimpleRequestInit) {
   // important to open the same origin, otherwise PW does not pass custom headers
-  await page.goto('https://jsonplaceholder.typicode.com');
+  // await page.goto('https://jsonplaceholder.typicode.com');
+
+  // load page from local file example.html
+  await page.goto(pathToFileURL(`test/example.html`).toString());
+
   // for debug
   // page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
   return page.evaluate<MakeRequestResult, [string, SimpleRequestInit | undefined]>(
