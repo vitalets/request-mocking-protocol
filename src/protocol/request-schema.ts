@@ -4,12 +4,35 @@
 
 // serializable
 export type MockRequestSchema = {
+  /**
+   * The pattern to match the request URL.
+   */
   url: string;
-  patternType?: 'urlpattern' | 'regexp'; // default is 'urlpattern'
+  /**
+   * Pattern type:
+   * - 'urlpattern': match the URL by pattern (default).
+   * - 'regexp': match the URL by regular expression.
+   */
+  patternType?: 'urlpattern' | 'regexp';
+  /**
+   * The request method for matching.
+   */
   method?: HttpMethod;
+  /**
+   * The query parameters for matching, defined as key-value pairs.
+   */
   query?: Record<string, string | number | null>;
+  /**
+   * The request headers for matching, defined as key-value pairs.
+   */
   headers?: Record<string, string | null>;
-  body?: Record<string, unknown> | Array<unknown> | string;
+  /**
+   * The request body for matching, defined as a string or JSON.
+   */
+  body?: string | Record<string, unknown> | Array<unknown>;
+  /**
+   * Flag to output debug info on server.
+   */
   debug?: boolean;
 };
 
