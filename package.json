@@ -26,7 +26,6 @@
     "prepare": "git config core.hooksPath scripts/git-hooks",
     "lint": "eslint . --no-warn-ignored",
     "tsc": "tsc",
-    "knip": "knip -c knip.config.ts",
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
     "test": "vitest run --no-cache --dir ./test",
@@ -41,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "@playwright/test": "^1.50.1",
+    "@release-it/keep-a-changelog": "^6.0.0",
     "@types/lodash": "^4.17.15",
     "@types/node": "^18.15.0",
     "eslint": "^9.19.0",
@@ -50,9 +50,9 @@
     "lint-staged": "^15.4.2",
     "markdown-magic": "3.3.0",
     "msw": "^2.7.1",
-    "np": "^10.1.0",
     "prettier": "^3.4.2",
     "publint": "^0.3.2",
+    "release-it": "^18.1.2",
     "typescript": "5.6",
     "typescript-eslint": "^8.21.0",
     "vitest": "^3.0.5"
