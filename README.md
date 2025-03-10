@@ -27,6 +27,7 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
   - [Playwright](#playwright)
   - [Cypress](#cypress)
   - [Custom](#custom-1)
+- [Parameters Substitution](#parameters-substitution)
 - [API](#api)
   - [Interceptors](#interceptors)
   - [MockClient](#mockclient)
@@ -193,6 +194,31 @@ You can integrate RMP with any test runner. It requires two steps:
 
 1. Use `MockClient` class to define mocks.
 2. Attach `mockClient.headers` to the navigation request.
+
+## Parameters Substitution
+
+You can define route parameters in the URL pattern and use them in the response:
+
+```ts
+await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+  body: {
+    id: '{{ id:number }}',
+    name: 'User {{ id }}',
+  }
+});
+```
+
+The request: 
+```
+GET https://jsonplaceholder.typicode.com/users/1
+```
+will be mocked with the response:
+```js
+{
+  id: 1,
+  name: 'User 1',
+}
+```
 
 ## API
 
