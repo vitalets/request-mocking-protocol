@@ -88,7 +88,7 @@ Example:
 x-mock-request: [{"reqSchema":{"method":"GET","patternType":"urlpattern","url":"https://example.com"},"resSchema":{"body":"hello","status":200}}]
 ```
 
-On the server side, the interceptor will read inbound headers and apply mocks.
+On the server side, the interceptor will read the incoming headers and apply the mocks.
 
 ## Installation
 ```
@@ -183,9 +183,9 @@ Basic usage:
 ```ts
 const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
 
-setupFetchInterceptor(() => { /* retrieve headers of the inbound HTTP request */ });
+setupFetchInterceptor(() => { /* retrieve headers of the incoming HTTP request */ });
 ```
-The actual function for retrieving inbound headers depends on the application framework. 
+The actual function for retrieving incoming headers depends on the application framework. 
 
 #### MSW
 
@@ -195,12 +195,12 @@ You can use [MSW](https://mswjs.io/docs/integrations/node) to intercept server-s
 import { setupServer } from 'msw/node';
 import { createHandler } from 'request-mocking-protocol/msw';
 
-const mockHandler = createHandler(() => { /* retrieve headers of the inbound HTTP request */ });
+const mockHandler = createHandler(() => { /* retrieve headers of the incoming HTTP request */ });
 const mswServer = setupServer(mockHandler);
 mswServer.listen();
 ```
 
-The actual function for retrieving inbound headers depends on the application framework. 
+The actual function for retrieving incoming headers depends on the application framework. 
 
 ### MockClient
 

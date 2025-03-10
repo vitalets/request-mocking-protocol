@@ -6,9 +6,9 @@ import { extractMockSchemas, GetHeaders } from '../transport';
 import { matchSchemas } from '../request-matcher/utils';
 import { ResponseBuilder } from '../response-builder';
 
-export function createHandler(getInboundHeaders: GetHeaders) {
+export function createHandler(getIncomingHeaders: GetHeaders) {
   return http.all('*', async ({ request }) => {
-    const mockSchemas = await extractMockSchemas(getInboundHeaders);
+    const mockSchemas = await extractMockSchemas(getIncomingHeaders);
     const matchResult = await matchSchemas(request, mockSchemas);
     if (!matchResult) return;
 

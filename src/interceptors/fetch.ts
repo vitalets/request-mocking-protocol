@@ -6,11 +6,11 @@ import { matchSchemas } from '../request-matcher/utils';
 import { ResponseBuilder } from '../response-builder';
 import { extractMockSchemas, GetHeaders } from '../transport';
 
-export function setupFetchInterceptor(getInboundHeaders: GetHeaders) {
+export function setupFetchInterceptor(getIncomingHeaders: GetHeaders) {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input, init) => {
     const request = new Request(input, init);
-    const mockSchemas = await extractMockSchemas(getInboundHeaders);
+    const mockSchemas = await extractMockSchemas(getIncomingHeaders);
     const matchResult = await matchSchemas(request, mockSchemas);
     if (!matchResult) return originalFetch(input, init);
 

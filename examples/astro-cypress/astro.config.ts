@@ -17,7 +17,7 @@ function requestMocking(): AstroIntegration {
     hooks: {
       'astro:server:setup': async ({ server }) => {
         if (process.env.NODE_ENV !== 'production') {
-          // store inbound headers to be used in the fetch interceptor
+          // store incoming headers to be used in the fetch interceptor
           const headersStore = new AsyncLocalStorage<IncomingHttpHeaders>();
           server.middlewares.use((req, _res, next) => {
             headersStore.run(req.headers, next);
