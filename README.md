@@ -1,7 +1,13 @@
-# Request Mocking Protocol (RMP)
+# Request Mocking Protocol
 
-A protocol for declarative mocking of HTTP requests.
-Useful in E2E testing when you need to mock API calls made on the server (e.g., in React Server Components).
+[![lint](https://github.com/vitalets/request-mocking-protocol/actions/workflows/lint.yaml/badge.svg)](https://github.com/vitalets/request-mocking-protocol/actions/workflows/lint.yaml)
+[![test](https://github.com/vitalets/request-mocking-protocol/actions/workflows/test.yaml/badge.svg)](https://github.com/vitalets/request-mocking-protocol/actions/workflows/test.yaml)
+[![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
+[![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
+
+Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
+It defines JSON schemas for matching a request and building a mocked response. 
+The schemas can be serialized and passed over the wire, that allows to mock server-side API calls (e.g., in React Server Components).
 
 ## Index
 
@@ -37,8 +43,8 @@ flowchart LR;
 ```    
 
 1. The mock defines a request and response in a serializable JSON format.
-2. When opening a webpage, the mock is attached to the navigation request as a custom HTTP header.
-3. On the server, an interceptor reads the mock header and applies mock to the outgoing API requests.
+2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
+3. On the server, an interceptor reads the mock header and applies mocks to outgoing API requests.
 4. The application server renders the page using data from the mocked response.
 
 ## Concepts
