@@ -62,7 +62,7 @@
     "globals": "^16.0.0",
     "knip": "^5.43.3",
     "lint-staged": "^15.4.2",
-    "markdown-magic": "^3.4.0",
+    "markdown-magic": "3.3",
     "msw": "^2.7.1",
     "prettier": "^3.4.2",
     "publint": "^0.3.2",

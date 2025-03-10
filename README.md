@@ -6,7 +6,7 @@
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
 Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
-It defines JSON schemas for matching a request and building a mocked response. 
+It defines JSON schemas for matching a request and building a response. 
 The schemas can be serialized and passed over the wire, that allows to mock server-side API calls (e.g. in React Server Components).
 
 ## Index
@@ -22,6 +22,7 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
 - [App Integration](#app-integration)
   - [Next.js](#nextjs)
   - [Astro](#astro)
+  - [Custom](#custom)
 - [Test-runners Integration](#test-runners-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
@@ -42,10 +43,11 @@ flowchart LR;
     C -.-> B;
 ```    
 
-1. The mock defines a request and response in a serializable JSON format.
+
+1. The test runner defines a mock as a request and response in JSON format.
 2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
-3. On the server, an interceptor reads the mock header and applies mocks to outgoing API requests.
-4. The application server renders the page using data from the mocked response.
+3. The application server reads the mock header and applies the mocks to outgoing API calls.
+4. The page is rendered with data from the mocked response.
 
 ## Concepts
 
