@@ -38,7 +38,7 @@ flowchart LR;
 
 1. The mock defines a request and response in a serializable JSON format.
 2. When opening a webpage, the mock is attached to the navigation request as a custom HTTP header.
-3. On the server, an interceptor reads the mock header and applies mock to the outbound API requests.
+3. On the server, an interceptor reads the mock header and applies mock to the outgoing API requests.
 4. The application server renders the page using data from the mocked response.
 
 ## Concepts
