@@ -43,7 +43,6 @@ flowchart LR;
     C -.-> B;
 ```    
 
-
 1. The test runner defines a mock as a request and response in JSON format.
 2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
 3. The application server reads the mock header and applies the mocks to outgoing API calls.
@@ -88,8 +87,7 @@ Example:
 
 ### Transport
 
-Transport allows passing mock schemas from the test runner to the application server.
-RMP uses a custom HTTP header `x-mock-request` for transferring a JSON-stringified schemas list.
+Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring a JSON-stringified schemas from the test runner to the application server.
 
 Example:
 ```
