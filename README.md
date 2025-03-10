@@ -19,11 +19,11 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
   - [Transport](#transport)
 - [Installation](#installation)
 - [Usage](#usage)
-- [App Integration](#app-integration)
+- [Framework Integration](#framework-integration)
   - [Next.js](#nextjs)
   - [Astro](#astro)
   - [Custom](#custom)
-- [Test-runners Integration](#test-runners-integration)
+- [Test-runner Integration](#test-runner-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
 - [API](#api)
@@ -105,12 +105,12 @@ npm i -D request-mocking-protocol
 
 To mock requests with RMP, you need to perform two actions:
 
-1. Setup a request interceptor in the application.
-2. Define mocks in your test using the `MockClient` class.
+1. Define the mocks in your test using the `MockClient` class.
+2. Setup an interceptor in the application.
 
 Check out the sections below for integration with varios frameworks and test-runners.
 
-## App Integration
+## Framework Integration
 
 ### Next.js
 
@@ -133,42 +133,43 @@ See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypre
 
 ### Custom
 
-You can write an interceptor for any other framework. It requires 2 steps:
+You can write an interceptor for any framework. It requires two steps:
 
 1. Read the HTTP headers of the incoming request
 2. Capture outgoing HTTP requests
 
 Check-out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
-## Test-runners Integration
+## Test-runner Integration
 
 On the test runner side, you can define request mocks via the `MockClient` class.
 
 ### Playwright
 
-Set up the `mockServerRequest` fixture:
-```ts
-import { test as base } from '@playwright/test';
-import { MockClient } from 'request-mocking-protocol';
+1. Set up the `mockServerRequest` fixture:
+    ```ts
+    import { test as base } from '@playwright/test';
+    import { MockClient } from 'request-mocking-protocol';
 
-export const test = base.extend<{ mockServerRequest: MockClient }>({
-  mockServerRequest: async ({ context }, use) => {
-    const mockClient = new MockClient();
-    mockClient.onChange = async (headers) => context.setExtraHTTPHeaders(headers);
-    await use(mockClient);
-  },
-});
-```
-Use the `mockServerRequest` fixture to define server-side request mocks:
-```ts
-test('my test', async ({ page, mockServerRequest }) => {
-  await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
-    body: [{ id: 1, name: 'John Smith' }],
-  });
+    export const test = base.extend<{ mockServerRequest: MockClient }>({
+      mockServerRequest: async ({ context }, use) => {
+        const mockClient = new MockClient();
+        mockClient.onChange = async (headers) => context.setExtraHTTPHeaders(headers);
+        await use(mockClient);
+      },
+    });
+    ```
 
-  // ...
-});
-```
+2. Use the `mockServerRequest` fixture to define server-side request mocks:
+    ```ts
+    test('my test', async ({ page, mockServerRequest }) => {
+      await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
+        body: [{ id: 1, name: 'John Smith' }],
+      });
+
+      // ...
+    });
+    ```
 
 ### Cypress
 
@@ -189,18 +190,20 @@ test('my test', async ({ page, mockServerRequest }) => {
 
 ### Interceptors
 
-Interceptors are used on the server side to capture HTTP requests and apply mocks.
+Interceptors are used on the server to capture HTTP requests and apply mocks.
 Currently, there are two interceptors available.
 
 #### Fetch
 
-This interceptor hooks into `globalThis.fetch`.
+This interceptor overwrites `globalThis.fetch` function.
 
 Basic usage:
 ```ts
 const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
 
-setupFetchInterceptor(() => { /* retrieve headers of the incoming HTTP request */ });
+setupFetchInterceptor(() => { 
+  // read and return headers of the incoming HTTP request
+});
 ```
 The actual function for retrieving incoming headers depends on the application framework. 
 
@@ -212,7 +215,9 @@ You can use [MSW](https://mswjs.io/docs/integrations/node) to intercept server-s
 import { setupServer } from 'msw/node';
 import { createHandler } from 'request-mocking-protocol/msw';
 
-const mockHandler = createHandler(() => { /* retrieve headers of the incoming HTTP request */ });
+const mockHandler = createHandler(() => { 
+  // read and return headers of the incoming HTTP request
+});
 const mswServer = setupServer(mockHandler);
 mswServer.listen();
 ```
@@ -260,7 +265,7 @@ Adds a new mock for the corresponding HTTP method.
 
 ##### `async reset(): Promise<void>`
 
-Clears all mock schemas and rebuilds the headers.
+Clears all mocks and rebuilds the headers.
 
 ## License
 [MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
