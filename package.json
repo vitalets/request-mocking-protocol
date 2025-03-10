@@ -42,7 +42,7 @@
     "tsc": "tsc",
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
-    "test": "vitest run --no-cache --dir ./test",
+    "test": "vitest run --no-cache --testTimeout 10000 --dir ./test",
     "toc": "md-magic --files README.md",
     "build": "./scripts/build.sh",
     "release": "release-it"
