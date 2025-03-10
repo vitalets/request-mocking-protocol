@@ -7,7 +7,7 @@
 
 Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
 It defines JSON schemas for matching a request and building a mocked response. 
-The schemas can be serialized and passed over the wire, that allows to mock server-side API calls (e.g., in React Server Components).
+The schemas can be serialized and passed over the wire, that allows to mock server-side API calls (e.g. in React Server Components).
 
 ## Index
 
