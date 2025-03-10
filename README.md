@@ -120,8 +120,19 @@ export async function register() {
 }
 ```
 
+> Note that you need to dynamically import interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
+
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
+
+### Custom
+
+You can write an interceptor for any other framework. It requires 2 steps:
+
+1. Read the HTTP headers of the incoming request
+2. Capture outgoing HTTP requests
+
+Check-out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
 ## Test-runners Integration
 
