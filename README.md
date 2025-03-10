@@ -26,6 +26,7 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
 - [Test-runner Integration](#test-runner-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
+  - [Custom](#custom-1)
 - [API](#api)
   - [Interceptors](#interceptors)
   - [MockClient](#mockclient)
@@ -185,6 +186,13 @@ On the test runner side, you can define request mocks via the `MockClient` class
       // ...
     });
     ```
+
+### Custom
+
+You can integrate RMP with any test runner. It requires two steps:
+
+1. Use `MockClient` class to define mocks.
+2. Attach `mockClient.headers` to the navigation request.
 
 ## API
 
