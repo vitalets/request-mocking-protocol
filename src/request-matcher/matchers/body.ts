@@ -1,7 +1,7 @@
 /**
  * Body matcher.
  */
-import isMatch from 'lodash/ismatch';
+import isMatch from 'lodash/isMatch';
 import { MockRequestSchema } from '../../protocol';
 import { MatchingContext } from '../context';
 
