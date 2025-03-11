@@ -28,8 +28,8 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
   - [Custom](#custom-1)
 - [Parameters Substitution](#parameters-substitution)
 - [API](#api)
-  - [Interceptors](#interceptors)
   - [MockClient](#mockclient)
+  - [Interceptors](#interceptors)
 - [License](#license)
 <!-- end-doc-gen -->
 
@@ -213,8 +213,50 @@ will be mocked with the response:
 }
 ```
 
-
 ## API
+
+### MockClient
+
+The `MockClient` class is used on the test-runner side to define HTTP request mocks.
+
+#### Constructor
+
+##### `constructor(options?: MockClientOptions)`
+
+Creates a new instance of `MockClient`.
+
+- `options` (optional): An object containing configuration options.
+  - `debug` (optional): A boolean indicating whether to enable debug mode.
+  - `defaultMethod` (optional): The default HTTP method to use for requests.
+
+#### Properties
+
+##### `headers: Record<string, string>`
+
+Returns HTTP headers that are built from the mock schemas. Can be sent to the server for mocking server-side requests.
+
+##### `onChange?: (headers: Record<string, string>) => void`
+
+A callback function that is called whenever the mocks are changed.
+
+#### Methods
+
+##### `async addMock(reqSchema, resSchema): Promise<void>`
+##### `async GET(reqSchema, resSchema): Promise<void>`
+##### `async POST(reqSchema, resSchema): Promise<void>`
+##### `async PUT(reqSchema, resSchema): Promise<void>`
+##### `async DELETE(reqSchema, resSchema): Promise<void>`
+##### `async HEAD(reqSchema, resSchema): Promise<void>`
+##### `async ALL(reqSchema, resSchema): Promise<void>`
+
+Adds a new mock for the corresponding HTTP method.
+
+- `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) to add. If defined as `string | RegExp`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) or [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
+- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) to add. If defined as `number`, it is treated as HTTP status code.
+
+##### `async reset(): Promise<void>`
+
+Clears all mocks and rebuilds the headers.
 
 ### Interceptors
 
@@ -251,49 +293,6 @@ mswServer.listen();
 ```
 
 The actual function for retrieving incoming headers depends on the application framework. 
-
-### MockClient
-
-The `MockClient` class is used on the test-runner side to define HTTP request mocks.
-
-#### Constructor
-
-##### `constructor(options?: MockClientOptions)`
-
-Creates a new instance of `MockClient`.
-
-- `options` (optional): An object containing configuration options.
-  - `debug` (optional): A boolean indicating whether to enable debug mode.
-  - `defaultMethod` (optional): The default HTTP method to use for requests.
-
-#### Properties
-
-##### `headers: Record<string, string>`
-
-Returns HTTP headers that are built from the mock schemas. Can be sent to the server for mocking server-side requests.
-
-##### `onChange?: (headers: Record<string, string>) => unknown`
-
-A callback function that is called whenever the mocks are changed.
-
-#### Methods
-
-##### `async addMock(reqSchema, resSchema): Promise<void>`
-##### `async GET(reqSchema, resSchema): Promise<void>`
-##### `async POST(reqSchema, resSchema): Promise<void>`
-##### `async PUT(reqSchema, resSchema): Promise<void>`
-##### `async DELETE(reqSchema, resSchema): Promise<void>`
-##### `async HEAD(reqSchema, resSchema): Promise<void>`
-##### `async ALL(reqSchema, resSchema): Promise<void>`
-
-Adds a new mock for the corresponding HTTP method.
-
-- `reqSchema`: The request schema to add.
-- `resSchema`: The response schema to add.
-
-##### `async reset(): Promise<void>`
-
-Clears all mocks and rebuilds the headers.
 
 ## License
 [MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)

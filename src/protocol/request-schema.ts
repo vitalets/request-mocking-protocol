@@ -10,8 +10,8 @@ export type MockRequestSchema = {
   url: string;
   /**
    * Pattern type:
-   * - 'urlpattern': match the URL by pattern (default).
-   * - 'regexp': match the URL by regular expression.
+   * - 'urlpattern': match request URL by URLPattern (default).
+   * - 'regexp': match request URL by regular expression.
    */
   patternType?: 'urlpattern' | 'regexp';
   /**
