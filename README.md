@@ -18,14 +18,13 @@ The schemas can be serialized and passed over the wire, that allows to mock serv
   - [Response Schema](#response-schema)
   - [Transport](#transport)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Framework Integration](#framework-integration)
-  - [Next.js](#nextjs)
-  - [Astro](#astro)
-  - [Custom](#custom)
 - [Test-runner Integration](#test-runner-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
+  - [Custom](#custom)
+- [Framework Integration](#framework-integration)
+  - [Next.js](#nextjs)
+  - [Astro](#astro)
   - [Custom](#custom-1)
 - [Parameters Substitution](#parameters-substitution)
 - [API](#api)
@@ -103,48 +102,9 @@ On the server side, the interceptor will read the incoming headers and apply the
 npm i -D request-mocking-protocol
 ```
 
-## Usage
-
-To mock requests with RMP, you need to perform two actions:
-
-1. Define the mocks in your test using the `MockClient` class.
-2. Setup an interceptor in the application.
-
-Check out the sections below for integration with varios frameworks and test-runners.
-
-## Framework Integration
-
-### Next.js
-
-Add the following code to the [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) file:
-```ts
-import { headers } from 'next/headers';
-
-export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
-    const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
-    setupFetchInterceptor(() => headers());
-  }
-}
-```
-
-> Note that you need to dynamically import interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
-
-### Astro
-See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
-
-### Custom
-
-You can write an interceptor for any framework. It requires two steps:
-
-1. Read the HTTP headers of the incoming request
-2. Capture outgoing HTTP requests
-
-Check-out the reference implementations in the [src/interceptors](src/interceptors) directory.
-
 ## Test-runner Integration
 
-On the test runner side, you can define request mocks via the `MockClient` class.
+On the test-runner side, you can define server-side mocks via the `MockClient` class.
 
 ### Playwright
 
@@ -195,6 +155,39 @@ You can integrate RMP with any test runner. It requires two steps:
 1. Use `MockClient` class to define mocks.
 2. Attach `mockClient.headers` to the navigation request.
 
+## Framework Integration
+
+On the server-side you should setup an interceptor to catch the requests and apply your mocks.
+
+### Next.js
+
+Add the following code to the [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) file:
+```ts
+import { headers } from 'next/headers';
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+    const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
+    setupFetchInterceptor(() => headers());
+  }
+}
+```
+
+> Note that you need to dynamically import interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
+
+### Astro
+See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
+
+### Custom
+
+You can write an interceptor for any framework. It requires two steps:
+
+1. Read the HTTP headers of the incoming request
+2. Capture outgoing HTTP requests
+
+Check-out the reference implementations in the [src/interceptors](src/interceptors) directory.
+
+
 ## Parameters Substitution
 
 You can define route parameters in the URL pattern and use them in the response:
@@ -219,6 +212,7 @@ will be mocked with the response:
   name: 'User 1',
 }
 ```
+
 
 ## API
 
