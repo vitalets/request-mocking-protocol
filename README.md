@@ -7,7 +7,7 @@
 
 Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
 It defines JSON schemas for matching a request and building a response. 
-The schemas can be serialized and passed over the wire, that allows to mock server-side API calls (e.g. in React Server Components).
+The schemas can be serialized and passed over the wire, allowing server-side API calls to be mocked (e.g., in React Server Components).
 
 ## Index
 
@@ -88,7 +88,7 @@ Example:
 
 ### Transport
 
-Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring a JSON-stringified schemas from the test runner to the application server.
+Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring JSON-stringified schemas from the test runner to the application server.
 
 Example:
 ```
@@ -152,12 +152,12 @@ On the test-runner side, you can define server-side mocks via the `MockClient` c
 
 You can integrate RMP with any test runner. It requires two steps:
 
-1. Use `MockClient` class to define mocks.
+1. Use the `MockClient` class to define mocks.
 2. Attach `mockClient.headers` to the navigation request.
 
 ## Framework Integration
 
-On the server-side you should setup an interceptor to catch the requests and apply your mocks.
+On the server side, you should set up an interceptor to catch the requests and apply your mocks.
 
 ### Next.js
 
@@ -173,7 +173,7 @@ export async function register() {
 }
 ```
 
-> Note that you need to dynamically import interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
+> Note that you need to dynamically import the interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
 
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
@@ -182,10 +182,10 @@ See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypre
 
 You can write an interceptor for any framework. It requires two steps:
 
-1. Read the HTTP headers of the incoming request
-2. Capture outgoing HTTP requests
+1. Read the HTTP headers of the incoming request.
+2. Capture outgoing HTTP requests.
 
-Check-out the reference implementations in the [src/interceptors](src/interceptors) directory.
+Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
 
 ## Parameters Substitution
@@ -252,7 +252,7 @@ A callback function that is called whenever the mocks are changed.
 Adds a new mock for the corresponding HTTP method.
 
 - `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) for the mock. If defined as `string | RegExp`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) or [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
-- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) for the mock. If defined as `number`, it is treated as HTTP status code.
+- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) for the mock. If defined as `number`, it is treated as an HTTP status code.
 
 ##### `async reset(): Promise<void>`
 
@@ -265,7 +265,7 @@ Currently, there are two interceptors available.
 
 #### Fetch
 
-This interceptor overwrites `globalThis.fetch` function.
+This interceptor overwrites the `globalThis.fetch` function.
 
 Basic usage:
 ```ts
