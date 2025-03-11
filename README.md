@@ -272,9 +272,33 @@ Adds a new mock for the corresponding HTTP method.
 - `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) for the mock.
     - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL.
     - If defined as `RegExp`, it is treated as [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
-    
+
 - `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) for the mock.
     - If defined as `number`, it is treated as an HTTP status code.
+
+Examples:
+```ts
+// mock any GET request to https://example.com
+await mockServerRequest.GET('https://example.com/*', {
+  body: { 
+    id: 1, 
+    name: 'John Smith' 
+  },
+});
+
+// mock any POST request to https://example.com having foo=bar in query
+await mockServerRequest.POST({
+  url: 'https://example.com/*',
+  query: {
+    foo: 'bar'
+  },
+}, {
+  body: { 
+    id: 1, 
+    name: 'John Smith' 
+  },
+});
+```
 
 ##### `async reset(): Promise<void>`
 
