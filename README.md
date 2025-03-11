@@ -251,8 +251,8 @@ A callback function that is called whenever the mocks are changed.
 
 Adds a new mock for the corresponding HTTP method.
 
-- `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) to add. If defined as `string | RegExp`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) or [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
-- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) to add. If defined as `number`, it is treated as HTTP status code.
+- `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) for the mock. If defined as `string | RegExp`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) or [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
+- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) for the mock. If defined as `number`, it is treated as HTTP status code.
 
 ##### `async reset(): Promise<void>`
 
