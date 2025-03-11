@@ -6,7 +6,7 @@
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
 Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
-It defines JSON schemas for matching a request and building a response. 
+It defines JSON schemas for catching a request and building a response. 
 The schemas can be serialized and passed over the wire, allowing server-side API calls to be mocked (e.g., in React Server Components).
 
 ## Index
@@ -52,6 +52,8 @@ flowchart LR;
 2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
 3. The application server reads the mock header and applies the mocks to outgoing API calls.
 4. The page is rendered with data from the mocked response.
+
+Check out the [Concepts](#concepts) for more details.
 
 ## Installation
 ```
@@ -119,6 +121,7 @@ On the server side, you should set up an interceptor to catch the requests and a
 
 Add the following code to the [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) file:
 ```ts
+// instrumentation.ts
 import { headers } from 'next/headers';
 
 export async function register() {
