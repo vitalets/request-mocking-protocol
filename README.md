@@ -11,12 +11,11 @@ The schemas can be serialized and passed over the wire, allowing server-side API
 
 ## Index
 
+<details>
+<summary>Click to expand</summary>
+
 <!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
 - [How it works](#how-it-works)
-- [Concepts](#concepts)
-  - [Request Schema](#request-schema)
-  - [Response Schema](#response-schema)
-  - [Transport](#transport)
 - [Installation](#installation)
 - [Test-runner Integration](#test-runner-integration)
   - [Playwright](#playwright)
@@ -27,12 +26,17 @@ The schemas can be serialized and passed over the wire, allowing server-side API
   - [Astro](#astro)
   - [Custom](#custom-1)
 - [Parameters Substitution](#parameters-substitution)
+- [Concepts](#concepts)
+  - [Request Schema](#request-schema)
+  - [Response Schema](#response-schema)
+  - [Transport](#transport)
 - [API](#api)
   - [MockClient](#mockclient)
   - [Interceptors](#interceptors)
 - [License](#license)
 <!-- end-doc-gen -->
 
+</details>
 
 ## How it works
 
@@ -48,54 +52,6 @@ flowchart LR;
 2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
 3. The application server reads the mock header and applies the mocks to outgoing API calls.
 4. The page is rendered with data from the mocked response.
-
-## Concepts
-
-### Request Schema
-
-The request schema is a serializable object that defines parameters for matching a request.
-
-Example:
-```js
-{
-  method: 'GET', 
-  url: 'https://jsonplaceholder.typicode.com/users',
-  query: {
-    foo: 'bar'
-  }
-}
-```
-This schema will match the request:
-```
-GET https://jsonplaceholder.typicode.com/users?foo=bar
-```
-
-[Full schema definition.](src/protocol/request-schema.ts)
-
-### Response Schema
-
-The response schema is a serializable object that defines how to build the mocked response.
-
-Example:
-```js
-{
-  status: 200,
-  body: 'Hello world'
-}
-```
-
-[Full schema definition.](src/protocol/response-schema.ts)
-
-### Transport
-
-Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring JSON-stringified schemas from the test runner to the application server.
-
-Example:
-```
-x-mock-request: [{"reqSchema":{"method":"GET","patternType":"urlpattern","url":"https://example.com"},"resSchema":{"body":"hello","status":200}}]
-```
-
-On the server side, the interceptor will read the incoming headers and apply the mocks.
 
 ## Installation
 ```
@@ -187,7 +143,6 @@ You can write an interceptor for any framework. It requires two steps:
 
 Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
-
 ## Parameters Substitution
 
 You can define route parameters in the URL pattern and use them in the response:
@@ -212,6 +167,54 @@ will be mocked with the response:
   name: 'User 1',
 }
 ```
+
+## Concepts
+
+### Request Schema
+
+The request schema is a serializable object that defines parameters for matching a request.
+
+Example:
+```js
+{
+  method: 'GET', 
+  url: 'https://jsonplaceholder.typicode.com/users',
+  query: {
+    foo: 'bar'
+  }
+}
+```
+This schema will match the request:
+```
+GET https://jsonplaceholder.typicode.com/users?foo=bar
+```
+
+[Full schema definition.](src/protocol/request-schema.ts)
+
+### Response Schema
+
+The response schema is a serializable object that defines how to build the mocked response.
+
+Example:
+```js
+{
+  status: 200,
+  body: 'Hello world'
+}
+```
+
+[Full schema definition.](src/protocol/response-schema.ts)
+
+### Transport
+
+Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring JSON-stringified schemas from the test runner to the application server.
+
+Example:
+```
+x-mock-request: [{"reqSchema":{"method":"GET","patternType":"urlpattern","url":"https://example.com"},"resSchema":{"body":"hello","status":200}}]
+```
+
+On the server side, the interceptor will read the incoming headers and apply the mocks.
 
 ## API
 
