@@ -25,7 +25,7 @@ The schemas can be serialized and passed over the wire, allowing server-side API
   - [Next.js](#nextjs)
   - [Astro](#astro)
   - [Custom](#custom-1)
-- [Parameters Substitution](#parameters-substitution)
+- [Parameter Substitution](#parameter-substitution)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
@@ -42,7 +42,7 @@ The schemas can be serialized and passed over the wire, allowing server-side API
 
 ```mermaid
 flowchart LR;
-    A(Test Runner) -- "x-mock-request:<br><code style='font-size: 0.8em;padding: 0 10px'>{url:#quot;http:\/\/external/api#quot;,body:#quot;Hello#quot;}</code></span>" --> B(App Server);
+    A(Test Runner) -- "GET /home<br>x-mock-request:<br><code style='font-size: 0.8em;padding: 0 10px'>{url:#quot;http:\/\/external/api#quot;,body:#quot;Hello#quot;}</code></span>" --> B(App Server);
     B -- &lt;h1&gt;Hello&lt;/h1&gt; --> A;
     B -. Mocked! .-> C(External API);
     C -.-> B;
@@ -62,11 +62,11 @@ npm i -D request-mocking-protocol
 
 ## Test-runner Integration
 
-On the test-runner side, you can define server-side mocks via the `MockClient` class.
+On the test-runner side, you can define server-side mocks via the [`MockClient`](#mockclient) class.
 
 ### Playwright
 
-1. Set up the `mockServerRequest` fixture:
+1. Set up a custom fixture `mockServerRequest`:
     ```ts
     import { test as base } from '@playwright/test';
     import { MockClient } from 'request-mocking-protocol';
@@ -80,16 +80,23 @@ On the test-runner side, you can define server-side mocks via the `MockClient` c
     });
     ```
 
-2. Use the `mockServerRequest` fixture to define server-side request mocks:
+2. Use `mockServerRequest` in test to define server-side mocks:
     ```ts
     test('my test', async ({ page, mockServerRequest }) => {
+      // set up server-side mock
       await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
         body: [{ id: 1, name: 'John Smith' }],
       });
 
-      // ...
+      // navigate to the page
+      await page.goto('/');
+
+      // assert page content according to mock
+      await expect(page).toContainText('John Smith');
     });
     ```
+
+Check out [`MockClient`](#mockclient) API for other methods.
 
 ### Cypress
 
@@ -98,11 +105,16 @@ On the test-runner side, you can define server-side mocks via the `MockClient` c
 2. Use the custom command to define mocks:
     ```js
     it('shows list of users', () => {
+      // set up server-side mock
       cy.mockServerRequest('https://jsonplaceholder.typicode.com/users', {
         body: [{ id: 1, name: 'John Smith' }],
       });
 
-      // ...
+      // navigate to the page
+      cy.visit('/');
+
+      // assert page content according to mock
+      cy.get('li').first().should('have.text', 'John Smith');
     });
     ```
 
@@ -115,7 +127,7 @@ You can integrate RMP with any test runner. It requires two steps:
 
 ## Framework Integration
 
-On the server side, you should set up an interceptor to catch the requests and apply your mocks.
+On the server side, you should set up an [interceptor](#interceptors) to catch the requests and apply your mocks.
 
 ### Next.js
 
@@ -132,7 +144,7 @@ export async function register() {
 }
 ```
 
-> Note that you need to dynamically import the interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
+> **Note:** you need to dynamically import the interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
 
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
@@ -146,7 +158,7 @@ You can write an interceptor for any framework. It requires two steps:
 
 Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
-## Parameters Substitution
+## Parameter Substitution
 
 You can define route parameters in the URL pattern and use them in the response:
 
