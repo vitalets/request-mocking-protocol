@@ -5,9 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is designed to be a standard for declarative mocking of HTTP requests.
-It defines JSON schemas for catching a request and building a response. 
-The schemas can be serialized and passed over the wire, allowing server-side API calls to be mocked (e.g., in React Server Components).
+Request Mocking Protocol (RMP) is designed for declarative HTTP request mocking. It defines JSON schemas for capturing requests and constructing responses. These schemas can be serialized and transmitted over the network, enabling server-side API calls mocking (e.g., in React Server Components).
 
 ## Index
 
