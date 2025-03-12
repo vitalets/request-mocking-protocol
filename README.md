@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is an open standard for declarative mocking of HTTP requests.
+Request Mocking Protocol (RMP) is designed to be a standard for declarative mocking of HTTP requests.
 It defines JSON schemas for catching a request and building a response. 
 The schemas can be serialized and passed over the wire, allowing server-side API calls to be mocked (e.g., in React Server Components).
 
@@ -26,10 +26,12 @@ The schemas can be serialized and passed over the wire, allowing server-side API
   - [Astro](#astro)
   - [Custom](#custom-1)
 - [Parameter Substitution](#parameter-substitution)
+- [Response Patching](#response-patching)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
   - [Transport](#transport)
+- [Limitations](#limitations)
 - [API](#api)
   - [MockClient](#mockclient)
   - [Interceptors](#interceptors)
@@ -53,7 +55,7 @@ flowchart LR;
 3. The application server reads the mock header and applies the mocks to outgoing API calls.
 4. The page is rendered with data from the mocked response.
 
-Check out the [Concepts](#concepts) for more details.
+Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
 ## Installation
 ```
@@ -183,6 +185,43 @@ will be mocked with the response:
 }
 ```
 
+## Response Patching
+
+Response patching allows to make a real request, but modify parts of the response for the testing purposes.
+RMP supports response patching by providing the `bodyPatch` key in the response schema:
+
+```ts
+await mockClient.GET('https://jsonplaceholder.typicode.com/users', {
+  bodyPatch: {
+    '[0].address.city': 'New York',
+  },
+});
+```
+The final response will contain actual and modified data:
+```diff
+[
+  {
+    "id": 1,
+    "name": "Leanne Graham",
+    "address": {
+-      "city": "Gwenborough",
++      "city": "New York",
+      ...
+    }
+  }
+  ...
+]    
+```
+This technique is particularly useful to keep your tests in sync with actual API responses, while maintaining test stability and logic.
+
+The `bodyPatch` contains object in a form:
+```
+{
+  [path.to.property]: new value
+}
+```
+`path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
+
 ## Concepts
 
 ### Request Schema
@@ -230,6 +269,12 @@ x-mock-request: [{"reqSchema":{"method":"GET","patternType":"urlpattern","url":"
 ```
 
 On the server side, the interceptor will read the incoming headers and apply the mocks.
+
+## Limitations
+
+1. **Static Data Only:** The mock must be serializable to JSON. This means you can't provide arbitrary function-based mocks. To mitigate this restriction, RMP supports [Parameter Substitution](#parameter-substitution) and [Response Patching](#response-patching) techniques.
+
+2. **Header Size Limits:** HTTP headers typically support 4KB to 8KB of data. This approach is best suited for small payloads.
 
 ## API
 
