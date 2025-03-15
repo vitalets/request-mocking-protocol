@@ -25,6 +25,7 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
   - [Custom](#custom-1)
 - [Parameter Substitution](#parameter-substitution)
 - [Response Patching](#response-patching)
+- [Debugging](#debugging)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
@@ -219,6 +220,28 @@ The `bodyPatch` contains object in a form:
 }
 ```
 `path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
+
+## Debugging
+
+You can debug the mocking process by providing `debug: true` option to either request or response schema:
+
+```ts
+await mockClient.GET(
+  {
+    url: 'https://jsonplaceholder.typicode.com/users',
+    query: {
+      foo: 'bar',
+    },
+    debug: true, // <-- use debugging
+  },
+  {
+    body: [{ id: 1, name: 'John Smith' }],
+  },
+);
+```
+When applying this mock, the server console with output the following:
+
+<img width="661" alt="Image" src="https://github.com/user-attachments/assets/b861ddc2-ebee-41fd-911f-ef37330a5854" />
 
 ## Concepts
 
