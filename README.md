@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP requests. It defines JSON schemas for capturing requests and constructing responses. These schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
+Request Mocking Protocol (RMP) is a declarative specification for mocking HTTP requests. It defines JSON schemas for capturing requests and building responses. These schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
 
 ## Index
 
@@ -41,17 +41,11 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
 
 ## How it works
 
-```mermaid
-flowchart LR;
-    A(Test Runner) -- "GET /home<br>x-mock-request:<br><code style='font-size: 0.8em;padding: 0 10px'>{url:#quot;http:\/\/external/api#quot;,body:#quot;Hello#quot;}</code></span>" --> B(App Server);
-    B -- &lt;h1&gt;Hello&lt;/h1&gt; --> A;
-    B -. Mocked! .-> C(External API);
-    C -.-> B;
-```    
+![How RMP works](https://github.com/user-attachments/assets/d274ef54-cabe-45fe-9684-5fd6dc0d626f)
 
-1. The test runner defines a mock as a request and response in JSON format.
-2. When a webpage is opened, the mock is attached to the navigation request as a custom HTTP header.
-3. The application server reads the mock header and applies the mocks to outgoing API calls.
+1. The test runner setups a request mock in JSON format.
+2. The mock is attached to the webpage navigation request as a custom HTTP header.
+3. The application server reads the mock header and applies the mock to outgoing API calls.
 4. The page is rendered with data from the mocked response.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
