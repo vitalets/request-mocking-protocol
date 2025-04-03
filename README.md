@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is a declarative specification for mocking HTTP requests. It defines JSON schemas for capturing requests and building responses. These schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
+Request Mocking Protocol (RMP) is a declarative specification for mocking HTTP requests. It defines JSON schemas for capturing requests and building responses. The schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
 
 ## Index
 
@@ -43,7 +43,7 @@ Request Mocking Protocol (RMP) is a declarative specification for mocking HTTP r
 
 ![How RMP works](https://github.com/user-attachments/assets/d274ef54-cabe-45fe-9684-5fd6dc0d626f)
 
-1. The test runner setups a request mock in JSON format.
+1. The test runner declares a request mock in JSON format.
 2. The mock is attached to the webpage navigation request as a custom HTTP header.
 3. The application server reads the mock header and applies the mock to outgoing API calls.
 4. The page is rendered with data from the mocked response.
@@ -124,22 +124,28 @@ You can integrate RMP with any test runner. It requires two steps:
 
 On the server side, you should set up an [interceptor](#interceptors) to catch the requests and apply your mocks.
 
-### Next.js
+### Next.js (App router)
 
 Add the following code to the [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) file:
+
+Add the following code to the top level `layout.tsx`:
 ```ts
-// instrumentation.ts
+// app/layout.tsx
 import { headers } from 'next/headers';
 
-export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
-    const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
-    setupFetchInterceptor(() => headers());
-  }
+if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+  const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
+  setupFetchInterceptor(() => headers());
 }
+
+// ...
 ```
 
-> **Note:** you need to dynamically import the interceptor inside `process.env.NEXT_RUNTIME = 'nodejs'`. 
+> [!NOTE]
+> Apply interceptor only in `nodejs` runtime.
+
+> [!IMPORTANT]
+> Don't load interceptor inside [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation), as it will be cleared in dev server after re-compilation.
 
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
