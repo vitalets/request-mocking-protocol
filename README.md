@@ -5,63 +5,35 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is a declarative specification for mocking HTTP requests. It defines JSON schemas for capturing requests and building responses. The schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
+Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP requests. It provides JSON schemas for capturing requests and building responses. The schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
 
-## Index
+## Features
 
-<details>
-<summary>Click to expand</summary>
+- [**Server-Side Mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
 
-<!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
-- [How it works](#how-it-works)
-- [Installation](#installation)
-- [Test-runner Integration](#test-runner-integration)
-  - [Playwright](#playwright)
-  - [Cypress](#cypress)
-  - [Custom](#custom)
-- [Framework Integration](#framework-integration)
-  - [Next.js (App router)](#nextjs-app-router)
-  - [Astro](#astro)
-  - [Custom](#custom-1)
-- [Parameter Substitution](#parameter-substitution)
-- [Response Patching](#response-patching)
-- [Debugging](#debugging)
-- [Concepts](#concepts)
-  - [Request Schema](#request-schema)
-  - [Response Schema](#response-schema)
-  - [Transport](#transport)
-- [Limitations](#limitations)
-- [API](#api)
-  - [MockClient](#mockclient)
-    - [Constructor](#constructor)
-      - [`constructor(options?: MockClientOptions)`](#constructoroptions-mockclientoptions)
-    - [Properties](#properties)
-      - [`headers: Record<string, string>`](#headers-recordstring-string)
-      - [`onChange?: (headers: Record<string, string>) => void`](#onchange-headers-recordstring-string--void)
-    - [Methods](#methods)
-      - [`async addMock(reqSchema, resSchema): Promise<void>`](#async-addmockreqschema-resschema-promisevoid)
-      - [`async GET(reqSchema, resSchema): Promise<void>`](#async-getreqschema-resschema-promisevoid)
-      - [`async POST(reqSchema, resSchema): Promise<void>`](#async-postreqschema-resschema-promisevoid)
-      - [`async PUT(reqSchema, resSchema): Promise<void>`](#async-putreqschema-resschema-promisevoid)
-      - [`async DELETE(reqSchema, resSchema): Promise<void>`](#async-deletereqschema-resschema-promisevoid)
-      - [`async HEAD(reqSchema, resSchema): Promise<void>`](#async-headreqschema-resschema-promisevoid)
-      - [`async ALL(reqSchema, resSchema): Promise<void>`](#async-allreqschema-resschema-promisevoid)
-      - [`async reset(): Promise<void>`](#async-reset-promisevoid)
-  - [Interceptors](#interceptors)
-    - [Fetch](#fetch)
-    - [MSW](#msw)
-- [License](#license)
-<!-- end-doc-gen -->
+- [**Per-Test Mock Isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
 
-</details>
+- [**Modern Test Runner Support**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
+
+- [**Framework-Agnostic Interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
+
+- [**Flexible Request Matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
+
+- [**Parameter Substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
+
+- [**Response Patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
+
+- [**Intuitive API**](#api): Provides a first-class `MockClient` for setting up the mocks.
+
+- [**Debug-Friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
 
 ## How it works
 
 ![How RMP works](https://github.com/user-attachments/assets/d274ef54-cabe-45fe-9684-5fd6dc0d626f)
 
-1. The test runner declares a request mock in JSON format.
-2. The mock is attached to the webpage navigation request as a custom HTTP header.
-3. The application server reads the mock header and applies the mock to outgoing API calls.
+1. The test runner declares a request mock in the JSON format.
+2. The mock is attached to the webpage navigation request inside a custom HTTP header.
+3. The application server reads the header and applies the mock to outgoing API calls.
 4. The page is rendered with data from the mocked response.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
@@ -73,7 +45,9 @@ npm i -D request-mocking-protocol
 
 ## Test-runner Integration
 
-On the test-runner side, you can define server-side mocks via the [`MockClient`](#mockclient) class.
+RMP is designed to work seamlessly with popular test runners like Playwright and Cypress, and can also be integrated with custom runners.
+
+Each test defines its own mocks using a [`MockClient`](#mockclient) class. Mocks are not shared across tests, enabling **per-test mock isolation** and **full parallelization**.
 
 ### Playwright
 
@@ -174,6 +148,48 @@ You can write an interceptor for any framework. It requires two steps:
 2. Capture outgoing HTTP requests.
 
 Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
+
+## Request Matching
+
+RMP offers flexible matching options to ensure your mocks are applied exactly when you need them:
+
+- **Exact URL Matching**: Match requests by providing a full URL string.
+  ```ts
+  await mockClient.GET('https://api.example.com/users', { body: [] });
+  ```
+
+- **Wildcard Matching**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
+  ```ts
+  await mockClient.GET('https://api.example.com/users/*', { body: [] });
+  ```
+
+- **Regular Expression Matching**: Match requests using JavaScript regular expressions.
+  ```ts
+  await mockClient.GET(/\/users\/\d+$/, { body: {} });
+  ```
+
+- **Query Parameter Matching**: Match specific query parameters for more targeted mocks.
+  ```ts
+  await mockClient.GET({
+    url: 'https://api.example.com/users',
+    query: { role: 'admin' },
+  }, { body: [] });
+  ```
+
+- **Method-Based Matching**: Explicitly define the HTTP method (`GET`, `POST`, etc.) to avoid accidental matches.
+  ```ts
+  await mockClient.POST('https://api.example.com/users', { status: 201 });
+  ```
+
+- **Schema Matching**: Use full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
+  ```ts
+  await mockClient.GET({
+    method: 'GET',
+    url: 'https://api.example.com/users',
+    query: { active: 'true' },
+    debug: true,
+  }, { body: [] });
+  ```
 
 ## Parameter Substitution
 
