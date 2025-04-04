@@ -9,15 +9,15 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
 
 ## Features
 
-- [**Server-Side Mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
-- [**Per-Test Mock Isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
-- [**Modern Test Runner Support**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
-- [**Framework-Agnostic Interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
-- [**Flexible Request Matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
-- [**Parameter Substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
-- [**Response Patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
+- [**Server-side mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
+- [**Per-test mock isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
+- [**Modern test runner support**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
+- [**Framework-agnostic interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
+- [**Flexible request matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
+- [**Parameter substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
+- [**Response patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
 - [**Intuitive API**](#api): Provides a first-class `MockClient` for setting up the mocks.
-- [**Debug-Friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
+- [**Debug-friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
 
 ## How it works
 
