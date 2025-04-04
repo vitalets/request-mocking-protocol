@@ -145,22 +145,22 @@ Check out the reference implementations in the [src/interceptors](src/intercepto
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them:
 
-- **Exact URL Matching**: Match requests by providing a full URL string.
+- **Exact URL matching**: Match requests by providing a full URL string.
   ```ts
   await mockClient.GET('https://api.example.com/users', { body: [] });
   ```
 
-- **Wildcard Matching**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
+- **Wildcard matching**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
   ```ts
   await mockClient.GET('https://api.example.com/users/*', { body: [] });
   ```
 
-- **Regular Expression Matching**: Match requests using JavaScript regular expressions.
+- **Regular expression matching**: Match requests using JavaScript regular expressions.
   ```ts
   await mockClient.GET(/\/users\/\d+$/, { body: {} });
   ```
 
-- **Query Parameter Matching**: Match specific query parameters for more targeted mocks.
+- **Query parameter matching**: Match specific query parameters for more targeted mocks.
   ```ts
   await mockClient.GET({
     url: 'https://api.example.com/users',
@@ -168,12 +168,12 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   }, { body: [] });
   ```
 
-- **Method-Based Matching**: Explicitly define the HTTP method (`GET`, `POST`, etc.) to avoid accidental matches.
+- **Method-based matching**: Explicitly define the HTTP method (`GET`, `POST`, etc.) to avoid accidental matches.
   ```ts
   await mockClient.POST('https://api.example.com/users', { status: 201 });
   ```
 
-- **Schema Matching**: Use full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
+- **Schema matching**: Use full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
   ```ts
   await mockClient.GET({
     method: 'GET',
