@@ -3,6 +3,7 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+* Update dependencies
 
 ## [0.1.2] - 2025-04-02
 * Fix lodash imports
