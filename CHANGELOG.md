@@ -3,6 +3,8 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+
+## [0.1.3] - 2025-06-19
 * Update dependencies
 
 ## [0.1.2] - 2025-04-02
@@ -17,7 +19,8 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.2...HEAD
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.3...HEAD
+[0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.2...0.1.3
 [0.1.2]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/vitalets/request-mocking-protocol/releases/tag/0.1.0
