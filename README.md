@@ -7,25 +7,13 @@
 
 Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP requests. It provides JSON schemas for capturing requests and building responses. The schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
 
-## Features
-
-- [**Server-side mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
-- [**Per-test mock isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
-- [**Modern test-runners integration**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
-- [**Framework-agnostic interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
-- [**Flexible request matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
-- [**Parameter substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
-- [**Response patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
-- [**Fluent API**](#api): Use a `MockClient` class for setting up the mocks.
-- [**Debug-friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
-
 ## Index
 <details>
 <summary>Click to expand</summary>
 
 <!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
-- [Features](#features)
 - [Index](#index)
+- [Features](#features)
 - [How it works](#how-it-works)
 - [Installation](#installation)
 - [Test-runner Integration](#test-runner-integration)
@@ -52,6 +40,18 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
 <!-- end-doc-gen -->
 
 </details>
+
+## Features
+
+- [**Server-side mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
+- [**Per-test mock isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
+- [**Modern test-runners integration**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
+- [**Framework-agnostic interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
+- [**Flexible request matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
+- [**Parameter substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
+- [**Response patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
+- [**Fluent API**](#api): Use a `MockClient` class for setting up the mocks.
+- [**Debug-friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
 
 ## How it works
 
