@@ -430,5 +430,21 @@ mswServer.listen();
 
 The actual function for retrieving incoming headers depends on the application framework. 
 
+Example with Next.js:
+```ts
+// app/layout.tsx
+import { headers } from 'next/headers';
+
+if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+  const { setupServer } = await import('msw/node');
+  const { createHandler } = await import('request-mocking-protocol/msw');
+  const mockHandler = createHandler(() => headers());
+  const mswServer = setupServer(mockHandler);
+  mswServer.listen();
+}
+
+export default function RootLayout({ ... });
+```
+
 ## License
 [MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
