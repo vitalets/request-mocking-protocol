@@ -19,6 +19,40 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
 - [**Fluent API**](#api): Use a `MockClient` class for setting up the mocks.
 - [**Debug-friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
 
+## Index
+<details>
+<summary>Click to expand</summary>
+
+<!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
+- [Features](#features)
+- [Index](#index)
+- [How it works](#how-it-works)
+- [Installation](#installation)
+- [Test-runner Integration](#test-runner-integration)
+  - [Playwright](#playwright)
+  - [Cypress](#cypress)
+  - [Custom](#custom)
+- [Framework Integration](#framework-integration)
+  - [Next.js (App router)](#nextjs-app-router)
+  - [Astro](#astro)
+  - [Custom](#custom-1)
+- [Request Matching](#request-matching)
+- [Parameter Substitution](#parameter-substitution)
+- [Response Patching](#response-patching)
+- [Debugging](#debugging)
+- [Concepts](#concepts)
+  - [Request Schema](#request-schema)
+  - [Response Schema](#response-schema)
+  - [Transport](#transport)
+- [Limitations](#limitations)
+- [API](#api)
+  - [MockClient](#mockclient)
+  - [Interceptors](#interceptors)
+- [License](#license)
+<!-- end-doc-gen -->
+
+</details>
+
 ## How it works
 
 ![How RMP works](https://github.com/user-attachments/assets/d274ef54-cabe-45fe-9684-5fd6dc0d626f)
