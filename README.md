@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP requests. It provides JSON schemas for capturing requests and building responses. The schemas can be serialized and transmitted over the network, enabling both client-side and server-side mocking (e.g., in React Server Components).
+**Request Mocking Protocol (RMP)** is a specification for declarative mocking of HTTP requests. It uses JSON schemas to define request matchers and response builders. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
 
 ## Index
 <details>
@@ -43,24 +43,24 @@ Request Mocking Protocol (RMP) is designed for declarative mocking of HTTP reque
 
 ## Features
 
-- [**Server-side mocking**](#how-it-works): Apply mocks on the server by transmitting them via a custom HTTP header.
-- [**Per-test mock isolation**](#test-runner-integration): Define mocks within each test and run the entire suite in parallel against the same app instance.
-- [**Modern test-runners integration**](#test-runner-integration): Seamlessly integrates with **Playwright**, **Cypress**, and any custom test runner.
-- [**Framework-agnostic interceptors**](#framework-integration): Use built-in interceptors for **Next.js**, **Astro**, or integrate with any other framework.
-- [**Flexible request matching**](#request-matching): Match requests by exact URL, wildcards, query parameters, headers, or body content.
-- [**Parameter substitution**](#parameter-substitution): Dynamically replace route or query parameters in mock responses using `{{ }}` syntax.
-- [**Response patching**](#response-patching): Fetch real API responses and override only what you need, keeping mocks in sync with backend changes.
-- [**Fluent API**](#api): Use a `MockClient` class for setting up the mocks.
-- [**Debug-friendly**](#debugging): Add `debug: true` to any mock and get a nicely formatted breakdown of the mocking process.
+* [**Server-side mocking**](#how-it-works) – Transmit mocks via a custom HTTP header to apply them on the server.
+* [**Per-test isolation**](#test-runner-integration) – Define mocks inside each test, enabling full parallel test execution.
+* [**Test runner support**](#test-runner-integration) – Works with **Playwright**, **Cypress**, and custom runners.
+* [**Framework-agnostic**](#framework-integration) – Built-in support for **Next.js** and **Astro**, or integrate with any framework.
+* [**Request matching**](#request-matching) – Match requests by URL, wildcard, query, headers, or body.
+* [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
+* [**Dynamic parameters**](#parameter-substitution) – Use `{{ }}` placeholders to inject route/query values into responses.
+* [**Clean API**](#api) – Set up mocks easily using a `MockClient` class.
+* [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## How it works
 
-![How RMP works](https://github.com/user-attachments/assets/d274ef54-cabe-45fe-9684-5fd6dc0d626f)
+![How RMP works](https://github.com/user-attachments/assets/5fb4e348-a88c-4f50-af7c-5fe319fc24ed)
 
-1. The test runner declares a request mock in the JSON format.
-2. The mock is attached to the webpage navigation request inside a custom HTTP header.
-3. The application server reads the header and applies the mock to outgoing API calls.
-4. The page is rendered with data from the mocked response.
+1. The test runner defines a request mock as a JSON object.
+2. The mock is sent with the page navigation via a custom HTTP header.
+3. The server reads the header and applies the mock to outgoing API requests.
+4. The page loads with data from the mocked response.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
@@ -141,8 +141,6 @@ You can integrate RMP with any test runner. It requires two steps:
 On the server side, you should set up an [interceptor](#interceptors) to catch the requests and apply your mocks.
 
 ### Next.js (App router)
-
-Add the following code to the [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) file:
 
 Add the following code to the top level `layout.tsx`:
 ```ts

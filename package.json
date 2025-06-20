@@ -43,6 +43,7 @@
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
     "test": "vitest run --no-cache --testTimeout 10000 --dir ./test",
+    "pw:browsers": "PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium",
     "toc": "md-magic --files README.md",
     "build": "./scripts/build.sh",
     "release": "release-it"
