@@ -36,6 +36,7 @@
 - [API](#api)
   - [MockClient](#mockclient)
   - [Interceptors](#interceptors)
+- [Comparison with MSW](#comparison-with-msw)
 - [License](#license)
 <!-- end-doc-gen -->
 
@@ -50,7 +51,7 @@
 * [**Request matching**](#request-matching) – Match requests by URL, wildcard, query, headers, or body.
 * [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
 * [**Dynamic parameters**](#parameter-substitution) – Use `{{ }}` placeholders to inject route/query values into responses.
-* [**Clean API**](#api) – Set up mocks easily using a `MockClient` class.
+* [**Mocks API**](#api) – Set up mocks easily using a `MockClient` class.
 * [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## How it works
@@ -431,7 +432,7 @@ Clears all mocks and rebuilds the headers.
 Interceptors are used on the server to capture HTTP requests and apply mocks.
 Currently, there are two interceptors available.
 
-#### Fetch
+#### Global Fetch
 
 This interceptor overwrites the `globalThis.fetch` function.
 
@@ -445,9 +446,9 @@ setupFetchInterceptor(() => {
 ```
 The actual function for retrieving incoming headers depends on the application framework. 
 
-#### MSW
+#### MSW Interceptor
 
-You can use [MSW](https://mswjs.io/docs/integrations/node) to intercept server-side requests:
+If your app doesn’t use `fetch`, you can try the [MSW](https://mswjs.io/docs/integrations/node) interceptor, which can capture a broader range of request types:
 
 ```ts
 import { setupServer } from 'msw/node';
@@ -460,9 +461,9 @@ const mswServer = setupServer(mockHandler);
 mswServer.listen();
 ```
 
-The actual function for retrieving incoming headers depends on the application framework. 
+> Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](#api) class.
 
-Example with Next.js:
+The function for retrieving incoming HTTP headers depends on the application framework. Example for **Next.js**:
 ```ts
 // app/layout.tsx
 import { headers } from 'next/headers';
@@ -477,6 +478,21 @@ if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'productio
 
 export default function RootLayout({ ... });
 ```
+
+## Comparison with MSW
+
+While both RMP and MSW support request mocking, RMP stands out by enabling **per-test isolation and parallelization for server-side mocks**. It also allows mocking server-side requests when tests run on CI against a remote target.
+
+| Feature                                     | RMP | MSW |
+| ------------------------------------------- | :-: | :--: |
+| REST API                            |  ✅  |   ✅  |
+| GraphQL API                         |  ❌  |   ✅  |
+| Arbitrary handler function                  |  ❌  |   ✅  |
+| Server-side mocking                         |  ✅  |   ✅  |
+| Server-side mocking with per-test isolation |  ✅  |  ❌¹  |
+| Server-side mocking on CI                   |  ✅  |   ❌  |
+
+¹ *Per-test isolation in MSW can be achieved via spinning a separate app instance for each test. See [this example](https://github.com/kettanaito/nextjs-rsc-testing).*
 
 ## License
 [MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
