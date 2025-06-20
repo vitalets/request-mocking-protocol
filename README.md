@@ -56,7 +56,7 @@
 
 ## How it works
 
-![How RMP works](https://github.com/user-attachments/assets/5fb4e348-a88c-4f50-af7c-5fe319fc24ed)
+![How RMP works](https://github.com/user-attachments/assets/dd72d254-3f2d-44a7-92da-68be3495d6bb)
 
 1. The test runner defines a request mock as a JSON object.
 2. The mock is sent with the page navigation via a custom HTTP header.
