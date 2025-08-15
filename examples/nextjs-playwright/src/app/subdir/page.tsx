@@ -24,7 +24,7 @@ export default async function Home() {
         ))}
       </ul>
       <div>
-        <Link href="/subdir">subdir</Link>
+        <Link href="/">Home</Link>
       </div>
     </>
   );
