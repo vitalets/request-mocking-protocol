@@ -7,6 +7,17 @@
 
 **Request Mocking Protocol (RMP)** is a specification for declarative mocking of HTTP requests. It uses JSON schemas to define request matchers and response builders. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
 
+## How it works
+
+![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
+
+1. The test runner defines a request mock as a JSON object.
+2. The mock is sent with the page navigation via a custom HTTP header.
+3. The server reads the header and applies the mock to outgoing API requests.
+4. The page loads with data from the mocked response.
+
+Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
+
 ## Index
 <details>
 <summary>Click to expand</summary>
@@ -53,17 +64,6 @@
 * [**Dynamic parameters**](#parameter-substitution) – Use `{{ }}` placeholders to inject route/query values into responses.
 * [**Mocks API**](#api) – Set up mocks easily using a `MockClient` class.
 * [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
-
-## How it works
-
-![How RMP works](https://github.com/user-attachments/assets/dd72d254-3f2d-44a7-92da-68be3495d6bb)
-
-1. The test runner defines a request mock as a JSON object.
-2. The mock is sent with the page navigation via a custom HTTP header.
-3. The server reads the header and applies the mock to outgoing API requests.
-4. The page loads with data from the mocked response.
-
-Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
 ## Installation
 ```
