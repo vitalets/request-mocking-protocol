@@ -4,7 +4,7 @@ const baseURL = 'http://localhost:3000';
 
 export default defineConfig({
   testDir: 'test',
-  reporter: [['html', { open: 'never' }]],
+  reporter: [['list'], ['html', { open: 'never' }]],
   webServer: {
     command: 'npm run dev',
     url: baseURL,
