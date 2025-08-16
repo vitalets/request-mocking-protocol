@@ -24,7 +24,7 @@ export default async function Home() {
         ))}
       </ul>
       <div>
-        <Link href="/sub-page">Sub page</Link> | <Link href="/heavy-page">Heavy page</Link>
+        <Link href="/sub-page">Sub page</Link>
       </div>
     </>
   );

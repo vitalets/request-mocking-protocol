@@ -12,11 +12,11 @@ test('show users on the home page', async ({ page, mockServerRequest }) => {
 });
 
 test('show users on sub page', async ({ page, mockServerRequest }) => {
+  await page.goto('/');
+
   await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
     body: [{ id: 1, name: 'John Smith' }],
   });
-
-  await page.goto('/');
   await page.getByRole('link', { name: 'sub page' }).click();
 
   await expect(page.getByRole('listitem')).toHaveText(['John Smith']);
