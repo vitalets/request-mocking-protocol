@@ -23,26 +23,26 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 <summary>Click to expand</summary>
 
 <!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
+- [How it works](#how-it-works)
 - [Index](#index)
 - [Features](#features)
-- [How it works](#how-it-works)
 - [Installation](#installation)
 - [Test-runner Integration](#test-runner-integration)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
-  - [Custom](#custom)
+  - [Custom Runner](#custom-runner)
 - [Framework Integration](#framework-integration)
   - [Next.js (App router)](#nextjs-app-router)
   - [Astro](#astro)
-  - [Custom](#custom-1)
+  - [Custom Framework](#custom-framework)
 - [Request Matching](#request-matching)
 - [Parameter Substitution](#parameter-substitution)
 - [Response Patching](#response-patching)
+- [Caching](#caching)
 - [Debugging](#debugging)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
-  - [Transport](#transport)
 - [Limitations](#limitations)
 - [API](#api)
   - [MockClient](#mockclient)
@@ -130,12 +130,22 @@ Check out [`MockClient`](#mockclient) API for other methods.
     });
     ```
 
-### Custom
+### Custom Runner
 
 You can integrate RMP with any test runner. It requires two steps:
 
-1. Use the `MockClient` class to define mocks.
-2. Attach `mockClient.headers` to the navigation request.
+1. Use the [`MockClient`](#mockclient) class to define mocks.
+   ```js
+   const mockClient = new MockClient();
+   ```
+
+2. Attach [`mockClient.headers`](#headers-recordstring-string) to the navigation request.
+   ```js
+   const headers = {
+    ...mockClient.headers
+   };
+   // ...navigate to the page with provided headers
+   ```
 
 ## Framework Integration
 
@@ -165,7 +175,7 @@ if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'productio
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
 
-### Custom
+### Custom Framework
 
 You can write an interceptor for any framework. It requires two steps:
 
@@ -278,6 +288,41 @@ The `bodyPatch` contains object in a form:
 ```
 `path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
 
+## Caching
+
+You can leverage RMP to cache server-side API calls and speed up your E2E tests. 
+The key point here is how to initially get API response for caching, as test and server runs in different contexts or even different machines?
+
+One solution is to inject API response into a hidden HTML element in non production environments.
+Then tests can read the response and provide it as a mock for futher navigations.
+
+Example:
+```tsx
+// app/page.tsx
+
+export default async function Page() {
+  const users = await fetchUsers();
+
+  return (
+    <>
+      {/* ...render users */}
+
+      {/* Embed raw response for testing */}
+      {process.env.NODE_ENV !== 'production' && (
+        <script id="users-response" type="application/json">
+          {JSON.stringify(users)}
+        </script>
+      )}
+    </>
+  );
+}
+```
+In the test you can 
+```ts
+```
+
+> It increases page size but the benefits from caching heavy requests are usually better
+
 ## Debugging
 
 You can debug the mocking process by providing `debug: true` option to either request or response schema:
@@ -374,11 +419,11 @@ Creates a new instance of `MockClient`.
 
 ##### `headers: Record<string, string>`
 
-Returns HTTP headers that are built from the mock schemas. Can be sent to the server for mocking server-side requests.
+Returns HTTP headers that are built from the mock schemas. Should be sent to the server for mocking server-side requests.
 
 ##### `onChange?: (headers: Record<string, string>) => void`
 
-A callback function that is called whenever the mocks are changed.
+A callback function that is called whenever the mocks are changed. Accepts `headers` parameter that can be attached to the browsing context and send to the server.
 
 #### Methods
 
@@ -402,7 +447,7 @@ Adds a new mock for the corresponding HTTP method.
 Examples:
 ```ts
 // mock any GET request to https://example.com
-await mockServerRequest.GET('https://example.com/*', {
+await mockClient.GET('https://example.com/*', {
   body: { 
     id: 1, 
     name: 'John Smith' 
@@ -410,7 +455,7 @@ await mockServerRequest.GET('https://example.com/*', {
 });
 
 // mock any POST request to https://example.com having foo=bar in query
-await mockServerRequest.POST({
+await mockClient.POST({
   url: 'https://example.com/*',
   query: {
     foo: 'bar'
