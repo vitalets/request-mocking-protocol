@@ -217,9 +217,9 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   await mockClient.POST('https://api.example.com/users', { status: 201 });
   ```
 
-- **Schema matching**: Use full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
+- **Schema matching**: Use `.addMock()` method with full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
   ```ts
-  await mockClient.GET({
+  await mockClient.addMock({
     method: 'GET',
     url: 'https://api.example.com/users',
     query: { active: 'true' },
