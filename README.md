@@ -158,7 +158,7 @@ Add the following code to the top level `layout.tsx`:
 // app/layout.tsx
 import { headers } from 'next/headers';
 
-if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+if (process.env.VERCEL_ENV !== 'production') {
   const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
   setupFetchInterceptor(() => headers());
 }
@@ -167,7 +167,8 @@ if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'productio
 ```
 
 > [!NOTE]
-> Apply interceptor only in `nodejs` runtime.
+> Don't use `process.env.NODE_ENV` for detecting non-production environment, 
+> because even preview deployments will have it as `production`.
 
 > [!IMPORTANT]
 > Don't load interceptor inside [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation), as it will be cleared in dev server after re-compilation.
@@ -308,7 +309,7 @@ export default async function Page() {
       {/* ...render users */}
 
       {/* Embed raw response for testing */}
-      {process.env.NODE_ENV !== 'production' && (
+      {process.env.VERCEL_ENV !== 'production' && (
         <script id="users-response" type="application/json">
           {JSON.stringify(users)}
         </script>
@@ -513,7 +514,7 @@ The function for retrieving incoming HTTP headers depends on the application fra
 // app/layout.tsx
 import { headers } from 'next/headers';
 
-if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'production') {
+if (process.env.VERCEL_ENV !== 'production') {
   const { setupServer } = await import('msw/node');
   const { createHandler } = await import('request-mocking-protocol/msw');
   const mockHandler = createHandler(() => headers());
