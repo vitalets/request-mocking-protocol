@@ -62,6 +62,7 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 * [**Request matching**](#request-matching) – Match requests by URL, wildcard, query, headers, or body.
 * [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
 * [**Dynamic parameters**](#parameter-substitution) – Use `{{ }}` placeholders to inject route/query values into responses.
+* [**Caching**](#caching) – Cache requests on server to make subsequent tests run faster.
 * [**Mocks API**](#api) – Set up mocks easily using a `MockClient` class.
 * [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
@@ -291,13 +292,12 @@ The `bodyPatch` contains object in a form:
 
 ## Caching
 
-You can leverage RMP to cache server-side API calls and speed up your E2E tests. 
-The key point here is how to initially get API response for caching, as test and server runs in different contexts or even different machines?
+You can leverage RMP to cache **server-side** API calls.
+The key question: how to initially fetch API response to put into cache?
 
-One solution is to inject API response into a hidden HTML element in non production environments.
-Then tests can read the response and provide it as a mock for futher navigations.
+The proposed solution is to return response as a hidden HTML element (in non-production environments). Tests can extract the response from the page source, and provide it as a mock during subsequent navigations.
 
-Example:
+In the app:
 ```tsx
 // app/page.tsx
 
@@ -318,11 +318,10 @@ export default async function Page() {
   );
 }
 ```
-In the test you can 
+In the test:
 ```ts
+// tbd
 ```
-
-> It increases page size but the benefits from caching heavy requests are usually better
 
 ## Debugging
 
