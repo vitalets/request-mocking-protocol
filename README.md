@@ -164,7 +164,9 @@ if (process.env.VERCEL_ENV !== 'production') {
   setupFetchInterceptor(() => headers());
 }
 
-// ...
+export default function Layout() {
+  // ...
+}
 ```
 
 > [!NOTE]
@@ -252,7 +254,7 @@ RMP lets you mock any part of the response.
   });
   ```
 
-- **Emulate errors**: Set arbitrary HTTP status code.
+- **Status code**: Set arbitrary HTTP status code to emulate errors.
   ```ts
   await mockClient.GET('https://example.com/*', { 
     status: 500
