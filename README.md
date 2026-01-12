@@ -354,15 +354,17 @@ await mockClient.GET(
   },
 );
 ```
-When applying this mock, the server console with output the following:
+When debug enabled, the server will output mocking logs to console:
 
-<img width="661" alt="Image" src="https://github.com/user-attachments/assets/b861ddc2-ebee-41fd-911f-ef37330a5854" />
+![Debug logs](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/debug.png)
 
 ## Concepts
 
 ### Request Schema
 
 The request schema is a serializable object that defines parameters for matching a request.
+
+[Full schema definition](src/protocol/request-schema.ts).
 
 Example:
 ```js
@@ -379,11 +381,11 @@ This schema will match the request:
 GET https://jsonplaceholder.typicode.com/users?foo=bar
 ```
 
-[Full schema definition.](src/protocol/request-schema.ts)
-
 ### Response Schema
 
 The response schema is a serializable object that defines how to build the mocked response.
+
+[Full schema definition](src/protocol/response-schema.ts).
 
 Example:
 ```js
@@ -392,8 +394,6 @@ Example:
   body: 'Hello world'
 }
 ```
-
-[Full schema definition.](src/protocol/response-schema.ts)
 
 ### Transport
 
@@ -410,7 +410,7 @@ On the server side, the interceptor will read the incoming headers and apply the
 
 1. **Static Data Only:** The mock must be serializable to JSON. This means you can't provide arbitrary function-based mocks. To mitigate this restriction, RMP supports [Parameter Substitution](#parameter-substitution) and [Response Patching](#response-patching) techniques.
 
-2. **Header Size Limits:** HTTP headers typically support 4KB to 8KB of data. This approach is best suited for small payloads.
+2. **Header Size Limits:** HTTP headers typically support 4KB to 8KB of data. If you need to mock larger payloads, consider [Response patching](#response-patching) or alternative techniques.
 
 ## API
 
