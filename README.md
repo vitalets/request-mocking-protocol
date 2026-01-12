@@ -11,10 +11,10 @@
 
 ![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
-1. The test runner defines a request mock as a JSON object.
-2. The mock is sent with the page navigation via a custom HTTP header.
+1. The test runner defines a request mock as a JSON object: `{url: "/users", body: "Hello"}`
+2. The browser sends this mock along with the page navigation as a custom HTTP header `x-mock-request`.
 3. The server reads the header and applies the mock to outgoing API requests.
-4. The page loads with data from the mocked response.
+4. The page renders using data from the mocked response.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
@@ -60,10 +60,10 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 * [**Test runner support**](#test-runner-integration) – Works with **Playwright**, **Cypress**, and custom runners.
 * [**Framework-agnostic**](#framework-integration) – Built-in support for **Next.js** and **Astro**, or integrate with any framework.
 * [**Request matching**](#request-matching) – Match requests by URL, wildcard, query, headers, or body.
+* [**Response mocking**](#response-mocking) – Mock the response with JSON/ string body or HTTP error.
+* [**Parameter Substitution**](#parameter-substitution) – Dynamically inject route/query values into responses.
 * [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
-* [**Dynamic parameters**](#parameter-substitution) – Use `{{ }}` placeholders to inject route/query values into responses.
-* [**Caching**](#caching) – Cache requests on server to make subsequent tests run faster.
-* [**Mocks API**](#api) – Set up mocks easily using a `MockClient` class.
+* [**API**](#api) – Set up mocks easily using a `MockClient` class.
 * [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## Installation
@@ -228,9 +228,56 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   }, { body: [] });
   ```
 
+## Response Mocking
+
+RMP lets you mock any part of the response. 
+
+- **Static body**: Set response body as string or JSON object.
+  ```ts
+  // string
+  await mockClient.GET('https://example.com/*', {
+    body: 'Hello world'
+  });
+
+  // JSON
+  await mockClient.GET('https://example.com/*', {
+    body: { id: 1, name: 'John Smith' },
+  });
+  ```
+
+- **Custom headers**: Set response headers.
+  ```ts
+  await mockClient.GET('https://example.com/*', {
+    headers: { 'content-type': 'application/json' },
+  });
+  ```
+
+- **Emulate errors**: Set arbitrary HTTP status code.
+  ```ts
+  await mockClient.GET('https://example.com/*', { 
+    status: 500
+  });
+  ```
+
+- **Respond with delay**: Set arbitrary delay in miliseconds.
+  ```ts
+  await mockClient.GET('https://example.com/*', { 
+    delay: 1000
+  });
+  ```
+
+You can combine all options together:
+```ts
+await mockClient.GET('https://example.com/*', {
+  headers: { 'content-type': 'application/json' },
+  body: { id: 1, name: 'John Smith' },
+  delay: 1000,
+});
+```
+
 ## Parameter Substitution
 
-You can define route parameters in the URL pattern and use them in the response:
+You can define route parameters in the URL pattern and use them in the response via `{{ }}` syntax:
 
 ```ts
 await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
@@ -289,39 +336,6 @@ The `bodyPatch` contains object in a form:
 }
 ```
 `path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
-
-## Caching
-
-You can leverage RMP to cache **server-side** API calls.
-The key question: how to initially fetch API response to put into cache?
-
-The proposed solution is to return response as a hidden HTML element (in non-production environments). Tests can extract the response from the page source, and provide it as a mock during subsequent navigations.
-
-In the app:
-```tsx
-// app/page.tsx
-
-export default async function Page() {
-  const users = await fetchUsers();
-
-  return (
-    <>
-      {/* ...render users */}
-
-      {/* Embed raw response for testing */}
-      {process.env.VERCEL_ENV !== 'production' && (
-        <script id="users-response" type="application/json">
-          {JSON.stringify(users)}
-        </script>
-      )}
-    </>
-  );
-}
-```
-In the test:
-```ts
-// tbd
-```
 
 ## Debugging
 
