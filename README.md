@@ -344,14 +344,13 @@ You can debug the mocking process by providing `debug: true` option to either re
 ```ts
 await mockClient.GET(
   {
-    url: 'https://jsonplaceholder.typicode.com/users',
-    query: {
-      foo: 'bar',
-    },
-    debug: true, // <-- use debugging
+    url: 'https://example.com/*',
+    query: { foo: 'bar' },
+    debug: true, // <-- enable debugging via request schema
   },
   {
-    body: [{ id: 1, name: 'John Smith' }],
+    body: { id: 1, name: 'John Smith' },
+    debug: true, // <-- or enable debugging via response schema
   },
 );
 ```
