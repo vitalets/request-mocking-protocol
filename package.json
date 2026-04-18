@@ -29,7 +29,7 @@
     }
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "files": [
     "dist",
@@ -50,20 +50,20 @@
     "release": "release-it"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "urlpattern-polyfill": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@playwright/test": "^1.51.1",
+    "@playwright/test": "^1.59.1",
     "@release-it/keep-a-changelog": "^7.0.0",
-    "@types/lodash": "^4.17.18",
-    "@types/node": "^18.15.0",
+    "@types/lodash": "^4.17.24",
+    "@types/node": "20.19.39",
     "eslint": "^9.39.2",
     "eslint-plugin-visual-complexity": "0.1.4",
-    "globals": "^17.0.0",
-    "knip": "^5.61.2",
-    "lint-staged": "^16.2.7",
+    "globals": "^17.5.0",
+    "knip": "^6.4.1",
+    "lint-staged": "^16.4.0",
     "markdown-magic": "^3.7.0",
     "msw": "^2.12.7",
     "prettier": "^3.7.4",
@@ -71,7 +71,7 @@
     "release-it": "^19.0.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.4"
   },
   "keywords": [
     "mocking",
