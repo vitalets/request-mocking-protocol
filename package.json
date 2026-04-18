@@ -5,7 +5,7 @@
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git://github.com/vitalets/request-mocking-protocol.git"
+    "url": "git+https://github.com/vitalets/request-mocking-protocol.git"
   },
   "main": "./dist/index.js",
   "exports": {
