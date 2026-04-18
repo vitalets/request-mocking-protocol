@@ -27,7 +27,7 @@ export class QueryMatcher {
     const result =
       expectedValue === null ? actualValues.length === 0 : actualValues.includes(expectedValue);
 
-    ctx.log(result, `query param "${name}"`, expectedValue, actualValues.join(','));
+    ctx.logger?.log(`query param "${name}"`, expectedValue, actualValues.join(','));
 
     return result;
   }

@@ -20,7 +20,7 @@ export class HeadersMatcher {
     const actualValue = ctx.req.headers.get(name);
 
     const result = actualValue === expectedValue;
-    ctx.log(result, `header "${name}"`, expectedValue, actualValue);
+    ctx.logger?.log(`header "${name}"`, expectedValue, actualValue);
 
     return result;
   }

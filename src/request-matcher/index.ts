@@ -14,6 +14,7 @@ import { MatchingContext } from './context';
 import { MethodMatcher } from './matchers/method';
 import { QueryMatcher } from './matchers/query';
 import { HeadersMatcher } from './matchers/headers';
+import { MatchingLogger } from './logger';
 
 export class RequestMatcher {
   private methodMatcher: MethodMatcher;
@@ -24,7 +25,7 @@ export class RequestMatcher {
 
   constructor(
     public schema: MockRequestSchema,
-    private debug?: boolean,
+    private logger?: MatchingLogger,
   ) {
     this.methodMatcher = new MethodMatcher(this.schema);
     this.urlMatcher = new UrlMatcher(this.schema);
@@ -32,28 +33,24 @@ export class RequestMatcher {
     this.headersMatcher = new HeadersMatcher(this.schema);
     this.bodyMatcher = new BodyMatcher(this.schema);
 
-    if (schema.debug) this.debug = true;
     this.ensureSingleQuerySource();
   }
 
   // eslint-disable-next-line visual/complexity
   async match(req: Request) {
-    const ctx = new MatchingContext(req);
-    try {
-      const matched =
-        this.methodMatcher.match(ctx) &&
-        this.urlMatcher.match(ctx) &&
-        this.queryMatcher.match(ctx) &&
-        this.headersMatcher.match(ctx) &&
-        (await this.bodyMatcher.match(ctx));
+    this.logger?.addMock(this.schema.method, this.schema.url);
+    const ctx = new MatchingContext(req, this.logger);
 
-      ctx.logDone(matched);
+    const matched =
+      this.methodMatcher.match(ctx) &&
+      this.urlMatcher.match(ctx) &&
+      this.queryMatcher.match(ctx) &&
+      this.headersMatcher.match(ctx) &&
+      (await this.bodyMatcher.match(ctx));
 
-      return matched ? ctx.params : null;
-    } finally {
-      // eslint-disable-next-line no-console
-      if (this.debug) console.log(ctx.logs.join('\n'));
-    }
+    ctx.logger?.done(matched);
+
+    return matched ? ctx.params : null;
   }
 
   private ensureSingleQuerySource() {

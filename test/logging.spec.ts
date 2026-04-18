@@ -23,32 +23,8 @@ afterEach(() => {
   logSpy.mockRestore();
 });
 
-test('logs debug output for matched fetch request', async () => {
-  await mockClient.GET(
-    {
-      url: 'https://example.com/',
-      debug: true,
-    },
-    {
-      body: { ok: true },
-    },
-  );
-
-  const res = await fetch('https://example.com/');
-  expect(res.status).toBe(200);
-
-  expectLogs([
-    'Matching request: GET https://example.com/',
-    '✅ Expected method: GET',
-    '     Actual method: GET',
-    '✅ Expected URL: https://example.com/',
-    '     Actual URL: https://example.com/',
-    'Request matched.',
-  ]);
-});
-
-test('logs debug output for unmatched fetch request', async () => {
-  await mockClient.GET(
+test('logs first mismatch then match for two mocks', async () => {
+  await mockClient.POST(
     {
       url: 'https://example.com/users/:id',
       debug: true,
@@ -57,16 +33,47 @@ test('logs debug output for unmatched fetch request', async () => {
       body: { ok: true },
     },
   );
+  await mockClient.DELETE(
+    {
+      url: 'https://example.com',
+      debug: true,
+    },
+    200,
+  );
 
-  await fetch('https://example.com/posts/1');
+  await mockClient.ALL(
+    {
+      url: 'https://example.com/foo',
+      debug: true,
+    },
+    200,
+  );
+
+  await mockClient.GET(
+    {
+      url: 'https://example.com/',
+      debug: true,
+    },
+    200,
+  );
+
+  const res = await fetch('https://example.com/');
+  expect(res.status).toBe(200);
 
   expectLogs([
-    'Matching request: GET https://example.com/posts/1',
-    '✅ Expected method: GET',
-    '     Actual method: GET',
-    '❌ Expected URL: https://example.com/users/:id',
-    '     Actual URL: https://example.com/posts/1',
-    'Request not matched.',
+    '⬇️  Matching request with mocks (4)',
+    '     Actual URL:  GET https://example.com/',
+    '   Expected URL: POST https://example.com/users/:id',
+    '❌ Mock not matched.',
+    '     Actual URL:    GET https://example.com/',
+    '   Expected URL: DELETE https://example.com',
+    '❌ Mock not matched.',
+    '     Actual URL: GET https://example.com/',
+    '   Expected URL:   * https://example.com/foo',
+    '❌ Mock not matched.',
+    '     Actual URL: GET https://example.com/',
+    '   Expected URL: GET https://example.com/',
+    '✅ Mock matched.',
   ]);
 });
 
@@ -94,17 +101,15 @@ test('logs all matcher lines when only body does not match', async () => {
   });
 
   expectLogs([
-    'Matching request: POST https://example.com/users/1?foo=1',
-    '✅ Expected method: POST',
-    '     Actual method: POST',
-    '✅ Expected URL: https://example.com/users/:id',
-    '     Actual URL: https://example.com/users/1 (query trimmed)',
-    '✅ Expected query param "foo": 1',
+    '⬇️  Matching request with mocks (1)',
+    '     Actual URL: POST https://example.com/users/1?foo=1',
+    '   Expected URL: POST https://example.com/users/:id',
     '     Actual query param "foo": 1',
-    '✅ Expected header "x-token": abc',
+    '   Expected query param "foo": 1',
     '     Actual header "x-token": abc',
-    '❌ Expected body: {"name":"John"}',
+    '   Expected header "x-token": abc',
     '     Actual body: {"name":"Jane"}',
-    'Request not matched.',
+    '   Expected body: {"name":"John"}',
+    '❌ Mock not matched.',
   ]);
 });

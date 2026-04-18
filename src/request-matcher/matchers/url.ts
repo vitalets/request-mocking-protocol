@@ -25,7 +25,7 @@ export class UrlMatcher {
         ? this.matchRegexp(ctx, url, this.matcher)
         : this.matchPattern(ctx, url, this.matcher);
 
-    ctx.log(result, `URL`, this.schema.url, `${url}${url !== req.url ? ' (query trimmed)' : ''}`);
+    ctx.logger?.log(`URL`, this.schema.url, `${url}${url !== req.url ? ' (query trimmed)' : ''}`);
 
     return result;
   }

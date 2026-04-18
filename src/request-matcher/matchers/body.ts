@@ -23,7 +23,7 @@ export class BodyMatcher {
 
     const actualBodyStream = this.schema.body;
     if (!actualBodyStream) {
-      ctx.log(false, `body`, this.expectedBodyStr, `null`);
+      ctx.logger?.log(`body`, this.expectedBodyStr, `null`);
       return false;
     }
 
@@ -37,7 +37,7 @@ export class BodyMatcher {
   private async matchAsString(ctx: MatchingContext, expectedBody: string) {
     const actualBody = await ctx.req.clone().text();
     const result = actualBody === expectedBody;
-    ctx.log(result, `body`, expectedBody, trimLongString(actualBody));
+    ctx.logger?.log(`body`, expectedBody, trimLongString(actualBody));
 
     return result;
   }
@@ -50,12 +50,12 @@ export class BodyMatcher {
     const actualBodyParsed = jsonParseSafe(actualBody);
 
     if (!actualBodyParsed) {
-      ctx.log(false, `body`, this.expectedBodyStr, trimLongString(actualBody));
+      ctx.logger?.log(`body`, this.expectedBodyStr, trimLongString(actualBody));
       return false;
     }
 
     const result = isMatch(actualBodyParsed, expectedBody);
-    ctx.log(result, `body`, this.expectedBodyStr, trimLongString(actualBody));
+    ctx.logger?.log(`body`, this.expectedBodyStr, trimLongString(actualBody));
 
     return result;
   }

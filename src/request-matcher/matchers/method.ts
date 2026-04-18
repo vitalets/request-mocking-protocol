@@ -12,7 +12,7 @@ export class MethodMatcher {
     const actualMethod = ctx.req.method;
 
     const result = !expectedMethod || expectedMethod === actualMethod;
-    ctx.log(result, `method`, expectedMethod || '*', actualMethod);
+    ctx.logger?.log(`method`, expectedMethod || '*', actualMethod);
 
     return result;
   }

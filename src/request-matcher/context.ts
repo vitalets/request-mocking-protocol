@@ -1,27 +1,19 @@
+import { MatchingLogger } from './logger';
+
 export class MatchingContext {
-  logs: string[] = [];
   params: Record<string, string> = {};
   #searchParams?: URLSearchParams;
 
-  constructor(public req: Request) {
-    this.logs.push(`Matching request: ${req.method} ${req.url}`);
-  }
+  constructor(
+    public req: Request,
+    public logger?: MatchingLogger,
+  ) {}
 
   get searchParams() {
     if (!this.#searchParams) {
       this.#searchParams = new URL(this.req.url).searchParams;
     }
     return this.#searchParams;
-  }
-
-  log(result: boolean, entity: string, expected: unknown, actual: unknown) {
-    const icon = result ? '✅' : '❌';
-    this.logs.push(`${icon} Expected ${entity}: ${expected}`);
-    this.logs.push(`${' '.repeat(4)} Actual ${entity}: ${actual}`);
-  }
-
-  logDone(matched: boolean) {
-    this.logs.push(`Request ${matched ? 'matched' : 'not matched'}.`);
   }
 
   appendParams(groups: Record<string, string | undefined> = {}) {
