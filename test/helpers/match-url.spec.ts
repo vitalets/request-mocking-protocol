@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { RequestMatcher } from '../../src/request-matcher';
+import { SchemaMatcher } from '../../src/request-matcher/schema-matcher';
 import { buildMockRequestSchema } from '../../src/protocol';
 
 test('no hostname slash', async () => {
@@ -84,10 +84,10 @@ test('with hostname slash, double asterisk', async () => {
 });
 
 function createMatcher(url: string) {
-  return new RequestMatcher(buildMockRequestSchema(url));
+  return new SchemaMatcher(buildMockRequestSchema(url));
 }
 
-async function match(matcher: RequestMatcher, url: string, shouldMatch = true) {
+async function match(matcher: SchemaMatcher, url: string, shouldMatch = true) {
   const req = new Request(url);
   expect(
     Boolean(await matcher.match(req)),

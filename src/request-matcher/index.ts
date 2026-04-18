@@ -1,63 +1,44 @@
-/**
- * RequestMatcher class.
- * The same as URLPattern, but for matching the whole HTTP request.
- * See: https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
- * See: https://developer.chrome.com/docs/web-platform/urlpattern
- *
- * todo: move to a separate package.
- */
-
-import { MockRequestSchema } from '../protocol';
-import { UrlMatcher } from './matchers/url';
-import { BodyMatcher } from './matchers/body';
-import { MatchingContext } from './context';
-import { MethodMatcher } from './matchers/method';
-import { QueryMatcher } from './matchers/query';
-import { HeadersMatcher } from './matchers/headers';
+import { SchemaMatcher } from './schema-matcher';
+import { MockMatchResult, MockSchema } from '../protocol';
 import { MatchingLogger } from './logger';
 
-export class RequestMatcher {
-  private methodMatcher: MethodMatcher;
-  private urlMatcher: UrlMatcher;
-  private queryMatcher: QueryMatcher;
-  private headersMatcher: HeadersMatcher;
-  private bodyMatcher: BodyMatcher;
-
-  constructor(
-    public schema: MockRequestSchema,
-    private logger?: MatchingLogger,
-  ) {
-    this.methodMatcher = new MethodMatcher(this.schema);
-    this.urlMatcher = new UrlMatcher(this.schema);
-    this.queryMatcher = new QueryMatcher(this.schema);
-    this.headersMatcher = new HeadersMatcher(this.schema);
-    this.bodyMatcher = new BodyMatcher(this.schema);
-
-    this.ensureSingleQuerySource();
+export async function matchSchemas(
+  req: Request,
+  mockSchemas: MockSchema[] = [],
+): Promise<MockMatchResult | undefined> {
+  const logger = initLogger(req, mockSchemas);
+  try {
+    return await matchSchemasInternal(req, mockSchemas, logger);
+  } finally {
+    logger.finalize();
   }
+}
 
-  // eslint-disable-next-line visual/complexity
-  async match(req: Request) {
-    this.logger?.addMock(this.schema.method, this.schema.url);
-    const ctx = new MatchingContext(req, this.logger);
+async function matchSchemasInternal(
+  req: Request,
+  mockSchemas: MockSchema[] = [],
+  logger?: MatchingLogger,
+) {
+  let matchResult: MockMatchResult | undefined;
 
-    const matched =
-      this.methodMatcher.match(ctx) &&
-      this.urlMatcher.match(ctx) &&
-      this.queryMatcher.match(ctx) &&
-      this.headersMatcher.match(ctx) &&
-      (await this.bodyMatcher.match(ctx));
-
-    ctx.logger?.done(matched);
-
-    return matched ? ctx.params : null;
-  }
-
-  private ensureSingleQuerySource() {
-    if (this.urlMatcher.hasQuery && this.queryMatcher.hasQuery) {
-      throw new Error(
-        `Query parameters should be defined either in the URL pattern or in the 'query' field.`,
-      );
+  for (const mockSchema of mockSchemas) {
+    const matcher = new SchemaMatcher(mockSchema.reqSchema, logger);
+    const result = await matcher.match(req);
+    if (result) {
+      matchResult = { mockSchema, req: req, params: result };
+      break;
     }
   }
+
+  return matchResult;
+}
+
+function initLogger(req: Request, mockSchemas: MockSchema[]) {
+  const logger = new MatchingLogger(req, hasDebug(mockSchemas));
+  logger.init(mockSchemas.length);
+  return logger;
+}
+
+function hasDebug(schemas: MockSchema[]) {
+  return schemas.some((schema) => schema.reqSchema.debug || schema.resSchema.debug);
 }

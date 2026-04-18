@@ -2,7 +2,7 @@
  * Global fetch interceptor.
  */
 
-import { matchSchemas } from '../request-matcher/utils';
+import { matchSchemas } from '../request-matcher';
 import { ResponseBuilder } from '../response-builder';
 import { extractMockSchemas, GetHeaders } from '../transport';
 

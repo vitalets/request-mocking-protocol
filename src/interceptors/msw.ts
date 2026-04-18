@@ -3,7 +3,7 @@
  */
 import { http, bypass, HttpResponse } from 'msw';
 import { extractMockSchemas, GetHeaders } from '../transport';
-import { matchSchemas } from '../request-matcher/utils';
+import { matchSchemas } from '../request-matcher';
 import { ResponseBuilder } from '../response-builder';
 
 export function createHandler(getIncomingHeaders: GetHeaders) {

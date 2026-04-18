@@ -4,7 +4,7 @@
  */
 
 import { Page, BrowserContext, Request as PwRequest, Route } from '@playwright/test';
-import { matchSchemas } from '../request-matcher/utils';
+import { matchSchemas } from '../request-matcher';
 import { ResponseBuilder } from '../response-builder';
 import { MockClient } from '../client';
 
