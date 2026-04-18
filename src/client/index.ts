@@ -22,7 +22,7 @@ export type MockClientOptions = {
 export type MockRequestSchemaNoMethod = Omit<MockRequestSchemaInit, 'method'>;
 
 export class MockClient {
-  private mockSchemas = new Map<MockRequestSchemaInit, MockSchema>();
+  private mockSchemas: MockSchema[] = [];
   public headers: Record<string, string> = {};
   public onChange?: (headers: Record<string, string>) => unknown;
 
@@ -32,7 +32,7 @@ export class MockClient {
   }
 
   get schemas() {
-    return [...this.mockSchemas.values()];
+    return [...this.mockSchemas];
   }
 
   async addMock(reqSchema: MockRequestSchemaInit, resSchema: MockResponseSchemaInit) {
@@ -40,7 +40,7 @@ export class MockClient {
       reqSchema: this.buildRequestSchema(reqSchema),
       resSchema: this.buildResponseSchema(resSchema),
     };
-    this.mockSchemas.set(reqSchema, mockSchema);
+    this.mockSchemas.unshift(mockSchema);
     await this.rebuildHeaders();
   }
 
@@ -69,7 +69,7 @@ export class MockClient {
   }
 
   async reset() {
-    this.mockSchemas.clear();
+    this.mockSchemas = [];
     await this.rebuildHeaders();
   }
 

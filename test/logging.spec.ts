@@ -20,16 +20,29 @@ afterEach(() => {
   logSpy.mockRestore();
 });
 
-test('logs first mismatch then match for two mocks', async () => {
-  await mockClient.POST('https://example.com/users/:id', {
-    body: { ok: true },
-  });
+test('logs newest mocks first when matching', async () => {
+  await mockClient.POST('https://example.com/users/:id', { body: 'ok' });
   await mockClient.DELETE('https://example.com', 200);
   await mockClient.ALL('https://example.com/foo', 200);
   await mockClient.GET('https://example.com/', 200);
 
-  const res = await fetch('https://example.com/');
-  expect(res.status).toBe(200);
+  await fetch('https://example.com/');
+
+  expectLogs([
+    '⬇️  Matching request with mocks (4)',
+    '     Actual URL: GET https://example.com/',
+    '   Expected URL: GET https://example.com/',
+    '✅ Mock matched.',
+  ]);
+});
+
+test('logs mismatches in newest-first order before a match', async () => {
+  await mockClient.GET('https://example.com/', 200);
+  await mockClient.ALL('https://example.com/foo', 200);
+  await mockClient.DELETE('https://example.com', 200);
+  await mockClient.POST('https://example.com/users/:id', { body: 'ok' });
+
+  await fetch('https://example.com/');
 
   expectLogs([
     '⬇️  Matching request with mocks (4)',
@@ -57,7 +70,7 @@ test('logs all matcher lines when only body does not match', async () => {
       body: { name: 'John' },
     },
     {
-      body: { ok: true },
+      body: 'ok',
     },
   );
 

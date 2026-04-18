@@ -453,6 +453,8 @@ A callback function that is called whenever the mocks are changed. Accepts `head
 
 Adds a new mock for the corresponding HTTP method.
 
+If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
+
 - `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) for the mock.
     - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL.
     - If defined as `RegExp`, it is treated as [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
