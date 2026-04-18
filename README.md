@@ -5,13 +5,13 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-**Request Mocking Protocol (RMP)** is a specification for declarative mocking of HTTP requests. It uses JSON schemas to define request matchers and response builders. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
+**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses **declarative** JSON schemas to define mocked request and response data. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
 
 ## How it works
 
-![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
+![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema2.png)
 
-1. The test runner defines a request mock as a JSON object: `{url: "/users", body: "Hello"}`
+1. The test setups request mock as a JSON object: `{url: "/users", body: "Hello"}`
 2. The browser sends this mock along with the page navigation as a custom HTTP header `x-mock-request`.
 3. The server reads the header and applies the mock to outgoing API requests.
 4. The page renders using data from the mocked response.
