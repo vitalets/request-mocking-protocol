@@ -38,16 +38,15 @@
   ],
   "scripts": {
     "prepare": "git config core.hooksPath scripts/git-hooks",
-    "lint": "eslint . --no-warn-ignored",
+    "lint": "eslint .",
     "tsc": "tsc",
     "prettier": "prettier --check --ignore-unknown .",
     "prettier:w": "prettier --write --ignore-unknown .",
     "test": "vitest run --no-cache --testTimeout 10000 --dir ./test",
-    "pw:browsers": "PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium",
+    "pw:install": "PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium",
     "toc": "md-magic --files README.md",
     "deps": "npx npm-check-updates -i --format group,dep,repo --cooldown 5",
-    "build": "./scripts/build.sh",
-    "release": "release-it"
+    "build": "./scripts/build.sh"
   },
   "dependencies": {
     "lodash": "^4.18.1",
@@ -56,7 +55,6 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.59.1",
-    "@release-it/keep-a-changelog": "^7.0.0",
     "@types/lodash": "^4.17.24",
     "@types/node": "20.19.39",
     "eslint": "^9.39.2",
@@ -67,8 +65,6 @@
     "markdown-magic": "^3.7.0",
     "msw": "^2.12.7",
     "prettier": "^3.7.4",
-    "publint": "^0.3.16",
-    "release-it": "^19.0.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.58.1",
     "vitest": "^4.1.4"
