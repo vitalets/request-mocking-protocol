@@ -31,10 +31,11 @@ export async function setupPlaywrightInterceptor(
 }
 
 function buildFetchRequest(pwRequest: PwRequest) {
+  const postData = pwRequest.postDataBuffer();
   return new Request(pwRequest.url(), {
     method: pwRequest.method(),
     headers: pwRequest.headers(),
-    body: pwRequest.postDataBuffer(),
+    body: postData ? Uint8Array.from(postData) : undefined,
   });
 }
 
@@ -49,7 +50,7 @@ async function bypass(req: Request, route: Route) {
     status: pwResponse.status(),
     statusText: pwResponse.statusText(),
     headers: new Headers(pwResponse.headers()),
-    arrayBuffer: () => pwResponse.body(),
+    arrayBuffer: async () => Uint8Array.from(await pwResponse.body()).buffer,
     json: () => pwResponse.json(),
   };
 }
