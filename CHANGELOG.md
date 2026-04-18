@@ -5,6 +5,7 @@
 ## [Unreleased]
 * add duplicate-setup guards for the fetch and Playwright interceptors.
 * improve debug logging.
+* support `REQUEST_MOCKING_DEBUG` env var to enable debug mode for all mocks.
 
 ## [0.1.3] - 2025-06-19
 * Update dependencies

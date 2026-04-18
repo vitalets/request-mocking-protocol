@@ -341,7 +341,7 @@ The `bodyPatch` contains object in a form:
 
 ## Debugging
 
-You can debug the mocking process by providing `debug: true` option to either request or response schema:
+You can enable debug logs globally by setting `REQUEST_MOCKING_DEBUG` env variable, or by setting `debug: true` on any request/response schema.
 
 ```ts
 await mockClient.GET(
@@ -356,6 +356,7 @@ await mockClient.GET(
   },
 );
 ```
+
 When debug enabled, the server will output mocking logs to console:
 
 ![Debug logs](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/debug.png)

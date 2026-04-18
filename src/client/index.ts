@@ -11,6 +11,7 @@ import {
   toMockRequestSchemaObject,
 } from '../protocol';
 import { buildMockHeaders } from '../transport';
+import { getEnvDebug } from './env';
 import { mergeOptions } from './utils';
 
 export type MockClientOptions = {
@@ -25,7 +26,10 @@ export class MockClient {
   public headers: Record<string, string> = {};
   public onChange?: (headers: Record<string, string>) => unknown;
 
-  constructor(protected options?: MockClientOptions) {}
+  constructor(protected options?: MockClientOptions) {
+    const debug = options?.debug ?? getEnvDebug();
+    this.options = mergeOptions({ debug }, options);
+  }
 
   get schemas() {
     return [...this.mockSchemas.values()];

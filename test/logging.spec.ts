@@ -2,60 +2,31 @@ import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { MockClient } from '../src';
 import { setupFetchInterceptor } from '../src/interceptors/fetch';
 
-const mockClient = new MockClient();
+let mockClient: MockClient;
 let logSpy: ReturnType<typeof vi.spyOn>;
-
-function expectLogs(lines: string[]) {
-  const logStrings = logSpy.mock.calls.map((call: unknown[]) => String(call[0]));
-  expect(logStrings).toEqual([lines.join('\n')]);
-}
 
 beforeAll(() => {
   setupFetchInterceptor(() => mockClient.headers);
 });
 
-beforeEach(async () => {
+beforeEach(() => {
+  process.env.REQUEST_MOCKING_DEBUG = '1';
+  mockClient = new MockClient();
   logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-  await mockClient.reset();
 });
 
 afterEach(() => {
+  delete process.env.REQUEST_MOCKING_DEBUG;
   logSpy.mockRestore();
 });
 
 test('logs first mismatch then match for two mocks', async () => {
-  await mockClient.POST(
-    {
-      url: 'https://example.com/users/:id',
-      debug: true,
-    },
-    {
-      body: { ok: true },
-    },
-  );
-  await mockClient.DELETE(
-    {
-      url: 'https://example.com',
-      debug: true,
-    },
-    200,
-  );
-
-  await mockClient.ALL(
-    {
-      url: 'https://example.com/foo',
-      debug: true,
-    },
-    200,
-  );
-
-  await mockClient.GET(
-    {
-      url: 'https://example.com/',
-      debug: true,
-    },
-    200,
-  );
+  await mockClient.POST('https://example.com/users/:id', {
+    body: { ok: true },
+  });
+  await mockClient.DELETE('https://example.com', 200);
+  await mockClient.ALL('https://example.com/foo', 200);
+  await mockClient.GET('https://example.com/', 200);
 
   const res = await fetch('https://example.com/');
   expect(res.status).toBe(200);
@@ -84,7 +55,6 @@ test('logs all matcher lines when only body does not match', async () => {
       query: { foo: '1' },
       headers: { 'x-token': 'abc' },
       body: { name: 'John' },
-      debug: true,
     },
     {
       body: { ok: true },
@@ -113,3 +83,8 @@ test('logs all matcher lines when only body does not match', async () => {
     '❌ Mock not matched.',
   ]);
 });
+
+function expectLogs(lines: string[]) {
+  const logStrings = logSpy.mock.calls.map((call: unknown[]) => String(call[0]));
+  expect(logStrings).toEqual([lines.join('\n')]);
+}
