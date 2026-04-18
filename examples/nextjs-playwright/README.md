@@ -24,11 +24,11 @@ Example of using `request-mocking-protocol` in [Next.js](https://nextjs.org/) ap
    npm run dev
    ```
 
-5. Run tests in the second terminal window:
+5. Run tests in *another* terminal window:
    ```
    npm test
    ```
 
-6. To check live reload, change some file in `src/app` directory
+## Live Reload
 
-7. Run tests again to ensure that interceptors are applied
+To check **live reload**, change some file in `src/app` directory and run tests again to ensure that interceptors are applied.
