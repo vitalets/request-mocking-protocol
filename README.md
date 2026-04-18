@@ -9,7 +9,7 @@
 
 ## How it works
 
-![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema2.png)
+![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
 1. The test setups request mock as a JSON object: `{url: "/users", body: "Hello"}`
 2. The browser sends this mock along with the page navigation as a custom HTTP header `x-mock-request`.
