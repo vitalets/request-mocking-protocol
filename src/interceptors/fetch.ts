@@ -6,7 +6,16 @@ import { matchSchemas } from '../request-matcher/utils';
 import { ResponseBuilder } from '../response-builder';
 import { extractMockSchemas, GetHeaders } from '../transport';
 
+const fetchInterceptorSymbol = Symbol.for('request-mocking-protocol.fetchInterceptorApplied');
+
 export function setupFetchInterceptor(getIncomingHeaders: GetHeaders) {
+  if (Reflect.get(globalThis, fetchInterceptorSymbol)) return;
+
+  Object.defineProperty(globalThis, fetchInterceptorSymbol, {
+    value: true,
+    configurable: true,
+  });
+
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input, init) => {
     const request = new Request(input, init);

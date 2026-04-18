@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach } from 'vitest';
+import { beforeAll, beforeEach, expect, test } from 'vitest';
 import { MockClient } from '../src';
 import { setupFetchInterceptor } from '../src/interceptors/fetch';
 import { createTestCases } from './test-cases';
@@ -14,3 +14,11 @@ beforeEach(async () => {
 });
 
 createTestCases(mockClient);
+
+// -- extra tests --
+
+test('does not apply fetch interceptor twice', () => {
+  const patchedFetch = globalThis.fetch;
+  setupFetchInterceptor(() => mockClient.headers);
+  expect(globalThis.fetch).toBe(patchedFetch);
+});

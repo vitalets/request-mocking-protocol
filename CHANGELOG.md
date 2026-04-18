@@ -3,6 +3,7 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+* chore: duplicate-setup guards for the fetch and Playwright interceptors. 
 
 ## [0.1.3] - 2025-06-19
 * Update dependencies

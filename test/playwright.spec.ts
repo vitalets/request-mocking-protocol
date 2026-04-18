@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, afterAll } from 'vitest';
+import { beforeAll, beforeEach, afterAll, expect, test, vi } from 'vitest';
 import { Browser, BrowserContext, chromium, Page } from 'playwright';
 import { MockClient } from '../src';
 import { setupPlaywrightInterceptor } from '../src/interceptors/playwright';
@@ -28,6 +28,14 @@ afterAll(async () => {
 });
 
 createTestCases(mockClient, makeRequestFromPage);
+
+// -- extra tests --
+
+test('does not apply playwright interceptor twice to the same page', async () => {
+  const routeSpy = vi.spyOn(page, 'route');
+  await setupPlaywrightInterceptor(page, mockClient);
+  expect(routeSpy).not.toHaveBeenCalled();
+});
 
 async function makeRequestFromPage(input: string, init?: SimpleRequestInit) {
   await page.goto(pathToFileURL(`test/example.html`).toString());

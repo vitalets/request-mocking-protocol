@@ -8,10 +8,14 @@ import { matchSchemas } from '../request-matcher/utils';
 import { ResponseBuilder } from '../response-builder';
 import { MockClient } from '../client';
 
+const interceptedTargets = new WeakSet<Page | BrowserContext>();
+
 export async function setupPlaywrightInterceptor(
   page: Page | BrowserContext,
   mockClient: MockClient,
 ) {
+  if (interceptedTargets.has(page)) return;
+
   await page.route('**', async (route) => {
     const request = buildFetchRequest(route.request());
     const matchResult = await matchSchemas(request, mockClient.schemas);
@@ -28,6 +32,8 @@ export async function setupPlaywrightInterceptor(
       // route.fulfill() doesn't accept statusText
     });
   });
+
+  interceptedTargets.add(page);
 }
 
 function buildFetchRequest(pwRequest: PwRequest) {
