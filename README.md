@@ -159,7 +159,6 @@ The Next.js setup includes two parts:
 
 Create `src/patch-fetch.js` with the following content:
 ```js
-// src/patch-fetch.js
 import { setupFetchInterceptor } from 'request-mocking-protocol/fetch';
 
 setupFetchInterceptor(async () => {
@@ -170,7 +169,6 @@ setupFetchInterceptor(async () => {
 
 Import the patch in `src/instrumentation.ts` (adjust the env variable for your project):
 ```ts
-// src/instrumentation.ts
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.VERCEL_ENV !== 'production') {
     await import('./patch-fetch.js');
