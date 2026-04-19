@@ -154,27 +154,49 @@ On the server side, you should set up an [interceptor](#interceptors) to catch t
 
 ### Next.js (App router)
 
-Add the following code to the top level `layout.tsx`:
+The Next.js setup includes two parts:
+1. Enable fetch interception in `instrumentation.ts` for normal server startup.
+2. Preload fetch interception with `NODE_OPTIONS` when running `next dev` so it remains active across HMR reloads.
+
+Create `src/patch-fetch.js` with the following content:
+```js
+// src/patch-fetch.js
+import { setupFetchInterceptor } from 'request-mocking-protocol/fetch';
+
+setupFetchInterceptor(async () => {
+  const { headers } = await import('next/headers.js');
+  return headers();
+});
+```
+
+Import the patch in `src/instrumentation.ts` (adjust the env variable for your project):
 ```ts
-// app/layout.tsx
-import { headers } from 'next/headers';
-
-if (process.env.VERCEL_ENV !== 'production') {
-  const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
-  setupFetchInterceptor(() => headers());
+// src/instrumentation.ts
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.VERCEL_ENV !== 'production') {
+    await import('./patch-fetch.js');
+  }
 }
+```
+> [!NOTE]
+> When deploying on Vercel, don't use `process.env.NODE_ENV` for detecting non-production environment, 
+> because even preview deployments will have it as `production`.
 
-export default function Layout() {
-  // ...
+Then adjust your `package.json` to require the patch when starting the Next.js dev server:
+```json
+{
+  "scripts": {
+    "dev": "NODE_OPTIONS='--require ./src/patch-fetch.js' next dev"
+  }
 }
 ```
 
-> [!NOTE]
-> Don't use `process.env.NODE_ENV` for detecting non-production environment, 
-> because even preview deployments will have it as `production`.
-
 > [!IMPORTANT]
-> Don't load interceptor inside [instrumentation.ts](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation), as it will be cleared in dev server after re-compilation.
+> Placing the fetch interceptor in `layout.tsx` is no longer recommended.
+> In dev mode, preload `patch-fetch.js` to keep interception active across HMR reloads.
+> This extra preload should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
+
+Now your server is ready for testing.
 
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
@@ -526,21 +548,8 @@ mswServer.listen();
 
 > Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](#api) class.
 
-The function for retrieving incoming HTTP headers depends on the application framework. Example for **Next.js**:
-```ts
-// app/layout.tsx
-import { headers } from 'next/headers';
-
-if (process.env.VERCEL_ENV !== 'production') {
-  const { setupServer } = await import('msw/node');
-  const { createHandler } = await import('request-mocking-protocol/msw');
-  const mockHandler = createHandler(() => headers());
-  const mswServer = setupServer(mockHandler);
-  mswServer.listen();
-}
-
-export default function RootLayout({ ... });
-```
+The function for retrieving incoming HTTP headers depends on the application framework.
+For **Next.js**, use the [`instrumentation.ts` setup](#nextjs-app-router) instead of `layout.tsx`.
 
 ## Comparison with MSW
 
