@@ -10,6 +10,9 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
+  expect: {
+    timeout: 2000,
+  },
   use: {
     baseURL,
     screenshot: 'on',
