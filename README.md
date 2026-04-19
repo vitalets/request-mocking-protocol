@@ -5,16 +5,15 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses **declarative** JSON schemas to define mocked request and response data. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
+**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
 
 ## How it works
 
 ![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
-1. The test setups request mock as a JSON object: `{url: "/users", body: "Hello"}`
-2. The browser sends this mock along with the page navigation as a custom HTTP header `x-mock-request`.
-3. The server reads the header and applies the mock to outgoing API requests.
-4. The page renders using data from the mocked response.
+1. The test creates a mock and serializes it into the page navigation request via a custom HTTP header: `x-mock-request: '{ url: "/users", body: "Hello" }'`.
+2. The server reads this header and applies the mock to outgoing API requests.
+3. The mocked response is used on both server and client to render the page in the desired state.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
@@ -64,7 +63,7 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 * [**Parameter Substitution**](#parameter-substitution) – Dynamically inject route/query values into responses.
 * [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
 * [**API**](#api) – Set up mocks easily using a `MockClient` class.
-* [**Debug-friendly**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
+* [**Debug**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## Installation
 ```
