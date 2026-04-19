@@ -3,6 +3,8 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-04-19
 * add duplicate-setup guards for the fetch and Playwright interceptors.
 * improve debug logging.
 * support `REQUEST_MOCKING_DEBUG` env var to enable debug mode for all mocks.
@@ -24,8 +26,9 @@
 
 * Initial release.
 
-[Unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.3...HEAD
-[0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.2...0.1.3
-[0.1.2]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.1...0.1.2
-[0.1.1]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.0...0.1.1
-[0.1.0]: https://github.com/vitalets/request-mocking-protocol/releases/tag/0.1.0
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.3...v0.2.0
+[0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/vitalets/request-mocking-protocol/releases/tag/v0.1.0
