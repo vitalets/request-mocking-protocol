@@ -73,7 +73,7 @@ jobs:
       # Tracked at: https://github.com/oscarotero/keep-a-changelog/issues/65
       - name: Update changelog and extract release notes
         run: |
-          NOTES=$(node scripts/release-changelog.ts ${{ env.VERSION }})
+          NOTES=$(node scripts/changelog.ts ${{ env.VERSION }})
           echo "NOTES<<EOF" >> $GITHUB_ENV
           echo "$NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
