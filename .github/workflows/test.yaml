@@ -3,7 +3,23 @@ name: test
 on:
   push:
     branches: ['**']
+    paths:
+      - '.github/workflows/test.yml'
+      - 'src/**'
+      - 'test/**'
+      - 'package*.json'
+      - 'tsconfig*.json'
+      - '.npmrc'
   pull_request:
+    branches: [main]
+    paths:
+      # no way to avoid repeating the paths here
+      - '.github/workflows/test.yml'
+      - 'src/**'
+      - 'test/**'
+      - 'package*.json'
+      - 'tsconfig*.json'
+      - '.npmrc'
 
 jobs:
   test:
