@@ -5,7 +5,7 @@
  * stdout for use in CI (e.g. GitHub Release body).
  *
  * Usage:
- *   node scripts/release-changelog.ts <version>
+ *   node scripts/changelog.ts <version>
  */
 import fs from 'node:fs';
 
@@ -17,9 +17,10 @@ const version = process.argv[2];
 
 main();
 
+/** Updates the changelog for the requested release version. */
 function main() {
   if (!version) {
-    logger.error('Usage: release-changelog.ts <version>');
+    logger.error('Usage: changelog.ts <version>');
     process.exit(1);
   }
 
@@ -31,6 +32,7 @@ function main() {
   logger.log(releaseNotes);
 }
 
+/** Converts the Unreleased section into a dated release section. */
 function stampChangelog(text: string, version: string) {
   const date = new Date().toISOString().slice(0, 10);
   const updated = text.replace('## [Unreleased]', `## [Unreleased]\n\n## [${version}] - ${date}`);
@@ -41,6 +43,7 @@ function stampChangelog(text: string, version: string) {
   return updated;
 }
 
+/** Reads the section body for a released version. */
 function extractReleaseNotes(text: string, version: string) {
   const lines = text.split('\n');
   const headingIndex = lines.findIndex((l) => l.startsWith(`## [${version}]`));
@@ -52,6 +55,7 @@ function extractReleaseNotes(text: string, version: string) {
   return bodyLines.join('\n').trim();
 }
 
+/** Refreshes Keep a Changelog link references at the end of the file. */
 function updateCompareLinks(text: string, repositoryUrl: string) {
   const versions = extractReleasedVersions(text);
   const lines = removeCompareLinks(text).split('\n');
@@ -65,6 +69,7 @@ function updateCompareLinks(text: string, repositoryUrl: string) {
   return `${lines.join('\n')}\n`;
 }
 
+/** Extracts released version numbers from changelog headings. */
 function extractReleasedVersions(text: string) {
   return text
     .split('\n')
@@ -72,12 +77,14 @@ function extractReleasedVersions(text: string) {
     .filter((version): version is string => Boolean(version));
 }
 
+/** Removes the existing changelog link reference block. */
 function removeCompareLinks(text: string) {
   const lines = text.split('\n');
   const compareLinksStartIndex = lines.findIndex((line) => /^\[unreleased\]: /i.test(line));
   return compareLinksStartIndex === -1 ? text : lines.slice(0, compareLinksStartIndex).join('\n');
 }
 
+/** Builds link references for Unreleased and every released version. */
 function buildCompareLinks(versions: string[], repositoryUrl: string) {
   return [
     `[unreleased]: ${repositoryUrl}/compare/v${versions[0]}...HEAD`,
@@ -87,6 +94,7 @@ function buildCompareLinks(versions: string[], repositoryUrl: string) {
   ];
 }
 
+/** Builds a tag or compare link reference for a released version. */
 function buildVersionCompareLink(
   versions: string[],
   repositoryUrl: string,
@@ -100,12 +108,14 @@ function buildVersionCompareLink(
   return `[${version}]: ${url}`;
 }
 
+/** Removes blank lines from the end of a line array. */
 function trimTrailingEmptyLines(lines: string[]) {
   while (lines.at(-1) === '') {
     lines.pop();
   }
 }
 
+/** Reads and normalizes the GitHub repository URL from package.json. */
 function getRepositoryUrl() {
   const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8')) as {
     repository?: { url?: string } | string;

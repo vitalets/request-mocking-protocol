@@ -68,7 +68,7 @@ jobs:
           VERSION=$(npm pkg get version | tr -d '"')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # TODO: replace scripts/release-changelog.ts with keep-a-changelog CLI once it supports
+      # TODO: replace scripts/changelog.ts with keep-a-changelog CLI once it supports
       # --release + --create in one step and --latest-release-full for extracting notes.
       # Tracked at: https://github.com/oscarotero/keep-a-changelog/issues/65
       - name: Update changelog and extract release notes
@@ -81,7 +81,7 @@ jobs:
       - name: Commit, tag, push
         if: ${{ !inputs.dry-run }}
         run: |
-          git add package.json CHANGELOG.md
+          git add package.json package-lock.json CHANGELOG.md
           git commit --no-verify -m "v${{ env.VERSION }}"
           git tag "v${{ env.VERSION }}"
           git push --no-verify origin HEAD --tags
@@ -110,5 +110,5 @@ jobs:
           echo "$NOTES"
           echo "--- package.json version ---"
           npm pkg get version
-          echo "--- CHANGELOG.md diff ---"
-          git diff CHANGELOG.md
+          echo "--- Release files diff ---"
+          git diff package.json package-lock.json CHANGELOG.md

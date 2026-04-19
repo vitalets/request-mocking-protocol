@@ -7,6 +7,7 @@
 * improve debug logging.
 * support `REQUEST_MOCKING_DEBUG` env var to enable debug mode for all mocks.
 * make `MockClient` use last-added-wins precedence for overlapping mocks, aligning with Playwright route ordering.
+* update examples and docs.
 
 ## [0.1.3] - 2025-06-19
 * Update dependencies
@@ -23,7 +24,7 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.3...HEAD
+[Unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.3...HEAD
 [0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.2...0.1.3
 [0.1.2]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/vitalets/request-mocking-protocol/compare/0.1.0...0.1.1
