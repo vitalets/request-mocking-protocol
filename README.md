@@ -236,7 +236,7 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   }, { body: [] });
   ```
 
-- **Method-based matching**: Explicitly define the HTTP method (`GET`, `POST`, etc.) to avoid accidental matches.
+- **Method-based matching**: Explicitly define the HTTP method (`GET`, `POST`, `PATCH`, etc.) to avoid accidental matches.
   ```ts
   await mockClient.POST('https://api.example.com/users', { status: 201 });
   ```
@@ -468,6 +468,7 @@ A callback function that is called whenever the mocks are changed. Accepts `head
 ##### `async GET(reqSchema, resSchema): Promise<void>`
 ##### `async POST(reqSchema, resSchema): Promise<void>`
 ##### `async PUT(reqSchema, resSchema): Promise<void>`
+##### `async PATCH(reqSchema, resSchema): Promise<void>`
 ##### `async DELETE(reqSchema, resSchema): Promise<void>`
 ##### `async HEAD(reqSchema, resSchema): Promise<void>`
 ##### `async ALL(reqSchema, resSchema): Promise<void>`

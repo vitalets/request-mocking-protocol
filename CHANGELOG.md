@@ -10,6 +10,7 @@
 * support `REQUEST_MOCKING_DEBUG` env var to enable debug mode for all mocks.
 * make `MockClient` use last-added-wins precedence for overlapping mocks, aligning with Playwright route ordering.
 * update examples and docs.
+* add `PATCH` method.
 
 ## [0.1.3] - 2025-06-19
 * Update dependencies

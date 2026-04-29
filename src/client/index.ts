@@ -56,6 +56,10 @@ export class MockClient {
     return this.addMockWithMethod('PUT', reqSchema, resSchema);
   }
 
+  async PATCH(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+    return this.addMockWithMethod('PATCH', reqSchema, resSchema);
+  }
+
   async DELETE(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('DELETE', reqSchema, resSchema);
   }
