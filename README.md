@@ -186,58 +186,58 @@ See the full working example in [`examples/nextjs-playwright`](examples/nextjs-p
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
-- **Exact URL matching**: Match requests by providing a full URL string.
+- **Method**: Explicitly define the HTTP method (`GET`, `POST`, `PATCH`, etc.) to avoid accidental matches.
   ```ts
-  await mockClient.GET('https://api.example.com/users', { body: [] });
+  await mockClient.GET('https://api.example.com/users', /* response */);
   ```
 
-- **Wildcard matching**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
+- **URL: exact match**: Match requests by providing a full URL string.
   ```ts
-  await mockClient.GET('https://api.example.com/users/*', { body: [] });
+  await mockClient.GET('https://api.example.com/users', /* response */);
   ```
 
-- **Regular expression matching**: Match requests using JavaScript regular expressions.
+- **URL: wildcard**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
   ```ts
-  await mockClient.GET(/\/users\/\d+$/, { body: {} });
+  await mockClient.GET('https://api.example.com/users/*', /* response */);
   ```
 
-- **Query parameter matching**: Match specific query parameters for more targeted mocks.
+- **URL: regular expression**: Match requests using JavaScript regular expressions.
+  ```ts
+  await mockClient.GET(/\/users\/\d+$/, /* response */);
+  ```
+
+- **Query parameters**: Match specific query parameters for more targeted mocks.
   ```ts
   await mockClient.GET({
     url: 'https://api.example.com/users',
     query: { role: 'admin' },
-  }, { body: [] });
+  }, /* response */);
   ```
 
-- **Header matching**: Match requests by expected HTTP headers.
+- **Headers**: Match requests by expected HTTP headers.
   ```ts
   await mockClient.GET({
     url: 'https://api.example.com/users',
     headers: { authorization: 'Bearer test-token' },
-  }, { body: [] });
+  }, /* response */);
   ```
 
-- **Body matching**: Match requests by string or JSON request body.
+- **Body**: Match requests by string or JSON request body.
   ```ts
   await mockClient.POST({
     url: 'https://api.example.com/users',
     body: { role: 'admin' },
-  }, { status: 201 });
+  }, /* response */);
   ```
 
-- **Method-based matching**: Explicitly define the HTTP method (`GET`, `POST`, `PATCH`, etc.) to avoid accidental matches.
-  ```ts
-  await mockClient.POST('https://api.example.com/users', { status: 201 });
-  ```
-
-- **Schema matching**: Use `.addMock()` method with full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
+- **Combination**: Use `.addMock()` method with full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
   ```ts
   await mockClient.addMock({
     method: 'GET',
     url: 'https://api.example.com/users',
     query: { active: 'true' },
     debug: true,
-  }, { body: [] });
+  }, /* response */);
   ```
 
 If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
@@ -268,6 +268,9 @@ RMP lets you mock any part of the response.
 
 - **Status code**: Set arbitrary HTTP status code to emulate errors.
   ```ts
+  await mockClient.GET('https://example.com/*', 500);
+  
+  // or with full syntax
   await mockClient.GET('https://example.com/*', {
     status: 500
   });
@@ -280,15 +283,15 @@ RMP lets you mock any part of the response.
   });
   ```
 
-You can combine all options together:
+- **combination**: You can combine all options together:
 
-```ts
-await mockClient.GET('https://example.com/*', {
-  headers: { 'content-type': 'application/json' },
-  body: { id: 1, name: 'John Smith' },
-  delay: 1000,
-});
-```
+  ```ts
+  await mockClient.GET('https://example.com/*', {
+    headers: { 'content-type': 'application/json' },
+    body: { id: 1, name: 'John Smith' },
+    delay: 1000,
+  });
+  ```
 
 ### Use Route Parameters
 
@@ -350,15 +353,13 @@ The final response will contain actual and modified data:
 
 This technique is particularly useful to keep your tests in sync with actual API responses, while maintaining test stability and logic.
 
-The `bodyPatch` contains object in a form:
+The `bodyPatch` defines fields in a dot-notation form, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set):
 
 ```
 {
   [path.to.property]: new value
 }
 ```
-
-`path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
 
 ### Debugging
 
