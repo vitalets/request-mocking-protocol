@@ -5,15 +5,15 @@
 [![npm version](https://img.shields.io/npm/v/request-mocking-protocol)](https://www.npmjs.com/package/request-mocking-protocol)
 [![license](https://img.shields.io/npm/l/request-mocking-protocol)](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
 
-**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking (e.g., in React Server Components).
+**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking.
 
 ## How it works
 
 ![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
-1. The test creates a mock and serializes it into the page navigation request via a custom HTTP header: `x-mock-request: '{ url: "/users", body: "Hello" }'`.
-2. The server reads this header and applies the mock to outgoing API requests.
-3. The mocked response is used on both server and client to render the page in the desired state.
+1. A test defines mocks and sends them to the app server in the `x-mock-request` HTTP header.
+2. The server-side interceptor reads that header and uses the mock schemas to intercept matching API calls.
+3. The page is rendered with mocked data, so the test can assert the expected result.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
@@ -66,8 +66,25 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 * [**Debug**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## Installation
+
+Install with any package manager:
+
+### npm
+
+```sh
+npm install --save-dev request-mocking-protocol
 ```
-npm i -D request-mocking-protocol
+
+### pnpm
+
+```sh
+pnpm add --save-dev request-mocking-protocol
+```
+
+### Yarn
+
+```sh
+yarn add --dev request-mocking-protocol
 ```
 
 ## Test-runner Integration
@@ -153,9 +170,11 @@ On the server side, you should set up an [interceptor](#interceptors) to catch t
 
 ### Next.js (App router)
 
-The Next.js setup includes two parts:
-1. Enable fetch interception in `instrumentation.ts` for normal server startup.
-2. Preload fetch interception with `NODE_OPTIONS` when running `next dev` so it remains active across HMR reloads.
+The Next.js setup includes two parts.
+
+#### 1. Setup instrumentation
+
+Enable fetch interception in `instrumentation.ts` for normal server startup.
 
 Create `src/patch-fetch.mjs` with the following content:
 ```js
@@ -181,7 +200,10 @@ export async function register() {
 > When deploying on Vercel, don't use `process.env.NODE_ENV` for detecting non-production environment, 
 > because even preview deployments will have it as `production`.
 
-Then adjust your `package.json` to require the patch when starting the Next.js dev server:
+#### 2. Adjust `next dev` command
+
+Add interceptor to the `next dev` command, so it remains active across HMR reloads. Update `package.json`:
+
 ```json
 {
   "scripts": {
@@ -191,11 +213,12 @@ Then adjust your `package.json` to require the patch when starting the Next.js d
 ```
 
 > [!IMPORTANT]
-> Placing the fetch interceptor in `layout.tsx` is no longer recommended.
-> In dev mode, preload `patch-fetch.mjs` to keep interception active across HMR reloads.
-> This extra preload should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
+> This `next dev` command import should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
 
-Now your server is ready for testing.
+> [!IMPORTANT]
+> Placing the fetch interceptor in `layout.tsx` is no longer recommended.
+
+Now your Next.js server is ready for testing.
 
 ### Astro
 See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
