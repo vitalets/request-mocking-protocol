@@ -157,8 +157,10 @@ The Next.js setup includes two parts:
 1. Enable fetch interception in `instrumentation.ts` for normal server startup.
 2. Preload fetch interception with `NODE_OPTIONS` when running `next dev` so it remains active across HMR reloads.
 
-Create `src/patch-fetch.js` with the following content:
+Create `src/patch-fetch.mjs` with the following content:
 ```js
+// Patch fetch for testing.
+// Keep this file as js to be able to import in the dev command.
 import { setupFetchInterceptor } from 'request-mocking-protocol/fetch';
 
 setupFetchInterceptor(async () => {
@@ -171,7 +173,7 @@ Import the patch in `src/instrumentation.ts` (adjust the env variable for your p
 ```ts
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.VERCEL_ENV !== 'production') {
-    await import('./patch-fetch.js');
+    await import('./patch-fetch.mjs');
   }
 }
 ```
@@ -183,14 +185,14 @@ Then adjust your `package.json` to require the patch when starting the Next.js d
 ```json
 {
   "scripts": {
-    "dev": "NODE_OPTIONS='--require ./src/patch-fetch.js' next dev"
+    "dev": "NODE_OPTIONS='--import ./src/patch-fetch.mjs' next dev"
   }
 }
 ```
 
 > [!IMPORTANT]
 > Placing the fetch interceptor in `layout.tsx` is no longer recommended.
-> In dev mode, preload `patch-fetch.js` to keep interception active across HMR reloads.
+> In dev mode, preload `patch-fetch.mjs` to keep interception active across HMR reloads.
 > This extra preload should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
 
 Now your server is ready for testing.
