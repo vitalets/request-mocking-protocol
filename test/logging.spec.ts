@@ -29,7 +29,7 @@ test('logs newest mocks first when matching', async () => {
   await fetch('https://example.com/');
 
   expectLogs([
-    '⬇️  Matching request with mocks (4)',
+    '⬇️  Matching request (mocks: 4)',
     '     Actual URL: GET https://example.com/',
     '   Expected URL: GET https://example.com/',
     '✅ Mock matched.',
@@ -45,7 +45,7 @@ test('logs mismatches in newest-first order before a match', async () => {
   await fetch('https://example.com/');
 
   expectLogs([
-    '⬇️  Matching request with mocks (4)',
+    '⬇️  Matching request (mocks: 4)',
     '     Actual URL:  GET https://example.com/',
     '   Expected URL: POST https://example.com/users/:id',
     '❌ Mock not matched.',
@@ -84,7 +84,7 @@ test('logs all matcher lines when only body does not match', async () => {
   });
 
   expectLogs([
-    '⬇️  Matching request with mocks (1)',
+    '⬇️  Matching request (mocks: 1)',
     '     Actual URL: POST https://example.com/users/1?foo=1',
     '   Expected URL: POST https://example.com/users/:id',
     '     Actual query param "foo": 1',
@@ -109,7 +109,7 @@ test('truncates very long URLs in logs', async () => {
   await fetch(longActualUrl);
 
   expectLogs([
-    '⬇️  Matching request with mocks (1)',
+    '⬇️  Matching request (mocks: 1)',
     `     Actual URL: GET ${longActualUrl.slice(0, visibleLength)}${suffix}`,
     `   Expected URL: GET ${longExpectedUrl.slice(0, visibleLength)}${suffix}`,
     '❌ Mock not matched.',

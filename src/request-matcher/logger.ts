@@ -32,7 +32,7 @@ export class MatchingLogger {
   init(totalMocks: number) {
     if (!this.enabled) return;
     // extra space is intentional here, to align with the mock done log.
-    this.lines.push(`⬇️  Matching request with mocks (${totalMocks})`);
+    this.lines.push(`⬇️  Matching request (mocks: ${totalMocks})`);
   }
 
   addMock(method: string | undefined, url: string) {
