@@ -3,6 +3,8 @@
  */
 
 export class MatchingLogger {
+  private static readonly maxUrlLength = 120;
+
   private lines: string[] = [];
 
   constructor(
@@ -19,7 +21,12 @@ export class MatchingLogger {
   }
 
   private formatMethodAndUrl(method: string, url: string, methodWidth: number) {
-    return `${method.padStart(methodWidth)} ${url}`;
+    return `${method.padStart(methodWidth)} ${this.truncateUrl(url)}`;
+  }
+
+  private truncateUrl(url: string) {
+    if (url.length <= MatchingLogger.maxUrlLength) return url;
+    return `${url.slice(0, MatchingLogger.maxUrlLength - 3)}...`;
   }
 
   init(totalMocks: number) {

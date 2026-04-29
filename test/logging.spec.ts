@@ -97,6 +97,25 @@ test('logs all matcher lines when only body does not match', async () => {
   ]);
 });
 
+test('truncates very long URLs in logs', async () => {
+  const maxLength = 120;
+  const suffix = '...';
+  const visibleLength = maxLength - suffix.length;
+  const longActualUrl = `https://example.com/users?${'a'.repeat(maxLength)}`;
+  const longExpectedUrl = `https://example.com/users?${'b'.repeat(maxLength)}`;
+
+  await mockClient.GET(longExpectedUrl, 200);
+
+  await fetch(longActualUrl);
+
+  expectLogs([
+    '⬇️  Matching request with mocks (1)',
+    `     Actual URL: GET ${longActualUrl.slice(0, visibleLength)}${suffix}`,
+    `   Expected URL: GET ${longExpectedUrl.slice(0, visibleLength)}${suffix}`,
+    '❌ Mock not matched.',
+  ]);
+});
+
 function expectLogs(lines: string[]) {
   const logStrings = logSpy.mock.calls.map((call: unknown[]) => String(call[0]));
   expect(logStrings).toEqual([lines.join('\n')]);
