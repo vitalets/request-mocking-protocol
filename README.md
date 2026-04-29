@@ -459,7 +459,7 @@ import { setupPlaywrightInterceptor } from 'request-mocking-protocol/playwright'
 export const test = base.extend<{ mockBrowserRequest: MockClient }>({
   mockBrowserRequest: async ({ context }, use) => {
     const mockClient = new MockClient();
-await setupPlaywrightInterceptor(context, mockClient);
+    await setupPlaywrightInterceptor(context, mockClient);
     await use(mockClient);
   },
 });
