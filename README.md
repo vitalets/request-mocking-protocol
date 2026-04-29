@@ -7,13 +7,13 @@
 
 **Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both *client-side* and *server-side* mocking.
 
-## How it works
+## How It Works
 
 ![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
-1. A test defines mocks and sends them to the app server in the `x-mock-request` HTTP header.
-2. The server-side interceptor reads that header and uses the mock schemas to intercept matching API calls.
-3. The page is rendered with mocked data, so the test can assert the expected result.
+1. A test defines mocks and sends them to the app server in a custom HTTP header: `x-mock-request`.
+2. The server-side interceptor reads that header and uses the mock schemas to intercept API calls.
+3. The page is rendered with mocked data, and the test can assert the expected UI.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
@@ -22,48 +22,42 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 <summary>Click to expand</summary>
 
 <!-- doc-gen TOC maxDepth="3" excludeText="Index" -->
-- [How it works](#how-it-works)
+- [How It Works](#how-it-works)
 - [Index](#index)
-- [Features](#features)
 - [Installation](#installation)
-- [Test-runner Integration](#test-runner-integration)
+  - [npm](#npm)
+  - [pnpm](#pnpm)
+  - [Yarn](#yarn)
+- [Quick Start: Next.js + Playwright](#quick-start-nextjs--playwright)
+  - [Setup Interception in Next.js](#setup-interception-in-nextjs)
+  - [Setup Playwright](#setup-playwright)
+- [Recipes](#recipes)
+  - [Match Requests](#match-requests)
+  - [Mock Responses](#mock-responses)
+  - [Use Route Parameters](#use-route-parameters)
+  - [Patch Real Responses](#patch-real-responses)
+  - [Debugging](#debugging)
+- [Integrations](#integrations)
+  - [Next.js App Router](#nextjs-app-router)
   - [Playwright](#playwright)
   - [Cypress](#cypress)
-  - [Custom Runner](#custom-runner)
-- [Framework Integration](#framework-integration)
-  - [Next.js (App router)](#nextjs-app-router)
   - [Astro](#astro)
+  - [Custom Test Runner](#custom-test-runner)
   - [Custom Framework](#custom-framework)
-- [Request Matching](#request-matching)
-- [Parameter Substitution](#parameter-substitution)
-- [Response Patching](#response-patching)
-- [Caching](#caching)
-- [Debugging](#debugging)
+  - [Browser / Client-Side Requests](#browser--client-side-requests)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
-- [Limitations](#limitations)
-- [API](#api)
+  - [Transport](#transport)
+- [API Reference](#api-reference)
   - [MockClient](#mockclient)
   - [Interceptors](#interceptors)
+- [Limitations](#limitations)
 - [Comparison with MSW](#comparison-with-msw)
 - [License](#license)
 <!-- end-doc-gen -->
 
 </details>
-
-## Features
-
-* [**Server-side mocking**](#how-it-works) – Transmit mocks via a custom HTTP header to apply them on the server.
-* [**Per-test isolation**](#test-runner-integration) – Define mocks inside each test, enabling full parallel test execution.
-* [**Test runner support**](#test-runner-integration) – Works with **Playwright**, **Cypress**, and custom runners.
-* [**Framework-agnostic**](#framework-integration) – Built-in support for **Next.js** and **Astro**, or integrate with any framework.
-* [**Request matching**](#request-matching) – Match requests by URL, wildcard, query, headers, or body.
-* [**Response mocking**](#response-mocking) – Mock the response with JSON/ string body or HTTP error.
-* [**Parameter Substitution**](#parameter-substitution) – Dynamically inject route/query values into responses.
-* [**Response patching**](#response-patching) – Fetch real API responses and override only what’s needed.
-* [**API**](#api) – Set up mocks easily using a `MockClient` class.
-* [**Debug**](#debugging) – Add `debug: true` for detailed breakdown of the mocking process.
 
 ## Installation
 
@@ -87,96 +81,20 @@ pnpm add --save-dev request-mocking-protocol
 yarn add --dev request-mocking-protocol
 ```
 
-## Test-runner Integration
+## Quick Start: Next.js + Playwright
 
-RMP is designed to work seamlessly with popular test runners like Playwright and Cypress, and can also be integrated with custom runners.
+This setup mocks server-side `fetch` calls made by a Next.js app during Playwright tests.
 
-Each test defines its own mocks using a [`MockClient`](#mockclient) class. Mocks are not shared across tests, enabling **per-test mock isolation** and **full parallelization**.
-
-### Playwright
-
-1. Set up a custom fixture `mockServerRequest`:
-    ```ts
-    import { test as base } from '@playwright/test';
-    import { MockClient } from 'request-mocking-protocol';
-
-    export const test = base.extend<{ mockServerRequest: MockClient }>({
-      mockServerRequest: async ({ context }, use) => {
-        const mockClient = new MockClient();
-        mockClient.onChange = async (headers) => context.setExtraHTTPHeaders(headers);
-        await use(mockClient);
-      },
-    });
-    ```
-
-2. Use `mockServerRequest` in test to define server-side mocks:
-    ```ts
-    test('my test', async ({ page, mockServerRequest }) => {
-      // set up server-side mock
-      await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
-        body: [{ id: 1, name: 'John Smith' }],
-      });
-
-      // navigate to the page
-      await page.goto('/');
-
-      // assert page content according to mock
-      await expect(page).toContainText('John Smith');
-    });
-    ```
-
-Check out [`MockClient`](#mockclient) API for other methods.
-
-### Cypress
-
-1. Add a custom command `mockServerRequest` in support files, see example [mock-server-request.js](examples/astro-cypress/cypress/support/mock-server-request.js).
-
-2. Use the custom command to define mocks:
-    ```js
-    it('shows list of users', () => {
-      // set up server-side mock
-      cy.mockServerRequest('https://jsonplaceholder.typicode.com/users', {
-        body: [{ id: 1, name: 'John Smith' }],
-      });
-
-      // navigate to the page
-      cy.visit('/');
-
-      // assert page content according to mock
-      cy.get('li').first().should('have.text', 'John Smith');
-    });
-    ```
-
-### Custom Runner
-
-You can integrate RMP with any test runner. It requires two steps:
-
-1. Use the [`MockClient`](#mockclient) class to define mocks.
-   ```js
-   const mockClient = new MockClient();
-   ```
-
-2. Attach [`mockClient.headers`](#headers-recordstring-string) to the navigation request.
-   ```js
-   const headers = {
-    ...mockClient.headers
-   };
-   // ...navigate to the page with provided headers
-   ```
-
-## Framework Integration
-
-On the server side, you should set up an [interceptor](#interceptors) to catch the requests and apply your mocks.
-
-### Next.js (App router)
+### Setup Interception in Next.js
 
 The Next.js setup includes two parts.
 
-#### 1. Setup instrumentation
+#### 1. Setup Instrumentation
 
 Enable fetch interception in `instrumentation.ts` for normal server startup.
 
 Create `src/patch-fetch.mjs` with the following content:
+
 ```js
 // Patch fetch for testing.
 // Keep this file as js to be able to import in the dev command.
@@ -189,6 +107,7 @@ setupFetchInterceptor(async () => {
 ```
 
 Import the patch in `src/instrumentation.ts` (adjust the env variable for your project):
+
 ```ts
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.VERCEL_ENV !== 'production') {
@@ -196,8 +115,9 @@ export async function register() {
   }
 }
 ```
+
 > [!NOTE]
-> When deploying on Vercel, don't use `process.env.NODE_ENV` for detecting non-production environment, 
+> When deploying on Vercel, don't use `process.env.NODE_ENV` for detecting non-production environment,
 > because even preview deployments will have it as `production`.
 
 #### 2. Adjust `next dev` command
@@ -220,21 +140,51 @@ Add interceptor to the `next dev` command, so it remains active across HMR reloa
 
 Now your Next.js server is ready for testing.
 
-### Astro
-See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
+### Setup `MockClient` in Playwright
 
-### Custom Framework
+Each test defines its own mocks using a [`MockClient`](#mockclient) class. Mocks are not shared across tests, enabling **per-test mock isolation** and **full parallelization**.
 
-You can write an interceptor for any framework. It requires two steps:
+#### 1. Setup a custom fixture `mockServerRequest`
 
-1. Read the HTTP headers of the incoming request.
-2. Capture outgoing HTTP requests.
+```ts
+import { test as base } from '@playwright/test';
+import { MockClient } from 'request-mocking-protocol';
 
-Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
+export const test = base.extend<{ mockServerRequest: MockClient }>({
+  mockServerRequest: async ({ context }, use) => {
+    const mockClient = new MockClient();
+    mockClient.onChange = async (headers) => context.setExtraHTTPHeaders(headers);
+    await use(mockClient);
+  },
+});
+```
 
-## Request Matching
+#### 2. Use `mockServerRequest` in test to define server-side mocks
 
-RMP offers flexible matching options to ensure your mocks are applied exactly when you need them:
+```ts
+test('my test', async ({ page, mockServerRequest }) => {
+  // set up server-side mock
+  await mockServerRequest.GET('https://jsonplaceholder.typicode.com/users', {
+    body: [{ id: 1, name: 'John Smith' }],
+  });
+
+  // navigate to the page
+  await page.goto('/');
+
+  // assert page content according to mock
+  await expect(page).toContainText('John Smith');
+});
+```
+
+Check out [`MockClient`](#mockclient) API for other methods.
+
+See the full working example in [`examples/nextjs-playwright`](examples/nextjs-playwright).
+
+## Recipes
+
+### Match Requests
+
+RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
 - **Exact URL matching**: Match requests by providing a full URL string.
   ```ts
@@ -259,6 +209,22 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   }, { body: [] });
   ```
 
+- **Header matching**: Match requests by expected HTTP headers.
+  ```ts
+  await mockClient.GET({
+    url: 'https://api.example.com/users',
+    headers: { authorization: 'Bearer test-token' },
+  }, { body: [] });
+  ```
+
+- **Body matching**: Match requests by string or JSON request body.
+  ```ts
+  await mockClient.POST({
+    url: 'https://api.example.com/users',
+    body: { role: 'admin' },
+  }, { status: 201 });
+  ```
+
 - **Method-based matching**: Explicitly define the HTTP method (`GET`, `POST`, `PATCH`, etc.) to avoid accidental matches.
   ```ts
   await mockClient.POST('https://api.example.com/users', { status: 201 });
@@ -274,9 +240,11 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   }, { body: [] });
   ```
 
-## Response Mocking
+If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
 
-RMP lets you mock any part of the response. 
+### Mock Responses
+
+RMP lets you mock any part of the response.
 
 - **Static body**: Set response body as string or JSON object.
   ```ts
@@ -300,19 +268,20 @@ RMP lets you mock any part of the response.
 
 - **Status code**: Set arbitrary HTTP status code to emulate errors.
   ```ts
-  await mockClient.GET('https://example.com/*', { 
+  await mockClient.GET('https://example.com/*', {
     status: 500
   });
   ```
 
 - **Respond with delay**: Set arbitrary delay in miliseconds.
   ```ts
-  await mockClient.GET('https://example.com/*', { 
+  await mockClient.GET('https://example.com/*', {
     delay: 1000
   });
   ```
 
 You can combine all options together:
+
 ```ts
 await mockClient.GET('https://example.com/*', {
   headers: { 'content-type': 'application/json' },
@@ -321,7 +290,7 @@ await mockClient.GET('https://example.com/*', {
 });
 ```
 
-## Parameter Substitution
+### Use Route Parameters
 
 You can define route parameters in the URL pattern and use them in the response via `{{ }}` syntax:
 
@@ -334,11 +303,14 @@ await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
 });
 ```
 
-The request: 
+The request:
+
 ```
 GET https://jsonplaceholder.typicode.com/users/1
 ```
+
 will be mocked with the response:
+
 ```js
 {
   id: 1,
@@ -346,7 +318,7 @@ will be mocked with the response:
 }
 ```
 
-## Response Patching
+### Patch Real Responses
 
 Response patching allows to make a real request, but modify parts of the response for the testing purposes.
 RMP supports response patching by providing the `bodyPatch` key in the response schema:
@@ -358,7 +330,9 @@ await mockClient.GET('https://jsonplaceholder.typicode.com/users', {
   },
 });
 ```
+
 The final response will contain actual and modified data:
+
 ```diff
 [
   {
@@ -371,19 +345,22 @@ The final response will contain actual and modified data:
     }
   }
   ...
-]    
+]
 ```
+
 This technique is particularly useful to keep your tests in sync with actual API responses, while maintaining test stability and logic.
 
 The `bodyPatch` contains object in a form:
+
 ```
 {
   [path.to.property]: new value
 }
 ```
+
 `path.to.property` uses dot-notation, evaluated with [lodash.set](https://lodash.com/docs/4.17.15#set).
 
-## Debugging
+### Debugging
 
 You can enable debug logs globally by setting `REQUEST_MOCKING_DEBUG` env variable, or by setting `debug: true` on any request/response schema.
 
@@ -405,6 +382,104 @@ When debug enabled, the server will output mocking logs to console:
 
 ![Debug logs](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/debug.png)
 
+## Integrations
+
+RMP is designed to work seamlessly with popular test runners like Playwright and Cypress, and can also be integrated with custom runners.
+
+On the server side, you should set up an [interceptor](#interceptors) to catch the requests and apply your mocks.
+
+### Next.js App Router
+
+Use the [`Quick Start: Next.js + Playwright`](#quick-start-nextjs--playwright) setup for Next.js App Router applications. For **Next.js**, use the [`instrumentation.ts` setup](#setup-interception-in-nextjs) instead of `layout.tsx`.
+
+### Playwright
+
+Use the [`Setup Playwright`](#setup-playwright) fixture to send mocks to your application server through Playwright's browser context headers.
+
+### Cypress
+
+1. Add a custom command `mockServerRequest` in support files, see example [mock-server-request.js](examples/astro-cypress/cypress/support/mock-server-request.js).
+
+2. Use the custom command to define mocks:
+    ```js
+    it('shows list of users', () => {
+      // set up server-side mock
+      cy.mockServerRequest('https://jsonplaceholder.typicode.com/users', {
+        body: [{ id: 1, name: 'John Smith' }],
+      });
+
+      // navigate to the page
+      cy.visit('/');
+
+      // assert page content according to mock
+      cy.get('li').first().should('have.text', 'John Smith');
+    });
+    ```
+
+### Astro
+
+See [astro.config.ts](examples/astro-cypress/astro.config.ts) in the astro-cypress example.
+
+### Custom Test Runner
+
+You can integrate RMP with any test runner. It requires two steps:
+
+1. Use the [`MockClient`](#mockclient) class to define mocks.
+   ```js
+   const mockClient = new MockClient();
+   ```
+
+2. Attach [`mockClient.headers`](#headers-recordstring-string) to the navigation request.
+   ```js
+   const headers = {
+    ...mockClient.headers
+   };
+   // ...navigate to the page with provided headers
+   ```
+
+### Custom Framework
+
+You can write an interceptor for any framework. It requires two steps:
+
+1. Read the HTTP headers of the incoming request.
+2. Capture outgoing HTTP requests.
+
+Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
+
+### Mocking Client-Side Requests
+
+You can mock in-browser page requests with the same syntax as server-side mocks. To achieve it in Playwright, create a `mockBrowserRequest` fixture:
+
+```ts
+import { test as base } from '@playwright/test';
+import { MockClient } from 'request-mocking-protocol';
+import { setupPlaywrightInterceptor } from 'request-mocking-protocol/playwright';
+
+export const test = base.extend<{ mockBrowserRequest: MockClient }>({
+  mockBrowserRequest: async ({ context }, use) => {
+    const mockClient = new MockClient();
+await setupPlaywrightInterceptor(context, mockClient);
+    await use(mockClient);
+  },
+});
+```
+
+Then use it in tests:
+```ts
+test('my test', async ({ page, mockBrowserRequest }) => {
+  // set up browser-side mock
+  await mockBrowserRequest.GET('https://jsonplaceholder.typicode.com/users', {
+    body: [{ id: 1, name: 'John Smith' }],
+  });
+
+  // navigate to the page
+  await page.goto('/');
+
+  // assert page content according to mock
+  await expect(page).toContainText('John Smith');
+});
+```
+
 ## Concepts
 
 ### Request Schema
@@ -414,16 +489,19 @@ The request schema is a serializable object that defines parameters for matching
 [Full schema definition](src/protocol/request-schema.ts).
 
 Example:
+
 ```js
 {
-  method: 'GET', 
+  method: 'GET',
   url: 'https://jsonplaceholder.typicode.com/users',
   query: {
     foo: 'bar'
   }
 }
 ```
+
 This schema will match the request:
+
 ```
 GET https://jsonplaceholder.typicode.com/users?foo=bar
 ```
@@ -435,6 +513,7 @@ The response schema is a serializable object that defines how to build the mocke
 [Full schema definition](src/protocol/response-schema.ts).
 
 Example:
+
 ```js
 {
   status: 200,
@@ -447,19 +526,14 @@ Example:
 Request-mocking-protocol uses a custom HTTP header `x-mock-request` for transferring JSON-stringified schemas from the test runner to the application server.
 
 Example:
+
 ```
 x-mock-request: [{"reqSchema":{"method":"GET","patternType":"urlpattern","url":"https://example.com"},"resSchema":{"body":"hello","status":200}}]
 ```
 
 On the server side, the interceptor will read the incoming headers and apply the mocks.
 
-## Limitations
-
-1. **Static Data Only:** The mock must be serializable to JSON. This means you can't provide arbitrary function-based mocks. To mitigate this restriction, RMP supports [Parameter Substitution](#parameter-substitution) and [Response Patching](#response-patching) techniques.
-
-2. **Header Size Limits:** HTTP headers typically support 4KB to 8KB of data. If you need to mock larger payloads, consider [Response patching](#response-patching) or alternative techniques.
-
-## API
+## API Reference
 
 ### MockClient
 
@@ -508,12 +582,13 @@ If multiple mocks match the same request, the most recently added matching mock 
     - If defined as `number`, it is treated as an HTTP status code.
 
 Examples:
+
 ```ts
 // mock any GET request to https://example.com
 await mockClient.GET('https://example.com/*', {
-  body: { 
-    id: 1, 
-    name: 'John Smith' 
+  body: {
+    id: 1,
+    name: 'John Smith'
   },
 });
 
@@ -524,9 +599,9 @@ await mockClient.POST({
     foo: 'bar'
   },
 }, {
-  body: { 
-    id: 1, 
-    name: 'John Smith' 
+  body: {
+    id: 1,
+    name: 'John Smith'
   },
 });
 ```
@@ -538,21 +613,23 @@ Clears all mocks and rebuilds the headers.
 ### Interceptors
 
 Interceptors are used on the server to capture HTTP requests and apply mocks.
-Currently, there are two interceptors available.
+Currently, there are two server-side interceptors available.
 
 #### Global Fetch
 
 This interceptor overwrites the `globalThis.fetch` function.
 
 Basic usage:
+
 ```ts
 const { setupFetchInterceptor } = await import('request-mocking-protocol/fetch');
 
-setupFetchInterceptor(() => { 
+setupFetchInterceptor(() => {
   // read and return headers of the incoming HTTP request
 });
 ```
-The actual function for retrieving incoming headers depends on the application framework. 
+
+The actual function for retrieving incoming headers depends on the application framework.
 
 #### MSW Interceptor
 
@@ -562,17 +639,35 @@ If your app doesn’t use `fetch`, you can try the [MSW](https://mswjs.io/docs/i
 import { setupServer } from 'msw/node';
 import { createHandler } from 'request-mocking-protocol/msw';
 
-const mockHandler = createHandler(() => { 
+const mockHandler = createHandler(() => {
   // read and return headers of the incoming HTTP request
 });
 const mswServer = setupServer(mockHandler);
 mswServer.listen();
 ```
 
-> Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](#api) class.
+> Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](#api-reference) class.
 
 The function for retrieving incoming HTTP headers depends on the application framework.
-For **Next.js**, use the [`instrumentation.ts` setup](#nextjs-app-router) instead of `layout.tsx`.
+For **Next.js**, use the [`instrumentation.ts` setup](#setup-interception-in-nextjs) instead of `layout.tsx`.
+
+#### Playwright Interceptor
+
+The Playwright interceptor is used in Playwright tests to mock page requests with the same syntax as for server requests.
+
+```ts
+import { setupPlaywrightInterceptor } from 'request-mocking-protocol/playwright';
+
+await setupPlaywrightInterceptor(page, mockClient);
+```
+
+Use it for in-browser requests. For server-side requests in Next.js, use the [`Global Fetch`](#global-fetch) interceptor through the [quick start setup](#quick-start-nextjs--playwright).
+
+## Limitations
+
+1. **Static Data Only:** The mock must be serializable to JSON. This means you can't provide arbitrary function-based mocks. To mitigate this restriction, RMP supports [Parameter Substitution](#use-route-parameters) and [Response Patching](#patch-real-responses) techniques.
+
+2. **Header Size Limits:** HTTP headers typically support 4KB to 8KB of data. If you need to mock larger payloads, consider [Response patching](#patch-real-responses) or alternative techniques.
 
 ## Comparison with MSW
 
@@ -580,14 +675,15 @@ While both RMP and MSW support request mocking, RMP stands out by enabling **per
 
 | Feature                                     | RMP | MSW |
 | ------------------------------------------- | :-: | :--: |
-| REST API                            |  ✅  |   ✅  |
-| GraphQL API                         |  ❌  |   ✅  |
-| Arbitrary handler function                  |  ❌  |   ✅  |
-| Server-side mocking                         |  ✅  |   ✅  |
+| REST API                                    |  ✅  |  ✅  |
+| GraphQL API                                 |  ❌  |  ✅  |
+| Arbitrary handler function                  |  ❌  |  ✅  |
+| Server-side mocking                         |  ✅  |  ✅  |
 | Server-side mocking with per-test isolation |  ✅  |  ❌¹  |
-| Server-side mocking on CI                   |  ✅  |   ❌  |
+| Server-side mocking on CI                   |  ✅  |  ❌  |
 
 ¹ *Per-test isolation in MSW can be achieved via spinning a separate app instance for each test. See [this example](https://github.com/kettanaito/nextjs-rsc-testing).*
 
 ## License
+
 [MIT](https://github.com/vitalets/request-mocking-protocol/blob/main/LICENSE)
