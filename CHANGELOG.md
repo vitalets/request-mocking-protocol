@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-04-29
+
 ## [0.2.0] - 2026-04-19
 * add duplicate-setup guards for the fetch and Playwright interceptors.
 * improve debug logging.
@@ -27,7 +29,8 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.1...v0.1.2
