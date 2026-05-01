@@ -30,13 +30,23 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
   - [Yarn](#yarn)
 - [Quick Start: Next.js + Playwright](#quick-start-nextjs--playwright)
   - [Setup Interception in Next.js](#setup-interception-in-nextjs)
-  - [Setup Playwright](#setup-playwright)
-- [Recipes](#recipes)
-  - [Match Requests](#match-requests)
-  - [Mock Responses](#mock-responses)
-  - [Use Route Parameters](#use-route-parameters)
-  - [Patch Real Responses](#patch-real-responses)
-  - [Debugging](#debugging)
+  - [Setup `MockClient` in Playwright](#setup-mockclient-in-playwright)
+- [Request Matching](#request-matching)
+  - [URL](#url)
+  - [Method](#method)
+  - [Query](#query)
+  - [Headers](#headers)
+  - [Body](#body)
+  - [Combination](#combination)
+- [Response Mocking](#response-mocking)
+  - [Body](#body-1)
+  - [Headers](#headers-1)
+  - [Status Code](#status-code)
+  - [Delay](#delay)
+  - [Combination](#combination-1)
+- [Response Patching](#response-patching)
+- [Route Parameters](#route-parameters)
+- [Debugging](#debugging)
 - [Integrations](#integrations)
   - [Next.js App Router](#nextjs-app-router)
   - [Playwright](#playwright)
@@ -44,7 +54,7 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
   - [Astro](#astro)
   - [Custom Test Runner](#custom-test-runner)
   - [Custom Framework](#custom-framework)
-  - [Browser / Client-Side Requests](#browser--client-side-requests)
+- [Client-Side Mocks](#client-side-mocks)
 - [Concepts](#concepts)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
@@ -180,15 +190,15 @@ Check out [`MockClient`](#mockclient) API for other methods.
 
 See the full working example in [`examples/nextjs-playwright`](examples/nextjs-playwright).
 
-## Recipes
-
-### Match Requests
+## Request Matching
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
-- **Method**: Explicitly define the HTTP method (`GET`, `POST`, `PATCH`, etc.) to avoid accidental matches.
+### URL
+
+- **URL: wildcard**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax:
   ```ts
-  await mockClient.GET('https://api.example.com/users', /* response */);
+  await mockClient.GET('https://api.example.com/users/*', /* response */);
   ```
 
 - **URL: exact match**: Match requests by providing a full URL string.
@@ -196,134 +206,163 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
   await mockClient.GET('https://api.example.com/users', /* response */);
   ```
 
-- **URL: wildcard**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax.
-  ```ts
-  await mockClient.GET('https://api.example.com/users/*', /* response */);
-  ```
-
 - **URL: regular expression**: Match requests using JavaScript regular expressions.
   ```ts
   await mockClient.GET(/\/users\/\d+$/, /* response */);
   ```
 
-- **Query parameters**: Match specific query parameters for more targeted mocks.
-  ```ts
-  await mockClient.GET({
-    url: 'https://api.example.com/users',
-    query: { role: 'admin' },
-  }, /* response */);
-  ```
+### Method
 
-- **Headers**: Match requests by expected HTTP headers.
-  ```ts
-  await mockClient.GET({
-    url: 'https://api.example.com/users',
-    headers: { authorization: 'Bearer test-token' },
-  }, /* response */);
-  ```
+Explicitly define the HTTP method to match:
 
-- **Body**: Match requests by string or JSON request body.
-  ```ts
-  await mockClient.POST({
-    url: 'https://api.example.com/users',
-    body: { role: 'admin' },
-  }, /* response */);
-  ```
+```ts
+// GET
+await mockClient.GET('https://api.example.com/users', /* response */);
+// POST
+await mockClient.POST('https://api.example.com/users', /* response */);
+// Any HTTP method
+await mockClient.ALL('https://api.example.com/users', /* response */);
+```
 
-- **Combination**: Use `.addMock()` method with full request schemas to match by method, URL, query, and optionally enable `debug` mode for inspection.
-  ```ts
-  await mockClient.addMock({
-    method: 'GET',
-    url: 'https://api.example.com/users',
-    query: { active: 'true' },
-    debug: true,
-  }, /* response */);
-  ```
+### Query
+
+Match requests by URL query parameters:
+
+```ts
+// Matches GET https://api.example.com/users?role=admin
+await mockClient.GET({
+  url: 'https://api.example.com/users',
+  query: { 
+    role: 'admin' 
+  },
+}, /* response */);
+```
+
+### Headers
+
+Match requests by HTTP headers:
+
+```ts
+await mockClient.GET({
+  url: 'https://api.example.com/users',
+  headers: { 
+    authorization: 'Bearer test-token' 
+  },
+}, /* response */);
+```
+
+### Body
+
+Match requests by string or JSON request body.
+```ts
+await mockClient.POST({
+  url: 'https://api.example.com/users',
+  body: { 
+    role: 'admin' 
+  },
+}, /* response */);
+```
+
+### Combination
+
+Combine all matchers together:
+
+```ts
+await mockClient.POST({
+  url: 'https://api.example.com/users',
+  query: { 
+    active: 'true' 
+  },
+  headers: { 
+    authorization: 'Bearer test-token' 
+  },
+  body: { 
+    role: 'admin' 
+  },
+}, /* response */);
+```
 
 If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
 
-### Mock Responses
+## Response Mocking
 
 RMP lets you mock any part of the response.
 
-- **Static body**: Set response body as string or JSON object.
-  ```ts
-  // string
-  await mockClient.GET('https://example.com/*', {
-    body: 'Hello world'
-  });
+### Body
 
-  // JSON
-  await mockClient.GET('https://example.com/*', {
-    body: { id: 1, name: 'John Smith' },
-  });
-  ```
-
-- **Custom headers**: Set response headers.
-  ```ts
-  await mockClient.GET('https://example.com/*', {
-    headers: { 'content-type': 'application/json' },
-  });
-  ```
-
-- **Status code**: Set arbitrary HTTP status code to emulate errors.
-  ```ts
-  await mockClient.GET('https://example.com/*', 500);
-  
-  // or with full syntax
-  await mockClient.GET('https://example.com/*', {
-    status: 500
-  });
-  ```
-
-- **Respond with delay**: Set arbitrary delay in miliseconds.
-  ```ts
-  await mockClient.GET('https://example.com/*', {
-    delay: 1000
-  });
-  ```
-
-- **combination**: You can combine all options together:
-
-  ```ts
-  await mockClient.GET('https://example.com/*', {
-    headers: { 'content-type': 'application/json' },
-    body: { id: 1, name: 'John Smith' },
-    delay: 1000,
-  });
-  ```
-
-### Use Route Parameters
-
-You can define route parameters in the URL pattern and use them in the response via `{{ }}` syntax:
+Set response body as string or JSON object:
 
 ```ts
-await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
-  body: {
-    id: '{{ id:number }}',
-    name: 'User {{ id }}',
-  }
+// string
+await mockClient.GET(/* req */, {
+  body: 'Hello world'
+});
+
+// JSON
+await mockClient.GET(/* req */, {
+  body: { 
+    id: 1, 
+    name: 'John Smith' 
+  },
 });
 ```
 
-The request:
+### Headers
 
-```
-GET https://jsonplaceholder.typicode.com/users/1
-```
+Set response headers:
 
-will be mocked with the response:
-
-```js
-{
-  id: 1,
-  name: 'User 1',
-}
+```ts
+await mockClient.GET(/* req */, {
+  headers: { 
+    'content-type': 'application/json' 
+  },
+});
 ```
 
-### Patch Real Responses
+### Status Code
 
-Response patching allows to make a real request, but modify parts of the response for the testing purposes.
+Set arbitrary HTTP status code to emulate errors:
+
+```ts
+// Emulate 500 Internal Server Error
+await mockClient.GET(/* req */, 500);
+
+// or with full syntax
+await mockClient.GET(/* req */, {
+  status: 500
+});
+```
+
+### Delay
+
+Set arbitrary response delay in miliseconds:
+
+```ts
+await mockClient.GET(/* req */, {
+  delay: 1000
+});
+```
+
+### Combination
+
+You can combine all options together to build the response mock:
+
+```ts
+await mockClient.GET('https://example.com/*', {
+  headers: { 
+    'content-type': 'application/json' 
+  },
+  body: { 
+    id: 1, 
+    name: 'John Smith' 
+  },
+  delay: 1000,
+});
+```
+
+## Response Patching
+
+Response patching allows to make a real request, and modify only parts of the response for the testing purposes.
 RMP supports response patching by providing the `bodyPatch` key in the response schema:
 
 ```ts
@@ -361,9 +400,40 @@ The `bodyPatch` defines fields in a dot-notation form, evaluated with [lodash.se
 }
 ```
 
-### Debugging
+## Route Parameters
 
-You can enable debug logs globally by setting `REQUEST_MOCKING_DEBUG` env variable, or by setting `debug: true` on any request/response schema.
+You can define route parameters in the URL pattern and use them in the response via `{{ }}` syntax:
+
+```ts
+await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+  body: {
+    id: '{{ id:number }}',
+    name: 'User {{ id }}',
+  }
+});
+```
+
+The request:
+
+```
+GET https://jsonplaceholder.typicode.com/users/1
+```
+
+will be mocked with the response:
+
+```js
+{
+  id: 1,
+  name: 'User 1',
+}
+```
+
+## Debugging
+
+You can enable debugging in two ways:
+
+- set `REQUEST_MOCKING_DEBUG=1` env variable to debug all mocks
+- set `debug: true` on any request/response schema to debug the specific mock
 
 ```ts
 await mockClient.GET(
@@ -447,9 +517,10 @@ You can write an interceptor for any framework. It requires two steps:
 
 Check out the reference implementations in the [src/interceptors](src/interceptors) directory.
 
-### Mocking Client-Side Requests
+## Client-Side Mocks
 
-You can mock in-browser page requests with the same syntax as server-side mocks. To achieve it in Playwright, create a `mockBrowserRequest` fixture:
+You can mock client-side requests with the same syntax as server-side mocks. 
+To achieve it in Playwright, create a `mockBrowserRequest` fixture:
 
 ```ts
 import { test as base } from '@playwright/test';
@@ -575,12 +646,14 @@ Adds a new mock for the corresponding HTTP method.
 
 If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
 
-- `reqSchema: string | RegExp | object` – The [request schema](src/protocol/request-schema.ts) for the mock.
+- `reqSchema: string | RegExp | object` – The request matching schema for the mock.
     - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL.
     - If defined as `RegExp`, it is treated as [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
+    - If defined as `object`, it is treated as [MockRequestSchemaInit](src/protocol/request-schema.ts) type.
 
-- `resSchema: number | object`: The [response schema](src/protocol/response-schema.ts) for the mock.
+- `resSchema: number | object`: The response schema for the mock.
     - If defined as `number`, it is treated as an HTTP status code.
+    - If defined as `object`, it is treated as [MockResponseSchema](src/protocol/response-schema.ts) type.
 
 Examples:
 

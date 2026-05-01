@@ -24,6 +24,7 @@ export type MockResponseSchema = {
   bodyPatch?: Record<string, string | number | boolean | null>;
   /**
    * Request overrides.
+   * Used for request modification or response patching.
    * If defined, the real request will be sent with the overrides.
    * Not compatible with the 'body' field.
    */
