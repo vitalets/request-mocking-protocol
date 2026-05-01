@@ -200,13 +200,11 @@ URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/do
 
 #### Wildcard
 
-Use wildcards `*` to match any substring:
+In URLPattern syntax, `*` matches any character sequence, not a single path segment:
 
 ```ts
 await mockClient.GET('https://example.com/users/*', /* response */);
 ```
-
-In URLPattern syntax, `*` matches any character sequence, not a single path segment:
 
 ```txt
 https://example.com/users/                matches
@@ -217,13 +215,11 @@ https://example.com/users?page=1          does not match
 https://example.com/products/1            does not match
 ```
 
-Wildcards can also be used inside the hostname:
+Wildcards can also be used inside the hostname. The hostname wildcard matches any character sequence inside the hostname component, including dots:
 
 ```ts
 await mockClient.GET('https://*.example.com/users', /* response */);
 ```
-
-The hostname wildcard matches any character sequence inside the hostname component, including dots:
 
 ```txt
 https://api.example.com/users              matches
@@ -318,14 +314,20 @@ await mockClient.ALL('https://api.example.com/users', /* response */);
 Match requests by specific URL query parameters:
 
 ```ts
-// Matches GET https://api.example.com/users?role=admin
-// Also matches GET https://api.example.com/users?role=admin&page=1
 await mockClient.GET({
   url: 'https://api.example.com/users',
   query: { 
     role: 'admin' 
   },
 }, /* response */);
+```
+
+```txt
+https://api.example.com/users?role=admin         matches
+https://api.example.com/users?role=admin&page=1  matches
+https://api.example.com/users                    does not match
+https://api.example.com/users?role=user          does not match
+https://api.example.com/posts?role=admin         does not match
 ```
 
 When `query` is defined, RMP trims the request URL's search params before URLPattern matching and then checks the listed query params separately. Extra query params are allowed. To require a URL with no query params, set `query` to `null`:
@@ -336,6 +338,8 @@ await mockClient.GET({
   query: null,
 }, /* response */);
 ```
+
+> If both `url` with query and `query` field are defined, it will be an error.
 
 ### Headers
 
@@ -501,7 +505,7 @@ The `bodyPatch` defines fields in a dot-notation form, evaluated with [lodash.se
 
 ## Route Parameters
 
-You can define route parameters in the URL pattern and use them in the response via `{{ }}` syntax:
+You can define [route parameters](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#fixed_text_and_capture_groups) in the URL pattern and use them in the response via `{{ }}` syntax:
 
 ```ts
 await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
