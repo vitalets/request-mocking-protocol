@@ -6,12 +6,8 @@
  * Response schema is used to generate the response.
  */
 
-import { MockRequestSchema, MockRequestSchemaInit, buildMockRequestSchema } from './request-schema';
-import {
-  MockResponseSchema,
-  MockResponseSchemaInit,
-  buildMockResponseSchema,
-} from './response-schema';
+import { MockRequestSchema, MockRequestSchemaInit, buildRequestSchema } from './request-schema';
+import { MockResponseSchema, MockResponseSchemaInit, buildResponseSchema } from './response-schema';
 
 export * from './request-schema';
 export * from './response-schema';
@@ -32,7 +28,7 @@ export function buildMockSchema(
   resSchema: MockResponseSchemaInit,
 ): MockSchema {
   return {
-    reqSchema: buildMockRequestSchema(reqSchema),
-    resSchema: buildMockResponseSchema(resSchema),
+    reqSchema: buildRequestSchema(reqSchema),
+    resSchema: buildResponseSchema(resSchema),
   };
 }

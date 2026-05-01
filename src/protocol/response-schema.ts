@@ -1,8 +1,7 @@
 /**
- * Schema to generate the response.
+ * Response schema, transfered over the wire.
+ * Must be serializable.
  */
-
-// serializable
 export type MockResponseSchema = {
   /**
    * The HTTP status code, default is 200.
@@ -61,16 +60,28 @@ export type MockResponseSchema = {
 };
 
 export type MockRequestOverrides = NonNullable<MockResponseSchema['request']>;
+
+/**
+ * Init data, used to build the response schema.
+ * Allows to provide `number` as a shortcut for status.
+ */
 export type MockResponseSchemaInit = number | MockResponseSchema;
 
-export function buildMockResponseSchema(init: MockResponseSchemaInit): MockResponseSchema {
-  const initObj = toMockResponseSchemaObject(init);
-  assertSchema(initObj);
+/**
+ * Builds the response schema from init data.
+ */
+export function buildResponseSchema(init: MockResponseSchemaInit): MockResponseSchema {
+  const obj = toResponseSchemaObjectInit(init);
+  assertSchema(obj);
 
-  return Object.assign({}, initObj);
+  // Actually init object is already in the correct format, so we just return it.
+  return { ...obj };
 }
 
-export function toMockResponseSchemaObject(init: MockResponseSchemaInit) {
+/**
+ * Converts init data to object.
+ */
+export function toResponseSchemaObjectInit(init: MockResponseSchemaInit) {
   return typeof init === 'number' ? { status: init } : init;
 }
 

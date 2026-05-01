@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { SchemaMatcher } from '../../src/request-matcher/schema-matcher';
-import { buildMockRequestSchema } from '../../src/protocol';
+import { buildRequestSchema } from '../../src/protocol';
 
 test('no hostname slash', async () => {
   const matcher = createMatcher('https://example.com');
@@ -84,7 +84,7 @@ test('with hostname slash, double asterisk', async () => {
 });
 
 function createMatcher(url: string) {
-  return new SchemaMatcher(buildMockRequestSchema(url));
+  return new SchemaMatcher(buildRequestSchema(url));
 }
 
 async function match(matcher: SchemaMatcher, url: string, shouldMatch = true) {

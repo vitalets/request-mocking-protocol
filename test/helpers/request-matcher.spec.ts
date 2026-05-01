@@ -1,11 +1,11 @@
 import { test, expect } from 'vitest';
 import { SchemaMatcher } from '../../src/request-matcher/schema-matcher';
-import { buildMockRequestSchema, MockRequestSchemaInit } from '../../src/protocol';
+import { buildRequestSchema, MockRequestSchemaInit } from '../../src/protocol';
 
 let req: Request;
 
 function createMatcher(inti: MockRequestSchemaInit) {
-  return new SchemaMatcher(buildMockRequestSchema(inti));
+  return new SchemaMatcher(buildRequestSchema(inti));
 }
 
 test('match method', async () => {

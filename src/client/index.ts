@@ -7,9 +7,9 @@ import {
   MockRequestSchemaObjectInit,
   MockResponseSchemaInit,
   MockSchema,
-  buildMockRequestSchema,
-  buildMockResponseSchema,
-  toMockRequestSchemaObjectInit,
+  buildRequestSchema,
+  buildResponseSchema,
+  toRequestSchemaObjectInit,
 } from '../protocol';
 import { buildMockHeaders } from '../transport';
 import { getEnvDebug } from './env';
@@ -86,7 +86,7 @@ export class MockClient {
     reqSchema: MockRequestSchemaInitNoMethod,
     resSchema: MockResponseSchemaInit,
   ) {
-    const obj = toMockRequestSchemaObjectInit(reqSchema);
+    const obj = toRequestSchemaObjectInit(reqSchema);
     return this.addMock({ method, ...obj }, resSchema);
   }
 
@@ -96,14 +96,14 @@ export class MockClient {
   }
 
   private buildRequestSchema(init: MockRequestSchemaInit) {
-    const obj = toMockRequestSchemaObjectInit(init);
+    const obj = toRequestSchemaObjectInit(init);
     const { defaultMethod: method, debug } = this.options || {};
     const initObjWithDefaults = mergeOptions({ method, debug }, obj);
-    return buildMockRequestSchema(initObjWithDefaults);
+    return buildRequestSchema(initObjWithDefaults);
   }
 
   private buildResponseSchema(init: MockResponseSchemaInit) {
     // place to apply defaults
-    return buildMockResponseSchema(init);
+    return buildResponseSchema(init);
   }
 }

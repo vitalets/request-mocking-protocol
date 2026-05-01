@@ -37,6 +37,7 @@ export type MockRequestSchema = {
 
 /**
  * Init data, used to build the request schema.
+ * Allows to provide `string` | `RegExp` as a shortcut for url.
  */
 export type MockRequestSchemaInit = string | RegExp | MockRequestSchemaObjectInit;
 
@@ -55,8 +56,8 @@ export type MockRequestSchemaObjectInit = {
 /**
  * Builds the request schema from init data.
  */
-export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequestSchema {
-  const { url, ...rest } = toMockRequestSchemaObjectInit(init);
+export function buildRequestSchema(init: MockRequestSchemaInit): MockRequestSchema {
+  const { url, ...rest } = toRequestSchemaObjectInit(init);
   return {
     // always convert url to string to handle regexp (direct and inside object)
     url: url.toString(),
@@ -68,7 +69,7 @@ export function buildMockRequestSchema(init: MockRequestSchemaInit): MockRequest
 /**
  * Converts init data to object, useful for merging additional props.
  */
-export function toMockRequestSchemaObjectInit<T extends Record<string, unknown>>(
+export function toRequestSchemaObjectInit<T extends Record<string, unknown>>(
   init: string | RegExp | T,
 ) {
   if (!init) throw new Error('Request schema cannot be empty.');
