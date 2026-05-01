@@ -3,6 +3,7 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+* remove the `defaultMethod` option from `MockClient`.
 
 ## [0.2.1] - 2026-04-29
 

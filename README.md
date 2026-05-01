@@ -619,7 +619,6 @@ Creates a new instance of `MockClient`.
 
 - `options` (optional): An object containing configuration options.
   - `debug` (optional): A boolean indicating whether to enable debug mode.
-  - `defaultMethod` (optional): The default HTTP method to use for requests.
 
 #### Properties
 

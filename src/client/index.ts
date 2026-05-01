@@ -17,7 +17,6 @@ import { mergeOptions } from './utils';
 
 export type MockClientOptions = {
   debug?: boolean;
-  defaultMethod?: MockRequestSchema['method'];
 };
 
 export type MockRequestSchemaInitNoMethod =
@@ -97,9 +96,9 @@ export class MockClient {
 
   private buildRequestSchema(init: MockRequestSchemaInit) {
     const obj = toRequestSchemaObjectInit(init);
-    const { defaultMethod: method, debug } = this.options || {};
-    const initObjWithDefaults = mergeOptions({ method, debug }, obj);
-    return buildRequestSchema(initObjWithDefaults);
+    const { debug } = this.options || {};
+    const objWithDefaults = mergeOptions({ debug }, obj);
+    return buildRequestSchema(objWithDefaults);
   }
 
   private buildResponseSchema(init: MockResponseSchemaInit) {
