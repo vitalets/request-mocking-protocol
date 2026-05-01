@@ -3,6 +3,8 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+
+## [0.3.0] - 2026-05-01
 * remove the `defaultMethod` option from `MockClient`.
 * support `query: null` to match URL without parameters. 
 
@@ -31,7 +33,8 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.1...HEAD
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.2...v0.1.3
