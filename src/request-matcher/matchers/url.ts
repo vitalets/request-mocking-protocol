@@ -17,7 +17,9 @@ export class UrlMatcher {
   match(ctx: MatchingContext) {
     const { req } = ctx;
 
-    const shouldTrimSearchParams = Boolean(this.schema.query);
+    // When query matching is configured, URL matching should only check the URL parts.
+    // Query params are validated separately by QueryMatcher.
+    const shouldTrimSearchParams = this.schema.query !== undefined;
     const url = shouldTrimSearchParams ? trimSearchParams(req.url) : req.url;
 
     const result =

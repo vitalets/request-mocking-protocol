@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 * remove the `defaultMethod` option from `MockClient`.
+* support `query: null` to match URL without parameters. 
 
 ## [0.2.1] - 2026-04-29
 

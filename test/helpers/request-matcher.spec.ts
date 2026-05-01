@@ -70,6 +70,36 @@ test('match query', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
+test('match empty query', async () => {
+  const matcher = createMatcher({
+    url: 'https://example.com/users',
+    query: null,
+  });
+
+  req = new Request('https://example.com/users');
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com/users?');
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com/users?foo=456');
+  expect(await matcher.match(req)).toEqual(null);
+
+  req = new Request('https://example.com/users/');
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('throw when empty query is defined both in URL and query field', () => {
+  expect(() =>
+    createMatcher({
+      url: 'https://example.com/users?',
+      query: null,
+    }),
+  ).toThrow(
+    `Query parameters should be defined either in the URL pattern or in the 'query' field.`,
+  );
+});
+
 test('match headers', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',

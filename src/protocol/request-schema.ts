@@ -19,8 +19,9 @@ export type MockRequestSchema = {
   method?: HttpMethod;
   /**
    * The query parameters for matching, defined as key-value pairs.
+   * Set to null to match requests without query parameters.
    */
-  query?: Record<string, string | number | null>;
+  query?: Record<string, string | number | null> | null;
   /**
    * The request headers for matching, defined as key-value pairs.
    */

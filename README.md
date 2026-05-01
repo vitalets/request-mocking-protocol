@@ -255,19 +255,28 @@ https://example.com/users?page=1         matches
 https://example.com/users?anything=here  matches
 ```
 
-Add a trailing `?` to the URL pattern when the request must not contain query parameters.
+Set `query: null` to match string URL without any query parameters:
 
 ```ts
-await mockClient.GET('https://example.com/users?', /* response */);
+await mockClient.GET({
+  url: 'https://example.com/users',
+  query: null,
+}, /* response */);
 ```
 
-This matches only requests without query parameters:
+Examples:
 
 ```txt
 https://example.com/users                matches
 https://example.com/users?               matches
 https://example.com/users?page=1         does not match
 https://example.com/users?anything=here  does not match
+```
+
+The URLPattern equivalent is a trailing `?`, which creates an explicit empty search component:
+
+```ts
+await mockClient.GET('https://example.com/users?', /* response */);
 ```
 
 #### Trailing Slash
@@ -319,10 +328,13 @@ await mockClient.GET({
 }, /* response */);
 ```
 
-When `query` is defined, RMP trims the request URL's search params before URLPattern matching and then checks the listed query params separately. Extra query params are allowed. To require a URL with no query params, use a URL pattern with an explicit empty search component:
+When `query` is defined, RMP trims the request URL's search params before URLPattern matching and then checks the listed query params separately. Extra query params are allowed. To require a URL with no query params, set `query` to `null`:
 
 ```ts
-await mockClient.GET('https://api.example.com/users?', /* response */);
+await mockClient.GET({
+  url: 'https://api.example.com/users',
+  query: null,
+}, /* response */);
 ```
 
 ### Headers
