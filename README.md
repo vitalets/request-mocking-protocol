@@ -196,20 +196,100 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
 
 ### URL
 
-- **URL: wildcard**: Use wildcards with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax:
-  ```ts
-  await mockClient.GET('https://api.example.com/users/*', /* response */);
-  ```
+URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
-- **URL: exact match**: Match requests by providing a full URL string.
-  ```ts
-  await mockClient.GET('https://api.example.com/users', /* response */);
-  ```
+#### Wildcard
 
-- **URL: regular expression**: Match requests using JavaScript regular expressions.
-  ```ts
-  await mockClient.GET(/\/users\/\d+$/, /* response */);
-  ```
+Use wildcards `*` to match any substring:
+
+```ts
+await mockClient.GET('https://example.com/users/*', /* response */);
+```
+
+In URLPattern syntax, `*` matches any character sequence, not a single path segment:
+
+```txt
+https://example.com/users/                matches
+https://example.com/users/1               matches
+https://example.com/users/1/posts         matches
+https://example.com/users                 does not match
+https://example.com/users?page=1          does not match
+https://example.com/products/1            does not match
+```
+
+Wildcards can also be used inside the hostname:
+
+```ts
+await mockClient.GET('https://*.example.com/users', /* response */);
+```
+
+The hostname wildcard matches any character sequence inside the hostname component, including dots:
+
+```txt
+https://api.example.com/users              matches
+https://cdn.example.com/users              matches
+https://foo.bar.example.com/users          matches
+https://example.com/users                  does not match
+https://api.example.com/users/1            does not match
+https://api.example.org/users              does not match
+```
+
+For any subdomain plus the root domain, use:
+```js
+await mockClient.GET('https://{*.}?example.com', /* response */);
+```
+
+#### Full URL String
+
+Match requests by providing a full URL string.
+
+```ts
+await mockClient.GET('https://example.com/users', /* response */);
+```
+
+Important: this string matches any query parameters. URLPattern treats a missing search component as `*`, so the mock above matches all of these requests:
+
+```txt
+https://example.com/users                matches
+https://example.com/users?page=1         matches
+https://example.com/users?anything=here  matches
+```
+
+Add a trailing `?` to the URL pattern when the request must not contain query parameters.
+
+```ts
+await mockClient.GET('https://example.com/users?', /* response */);
+```
+
+This matches only requests without query parameters:
+
+```txt
+https://example.com/users                matches
+https://example.com/users?               matches
+https://example.com/users?page=1         does not match
+https://example.com/users?anything=here  does not match
+```
+
+#### Trailing Slash
+
+URLPattern does not ignore trailing slashes by default. To match both `/users` and `/users/`, use an optional group as described in the [URLPattern pattern syntax docs](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#constructing_a_urlpattern):
+
+```ts
+await mockClient.GET('https://example.com/users{/}?', /* response */);
+```
+
+```txt
+https://example.com/users   matches
+https://example.com/users/  matches
+```
+
+#### Regular Expression
+
+Match requests using JavaScript regular expressions.
+
+```ts
+await mockClient.GET(/\/users\/\d+$/, /* response */);
+```
 
 ### Method
 
@@ -226,16 +306,23 @@ await mockClient.ALL('https://api.example.com/users', /* response */);
 
 ### Query
 
-Match requests by URL query parameters:
+Match requests by specific URL query parameters:
 
 ```ts
 // Matches GET https://api.example.com/users?role=admin
+// Also matches GET https://api.example.com/users?role=admin&page=1
 await mockClient.GET({
   url: 'https://api.example.com/users',
   query: { 
     role: 'admin' 
   },
 }, /* response */);
+```
+
+When `query` is defined, RMP trims the request URL's search params before URLPattern matching and then checks the listed query params separately. Extra query params are allowed. To require a URL with no query params, use a URL pattern with an explicit empty search component:
+
+```ts
+await mockClient.GET('https://api.example.com/users?', /* response */);
 ```
 
 ### Headers
@@ -646,7 +733,7 @@ Adds a new mock for the corresponding HTTP method.
 If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
 
 - `reqSchema: string | RegExp | object` – The request matching schema for the mock.
-    - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL.
+    - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL. A URL string without an explicit search component matches any query string.
     - If defined as `RegExp`, it is treated as [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
     - If defined as `object`, it is treated as [MockRequestSchemaInit](src/protocol/request-schema.ts) type.
 

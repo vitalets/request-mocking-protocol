@@ -31,6 +31,13 @@ test('match query (with hostname slash)', async () => {
   await match(matcher, 'https://example.com/?', false);
 });
 
+test('match empty query', async () => {
+  const matcher = createMatcher('https://example.com/users?');
+  await match(matcher, 'https://example.com/users');
+  await match(matcher, 'https://example.com/users?');
+  await match(matcher, 'https://example.com/users?foo=bar', false);
+});
+
 test('with hostname slash, with asterisk', async () => {
   const matcher = createMatcher('https://example.com/*');
   await match(matcher, 'https://example.com');
