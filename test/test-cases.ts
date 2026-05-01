@@ -85,13 +85,30 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
     expect(headers['content-type']).toEqual('application/json; charset=utf-8');
   });
 
-  test('url as regexp', async () => {
+  test('url as regexp (direct)', async () => {
     await mockClient.GET(/https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/, {
       body: {
         id: '{{ id:number }}',
         name: 'User {{ id }}',
       },
     });
+
+    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
+    expect(body).toEqual({ id: 1, name: 'User 1' });
+  });
+
+  test('url as regexp (in object)', async () => {
+    await mockClient.GET(
+      {
+        url: /https:\/\/jsonplaceholder\.typicode\.com\/users\/(?<id>[^/]+)/,
+      },
+      {
+        body: {
+          id: '{{ id:number }}',
+          name: 'User {{ id }}',
+        },
+      },
+    );
 
     const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
     expect(body).toEqual({ id: 1, name: 'User 1' });

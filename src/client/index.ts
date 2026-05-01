@@ -4,11 +4,12 @@
 import {
   MockRequestSchema,
   MockRequestSchemaInit,
+  MockRequestSchemaObjectInit,
   MockResponseSchemaInit,
   MockSchema,
   buildMockRequestSchema,
   buildMockResponseSchema,
-  toMockRequestSchemaObject,
+  toMockRequestSchemaObjectInit,
 } from '../protocol';
 import { buildMockHeaders } from '../transport';
 import { getEnvDebug } from './env';
@@ -19,7 +20,10 @@ export type MockClientOptions = {
   defaultMethod?: MockRequestSchema['method'];
 };
 
-export type MockRequestSchemaNoMethod = Omit<MockRequestSchemaInit, 'method'>;
+export type MockRequestSchemaInitNoMethod =
+  | string
+  | RegExp
+  | Omit<MockRequestSchemaObjectInit, 'method'>;
 
 export class MockClient {
   private mockSchemas: MockSchema[] = [];
@@ -44,31 +48,31 @@ export class MockClient {
     await this.rebuildHeaders();
   }
 
-  async GET(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async GET(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('GET', reqSchema, resSchema);
   }
 
-  async POST(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async POST(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('POST', reqSchema, resSchema);
   }
 
-  async PUT(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async PUT(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('PUT', reqSchema, resSchema);
   }
 
-  async PATCH(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async PATCH(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('PATCH', reqSchema, resSchema);
   }
 
-  async DELETE(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async DELETE(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('DELETE', reqSchema, resSchema);
   }
 
-  async HEAD(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async HEAD(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod('HEAD', reqSchema, resSchema);
   }
 
-  async ALL(reqSchema: MockRequestSchemaNoMethod, resSchema: MockResponseSchemaInit) {
+  async ALL(reqSchema: MockRequestSchemaInitNoMethod, resSchema: MockResponseSchemaInit) {
     return this.addMockWithMethod(undefined, reqSchema, resSchema);
   }
 
@@ -79,11 +83,11 @@ export class MockClient {
 
   private addMockWithMethod(
     method: MockRequestSchema['method'],
-    reqSchema: MockRequestSchemaNoMethod,
+    reqSchema: MockRequestSchemaInitNoMethod,
     resSchema: MockResponseSchemaInit,
   ) {
-    const initObj = toMockRequestSchemaObject(reqSchema as MockRequestSchemaInit);
-    return this.addMock({ ...initObj, method }, resSchema);
+    const obj = toMockRequestSchemaObjectInit(reqSchema);
+    return this.addMock({ method, ...obj }, resSchema);
   }
 
   private async rebuildHeaders() {
@@ -92,9 +96,9 @@ export class MockClient {
   }
 
   private buildRequestSchema(init: MockRequestSchemaInit) {
-    const initObj = toMockRequestSchemaObject(init);
+    const obj = toMockRequestSchemaObjectInit(init);
     const { defaultMethod: method, debug } = this.options || {};
-    const initObjWithDefaults = mergeOptions({ method, debug }, initObj);
+    const initObjWithDefaults = mergeOptions({ method, debug }, obj);
     return buildMockRequestSchema(initObjWithDefaults);
   }
 
