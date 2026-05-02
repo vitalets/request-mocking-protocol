@@ -79,6 +79,19 @@ test('match any tld (with hostname slash)', async () => {
   await match(matcher, 'https://example.com/foo/bar', false);
 });
 
+test('match hostname regex in URLPattern string', async () => {
+  const matcher = createMatcher('https://example.(com|io)/users');
+  await match(matcher, 'https://example.com/users');
+  await match(matcher, 'https://example.io/users');
+  await match(matcher, 'https://example.org/users', false);
+});
+
+test('match named path regex in URLPattern string', async () => {
+  const matcher = createMatcher('https://example.com/users/:id(\\d+)');
+  await match(matcher, 'https://example.com/users/123');
+  await match(matcher, 'https://example.com/users/abc', false);
+});
+
 // '**' does not make sense in URLPattern, but users may use it.
 test('with hostname slash, double asterisk', async () => {
   const matcher = createMatcher('https://example.com/**');

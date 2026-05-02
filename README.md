@@ -236,6 +236,35 @@ For any subdomain plus the root domain, use:
 await mockClient.GET('https://{*.}?example.com', /* response */);
 ```
 
+##### Regex in URLPattern
+
+URLPattern strings can include regex matchers inside **parentheses**. It can be named `:name(regex)` or unnamed `(regex)`. Use them to define alternative URL parts or constraints.
+
+**Example 1**: match two hostnames `example.com` and `example.io`:
+
+```ts
+await mockClient.GET('https://example.(com|io)/users', /* response */);
+```
+
+```txt
+https://example.com/users  matches
+https://example.io/users   matches
+https://example.org/users  does not match
+```
+
+**Example 2**: match only URLs with digits in user id:
+
+```ts
+await mockClient.GET('https://example.com/users/:id(\\d+)', /* response */);
+```
+
+```txt
+https://example.com/users/123  matches
+https://example.com/users/abc  does not match
+```
+
+> In JavaScript and TypeScript strings, escape regex backslashes as `\\`. For example, write `\\d+` instead of `\d+`.
+
 #### Full URL String
 
 Match requests by providing a full URL string.
