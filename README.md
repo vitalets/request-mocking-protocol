@@ -32,7 +32,7 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
   - [Setup Interception in Next.js](#setup-interception-in-nextjs)
   - [Setup `MockClient` in Playwright](#setup-mockclient-in-playwright)
 - [Request Matching](#request-matching)
-  - [URL: string](#url-string)
+  - [URL: String](#url-string)
   - [URL: Regex](#url-regex)
   - [Method](#method)
   - [Query](#query)
@@ -196,7 +196,7 @@ See the full working example in [`examples/nextjs-playwright`](examples/nextjs-p
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
-### URL: string
+### URL: String
 
 URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
@@ -376,20 +376,22 @@ Match requests by specific URL query parameters:
 await mockClient.GET({
   url: 'https://api.example.com/users',
   query: { 
-    role: 'admin' 
+    page: '1'
   },
 }, /* response */);
 ```
 
+This matches query `page=1` in any position:
+
 ```txt
-https://api.example.com/users?role=admin         matches
-https://api.example.com/users?role=admin&page=1  matches
+https://api.example.com/users?page=1             matches
+https://api.example.com/users?page=1&size=10     matches
+https://api.example.com/users?size=10&page=1     matches
 https://api.example.com/users                    does not match
-https://api.example.com/users?role=user          does not match
-https://api.example.com/posts?role=admin         does not match
+https://api.example.com/users?size=10            does not match
 ```
 
-When `query` is defined, RMP trims the request URL's search params before URLPattern matching and then checks the listed query params separately. Extra query params are allowed. To require a URL with no query params, set `query` to `null`:
+To require a URL with no query params, set `query` to `null`:
 
 ```ts
 await mockClient.GET({
@@ -397,8 +399,6 @@ await mockClient.GET({
   query: null,
 }, /* response */);
 ```
-
-> If both `url` with query and `query` field are defined, it will be an error.
 
 ### Headers
 
@@ -408,7 +408,7 @@ Match requests by HTTP headers:
 await mockClient.GET({
   url: 'https://api.example.com/users',
   headers: { 
-    authorization: 'Bearer test-token' 
+    Authorization: 'Bearer test-token' 
   },
 }, /* response */);
 ```
@@ -433,10 +433,10 @@ Combine all matchers together:
 await mockClient.POST({
   url: 'https://api.example.com/users',
   query: { 
-    active: 'true' 
+    page: '1'
   },
   headers: { 
-    authorization: 'Bearer test-token' 
+    Authorization: 'Bearer test-token' 
   },
   body: { 
     role: 'admin' 
