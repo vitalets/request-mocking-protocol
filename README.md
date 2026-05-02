@@ -56,6 +56,7 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
   - [Custom Framework](#custom-framework)
 - [Client-Side Mocks](#client-side-mocks)
 - [Concepts](#concepts)
+  - [Mock Schema](#mock-schema)
   - [Request Schema](#request-schema)
   - [Response Schema](#response-schema)
   - [Transport](#transport)
@@ -657,11 +658,41 @@ test('my test', async ({ page, mockBrowserRequest }) => {
 
 ## Concepts
 
+### Mock Schema
+
+A mock schema is a serializable object that describes one HTTP mock. It consists of a `reqSchema`, which defines the request to match, and a `resSchema`, which defines the mocked response to return.
+
+Example:
+
+```js
+{
+  reqSchema: {
+    method: 'GET',
+    url: 'https://example.com',
+  },
+  resSchema: {
+    status: 200,
+    body: 'Hello world',
+  }
+}
+```
+
+This schema will match the request:
+```
+GET https://example.com
+```
+
+and make it return the response:
+```
+HTTP 200 OK
+Hello world
+```
+
 ### Request Schema
 
 The request schema is a serializable object that defines parameters for matching a request.
 
-[Full schema definition](src/protocol/request-schema.ts).
+[Full request schema definition](src/protocol/request-schema.ts).
 
 Example:
 
@@ -685,7 +716,7 @@ GET https://jsonplaceholder.typicode.com/users?foo=bar
 
 The response schema is a serializable object that defines how to build the mocked response.
 
-[Full schema definition](src/protocol/response-schema.ts).
+[Full response schema definition](src/protocol/response-schema.ts).
 
 Example:
 
