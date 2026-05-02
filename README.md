@@ -32,7 +32,8 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
   - [Setup Interception in Next.js](#setup-interception-in-nextjs)
   - [Setup `MockClient` in Playwright](#setup-mockclient-in-playwright)
 - [Request Matching](#request-matching)
-  - [URL](#url)
+  - [URL: string](#url-string)
+  - [URL: Regex](#url-regex)
   - [Method](#method)
   - [Query](#query)
   - [Headers](#headers)
@@ -195,7 +196,7 @@ See the full working example in [`examples/nextjs-playwright`](examples/nextjs-p
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
-### URL
+### URL: string
 
 URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
@@ -335,7 +336,7 @@ await mockClient.GET('https://{*.}?example.com', /* response */);
 
 #### Trailing Slash
 
-URLPattern does not ignore trailing slashes by default. To match both `/users` and `/users/`, use an optional group as described in the [URLPattern pattern syntax docs](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#constructing_a_urlpattern):
+URLPattern does not ignore trailing slashes by default. To match both `/users` and `/users/`, use an optional group as described in the [URLPattern pattern syntax docs](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#trailing_slashes_in_pathname_are_not_matched_by_default):
 
 ```ts
 await mockClient.GET('https://example.com/users{/}?', /* response */);
@@ -346,7 +347,7 @@ https://example.com/users   matches
 https://example.com/users/  matches
 ```
 
-#### Regular Expression
+### URL: Regex
 
 RMP accepts `RegExp` object instead of string, that is more predictable in some cases. This exmaple matches any URL with `/users/xxx` pathname:
 
