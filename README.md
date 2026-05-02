@@ -11,9 +11,9 @@
 
 ![How RMP works](https://raw.githubusercontent.com/vitalets/request-mocking-protocol/refs/heads/main/scripts/img/rmp-schema.png)
 
-1. A test defines mocks and sends them to the app server in a custom HTTP header: `x-mock-request`.
-2. The server-side interceptor reads that header and uses the mock schemas to intercept API calls.
-3. The page is rendered with mocked data, and the test can assert the expected UI.
+1. A test defines mock schemas and sends them to the app server in a custom HTTP header: `x-mock-request`.
+2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.
+3. The page is rendered with mocked data, and the test can assert the expected UI state.
 
 Check out the [Concepts](#concepts) and [Limitations](#limitations) for more details.
 
