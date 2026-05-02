@@ -199,72 +199,6 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
 
 URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
-#### Wildcard
-
-In URLPattern syntax, `*` matches any character sequence, not a single path segment:
-
-```ts
-await mockClient.GET('https://example.com/users/*', /* response */);
-```
-
-```txt
-https://example.com/users/                matches
-https://example.com/users/1               matches
-https://example.com/users/1/posts         matches
-https://example.com/users                 does not match
-https://example.com/users?page=1          does not match
-https://example.com/products/1            does not match
-```
-
-Wildcards can also be used inside the hostname. The hostname wildcard matches any character sequence inside the hostname component, including dots:
-
-```ts
-await mockClient.GET('https://*.example.com/users', /* response */);
-```
-
-```txt
-https://api.example.com/users              matches
-https://cdn.example.com/users              matches
-https://foo.bar.example.com/users          matches
-https://example.com/users                  does not match
-https://api.example.com/users/1            does not match
-https://api.example.org/users              does not match
-```
-
-For any subdomain plus the root domain, use:
-```js
-await mockClient.GET('https://{*.}?example.com', /* response */);
-```
-
-##### Regex in URLPattern
-
-URLPattern strings can include regex matchers inside **parentheses**. It can be named `:name(regex)` or unnamed `(regex)`. Use them to define alternative URL parts or constraints.
-
-**Example 1**: match two hostnames `example.com` and `example.io`:
-
-```ts
-await mockClient.GET('https://example.(com|io)/users', /* response */);
-```
-
-```txt
-https://example.com/users  matches
-https://example.io/users   matches
-https://example.org/users  does not match
-```
-
-**Example 2**: match only URLs with digits in user id:
-
-```ts
-await mockClient.GET('https://example.com/users/:id(\\d+)', /* response */);
-```
-
-```txt
-https://example.com/users/123  matches
-https://example.com/users/abc  does not match
-```
-
-> In JavaScript and TypeScript strings, escape regex backslashes as `\\`. For example, write `\\d+` instead of `\d+`.
-
 #### Full URL String
 
 Match requests by providing a full URL string.
@@ -305,6 +239,100 @@ The URLPattern equivalent is a trailing `?`, which creates an explicit empty sea
 await mockClient.GET('https://example.com/users?', /* response */);
 ```
 
+##### Named Groups
+
+Named groups capture a part of the matched URL under a given name using `:name` syntax. They match any character sequence that doesn't cross a path segment boundary (i.e. stops at `/`).
+
+```ts
+await mockClient.GET('https://example.com/users/:id', /* response */);
+```
+
+```txt
+https://example.com/users/123  matches  (id = "123")
+https://example.com/users/abc  matches  (id = "abc")
+https://example.com/users      does not match
+```
+
+Named groups can be used in the response body via `{{ name }}` substitution — see [Route Parameters](#route-parameters).
+
+You can also use named groups in the hostname. In that case the group stops at `.` instead of `/`:
+
+```ts
+await mockClient.GET('https://:env.example.com/users', /* response */);
+```
+
+```txt
+https://api.example.com/users      matches  (env = "api")
+https://staging.example.com/users  matches  (env = "staging")
+https://example.com/users          does not match
+```
+
+##### Regex in URLPattern
+
+URLPattern strings can include regex matchers inside **parentheses**. It can be named `:name(regex)` or unnamed `(regex)`. Use them to define alternative URL parts or constraints.
+
+**Example 1**: match two hostnames `example.com` and `example.io`:
+
+```ts
+await mockClient.GET('https://example.(com|io)/users', /* response */);
+```
+
+```txt
+https://example.com/users  matches
+https://example.io/users   matches
+https://example.org/users  does not match
+```
+
+**Example 2**: match only URLs with digits in user id:
+
+```ts
+await mockClient.GET('https://example.com/users/:id(\\d+)', /* response */);
+```
+
+```txt
+https://example.com/users/123  matches
+https://example.com/users/abc  does not match
+```
+
+> In JavaScript and TypeScript strings, escape regex backslashes as `\\`. For example, write `\\d+` instead of `\d+`.
+
+#### Wildcard
+
+In URLPattern syntax, `*` matches any character sequence, not a single path segment:
+
+```ts
+await mockClient.GET('https://example.com/users/*', /* response */);
+```
+
+```txt
+https://example.com/users/                matches
+https://example.com/users/1               matches
+https://example.com/users/1/posts         matches
+https://example.com/users                 does not match
+https://example.com/users?page=1          does not match
+https://example.com/products/1            does not match
+```
+
+Wildcards can also be used inside the hostname. The hostname wildcard matches any character sequence inside the hostname component, including dots:
+
+```ts
+await mockClient.GET('https://*.example.com/users', /* response */);
+```
+
+```txt
+https://api.example.com/users              matches
+https://cdn.example.com/users              matches
+https://foo.bar.example.com/users          matches
+https://example.com/users                  does not match
+https://api.example.com/users/1            does not match
+https://api.example.org/users              does not match
+```
+
+For any subdomain plus the root domain, use:
+```js
+await mockClient.GET('https://{*.}?example.com', /* response */);
+```
+
 #### Trailing Slash
 
 URLPattern does not ignore trailing slashes by default. To match both `/users` and `/users/`, use an optional group as described in the [URLPattern pattern syntax docs](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#constructing_a_urlpattern):
@@ -320,7 +348,7 @@ https://example.com/users/  matches
 
 #### Regular Expression
 
-Match requests using JavaScript regular expressions.
+RMP accepts `RegExp` object instead of string, that is more predictable in some cases. This exmaple matches any URL with `/users/xxx` pathname:
 
 ```ts
 await mockClient.GET(/\/users\/\d+$/, /* response */);
