@@ -13,6 +13,8 @@
     "./msw": "./dist/interceptors/msw.js",
     "./fetch": "./dist/interceptors/fetch.js",
     "./playwright": "./dist/interceptors/playwright.js",
+    "./request-matcher": "./dist/request-matcher/index.js",
+    "./response-builder": "./dist/response-builder/index.js",
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -25,6 +27,12 @@
       ],
       "playwright": [
         "./dist/interceptors/playwright.d.ts"
+      ],
+      "request-matcher": [
+        "./dist/request-matcher/index.d.ts"
+      ],
+      "response-builder": [
+        "./dist/response-builder/index.d.ts"
       ]
     }
   },

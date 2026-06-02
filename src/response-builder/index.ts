@@ -1,17 +1,17 @@
 /**
- * Response builder class.
+ * Response builder module — re-exports standalone primitives and the ResponseBuilder class.
  */
-import { STATUS_CODES } from 'node:http';
 import { MockMatchResult } from '../protocol';
-import { patchObject, wait } from './utils';
-import {
-  cloneWithPlaceholders,
-  replacePlaceholders,
-  stringifyWithPlaceholders,
-} from './placeholders';
+import { STATUS_TEXTS } from './status-codes';
+import { wait } from './utils';
 import { RequestPatcher } from '../request-patcher';
+import { buildResponse } from './build-response';
+import { patchResponse } from './patch-response';
 
-// Universal shape for response object.
+export { buildResponse, type BuildResponseResult } from './build-response';
+export { patchResponse, type PatchResponseResult } from './patch-response';
+
+// Universal shape for response object used by interceptors.
 export type ResponseLike = {
   status: number;
   statusText: string;
@@ -21,6 +21,11 @@ export type ResponseLike = {
 };
 
 export type ResponseBuilderCallbacks = {
+  /**
+   * Sends the real request and returns the response.
+   * Required for "modify" mocks that use bodyPatch or request overrides,
+   * where the actual network response must be fetched before patching.
+   */
   bypass: (req: Request) => Promise<ResponseLike>;
 };
 
@@ -56,7 +61,8 @@ export class ResponseBuilder {
 
   async build(): Promise<ResponseBuilderResult> {
     if (this.needsRealRequest()) {
-      await this.setPatchedResponse();
+      const res = await this.sendRealRequest();
+      await this.setPatchedResponse(res);
     } else {
       this.setStaticResponse();
     }
@@ -75,27 +81,43 @@ export class ResponseBuilder {
     return this.resSchema.request || this.resSchema.bodyPatch;
   }
 
-  private async setPatchedResponse() {
-    const res = await this.sendRealRequest();
+  private async setPatchedResponse(res: ResponseLike) {
+    const realBodyStr = this.resSchema.bodyPatch ? JSON.stringify(await res.json()) : '';
+    const result = patchResponse(
+      this.resSchema,
+      {
+        status: res.status,
+        headers: Object.fromEntries(res.headers),
+        body: realBodyStr,
+      },
+      this.params,
+    );
 
-    this.setStatus(res.status, res.statusText);
-    this.setHeaders(res.headers);
-
-    // remove content-encoding header, otherwise error: Decompression failed
+    this.status = result.status;
+    this.statusText = STATUS_TEXTS[result.status] ?? res.statusText;
+    // Important to use Object.fromEntries(), otherwise headers become empty inside msw.
+    // See: https://github.com/mswjs/msw/blob/main/src/core/utils/HttpResponse/decorators.ts#L20
+    this.headers = new Headers(result.headers);
+    // Remove content-encoding header, otherwise error: Decompression failed
     this.headers.delete('content-encoding');
 
-    await this.setPatchedBody(res);
+    if (this.resSchema.bodyPatch) {
+      this.setBodyAsString(result.body!, 'application/json');
+    } else {
+      this.body = await res.arrayBuffer();
+    }
   }
 
   private setStaticResponse() {
-    if (this.resSchema.status) this.setStatus(this.resSchema.status);
-    this.setHeaders();
-    this.setStaticBody();
-  }
-
-  private setStatus(status: number, statusText?: string) {
-    this.status = status;
-    this.statusText = statusText || STATUS_CODES[status] || 'Unknown';
+    const result = buildResponse(this.resSchema, this.params);
+    this.status = result.status;
+    this.statusText = result.statusText;
+    this.headers = new Headers(result.headers);
+    if (result.body !== null) {
+      const contentType =
+        typeof this.resSchema.body === 'string' ? 'text/plain' : 'application/json';
+      this.setBodyAsString(result.body, contentType);
+    }
   }
 
   private async sendRealRequest() {
@@ -105,47 +127,6 @@ export class ResponseBuilder {
       : this.req;
 
     return this.callbacks.bypass(req);
-  }
-
-  private setHeaders(origHeaders?: Headers) {
-    // Important to use Object.fromEntries(), otherwise headers become empty inside msw.
-    // See: https://github.com/mswjs/msw/blob/main/src/core/utils/HttpResponse/decorators.ts#L20
-    this.headers = new Headers(Object.fromEntries(origHeaders || []));
-
-    Object.entries(this.resSchema.headers || {}).forEach(([key, value]) => {
-      if (value) {
-        value = replacePlaceholders(value, this.params);
-        this.headers.set(key, value);
-      } else {
-        this.headers.delete(key);
-      }
-    });
-  }
-
-  private async setPatchedBody(res: ResponseLike) {
-    const { bodyPatch } = this.resSchema;
-    if (bodyPatch) {
-      // todo: match status? If response status is not 200, should we patch it?
-      // todo: handle parse error
-      const actualBody = await res.json();
-      const bodyPatchFinal = cloneWithPlaceholders(bodyPatch, this.params);
-      patchObject(actualBody, bodyPatchFinal);
-      this.setBodyAsString(JSON.stringify(actualBody), 'application/json');
-    } else {
-      this.body = await res.arrayBuffer();
-    }
-  }
-
-  private setStaticBody() {
-    const { body } = this.resSchema;
-    if (!body) return;
-    if (typeof body === 'string') {
-      const newBody = replacePlaceholders(body, this.params);
-      this.setBodyAsString(newBody, 'text/plain');
-    } else {
-      const newBody = stringifyWithPlaceholders(body, this.params);
-      this.setBodyAsString(newBody, 'application/json');
-    }
   }
 
   private setBodyAsString(body: string, contentType: string) {
