@@ -20,7 +20,7 @@ export type MockResponseSchema = {
    * If defined, the real request will be sent, and the response will be patched.
    * Not compatible with the 'body' field.
    */
-  bodyPatch?: Record<string, string | number | boolean | null>;
+  bodyPatch?: Record<string, unknown>;
   /**
    * Request overrides.
    * Used for request modification or response patching.
@@ -47,7 +47,7 @@ export type MockResponseSchema = {
     /**
      * The new request body patch, defined as a key-value pairs.
      */
-    bodyPatch?: Record<string, string | number | boolean | null>;
+    bodyPatch?: Record<string, unknown>;
   };
   /**
    * The delay in milliseconds before sending the response.

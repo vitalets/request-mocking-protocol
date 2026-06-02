@@ -67,6 +67,20 @@ export function createTestCases(mockClient: MockClient, makeRequest = makeReques
     expect(body.phone).toEqual(1);
   });
 
+  test('patch response (object/array values)', async () => {
+    await mockClient.GET('https://jsonplaceholder.typicode.com/users/:id', {
+      bodyPatch: {
+        address: { city: 'New York', zip: '10001' },
+        tags: ['admin', 'user'],
+      },
+    });
+
+    const { body } = await makeRequest('https://jsonplaceholder.typicode.com/users/1');
+
+    expect(body.address).toEqual({ city: 'New York', zip: '10001' });
+    expect(body.tags).toEqual(['admin', 'user']);
+  });
+
   test('patch request', async () => {
     await mockClient.GET('https://jsonplaceholder.typicode.com/users/2', {
       request: {
