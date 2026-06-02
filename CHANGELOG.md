@@ -3,6 +3,8 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+
+## [0.4.0] - 2026-06-02
 * refactor and export response builder.
 * support objects and arrays as `bodyPatch` values.
 
@@ -35,7 +37,8 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.3.0...HEAD
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.1.3...v0.2.0
