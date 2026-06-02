@@ -3,6 +3,7 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+* refactor and export response builder.
 
 ## [0.3.0] - 2026-05-01
 * remove the `defaultMethod` option from `MockClient`.
