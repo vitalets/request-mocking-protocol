@@ -200,6 +200,10 @@ RMP offers flexible matching options to ensure your mocks are applied exactly wh
 
 URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
+> [!TIP]
+> Use the [URL Pattern Checker](https://vitalets.github.io/url-pattern-checker/) to test and debug your URLPattern strings.
+
+
 #### Full URL String
 
 Match requests by providing a full URL string.
