@@ -53,7 +53,7 @@
     "test": "vitest run --no-cache --testTimeout 10000 --dir ./test",
     "pw:install": "PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium",
     "toc": "md-magic --files README.md",
-    "deps": "npx npm-check-updates -i --format group,dep,repo --cooldown 5",
+    "deps": "npx npm-check-updates -i --format group,dep,repo --cooldown 3",
     "build": "./scripts/build.sh"
   },
   "dependencies": {
