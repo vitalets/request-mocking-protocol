@@ -3,6 +3,7 @@
  */
 import { MockRequestSchema } from '../../protocol';
 import { MatchingContext } from '../context';
+import { matchValue } from '../value-matcher';
 
 export class QueryMatcher {
   private expectedQuery: MockRequestSchema['query'];
@@ -25,15 +26,25 @@ export class QueryMatcher {
   }
 
   private matchQueryParam(ctx: MatchingContext, name: string) {
-    // todo: handle multi-value params in expectedQuery
-    const expectedValue = this.expectedQuery?.[name]?.toString() ?? null;
+    const expectedValue = this.expectedQuery?.[name] ?? null;
     const actualValues = ctx.searchParams.getAll(name);
 
+    // null means the parameter must be absent.
     const result =
-      expectedValue === null ? actualValues.length === 0 : actualValues.includes(expectedValue);
+      expectedValue === null
+        ? actualValues.length === 0
+        : actualValues.some((actualValue) => matchValue(expectedValue, actualValue));
 
-    ctx.logger?.log(`query param "${name}"`, expectedValue, actualValues.join(','));
+    ctx.logger?.log(
+      `query param "${name}"`,
+      stringifyExpected(expectedValue),
+      actualValues.join(','),
+    );
 
     return result;
   }
+}
+
+function stringifyExpected(expected: unknown) {
+  return expected !== null && typeof expected === 'object' ? JSON.stringify(expected) : expected;
 }

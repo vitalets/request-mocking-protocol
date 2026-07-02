@@ -34,10 +34,12 @@ Check out the [Concepts](#concepts) and [Limitations](#limitations) for more det
 - [Request Matching](#request-matching)
   - [URL: String](#url-string)
   - [URL: Regex](#url-regex)
+  - [URL: Matcher Object](#url-matcher-object)
   - [Method](#method)
   - [Query](#query)
   - [Headers](#headers)
   - [Body](#body)
+  - [Value Matchers](#value-matchers)
   - [Combination](#combination)
 - [Response Mocking](#response-mocking)
   - [Body](#body-1)
@@ -359,6 +361,31 @@ RMP accepts `RegExp` object instead of string, that is more predictable in some 
 await mockClient.GET(/\/users\/\d+$/, /* response */);
 ```
 
+### URL: Matcher Object
+
+Instead of a plain string, `url` can be a matcher object using the same `$regex` / `$contains` vocabulary shared with query, headers and body [value matchers](#value-matchers). A plain string is already a URLPattern (the default), so there's no separate key for it.
+
+```ts
+// URLPattern (default) — just a plain string
+await mockClient.GET('https://example.com/users/*', /* response */);
+
+// Regular expression
+await mockClient.GET({ url: { $regex: '/users/\\d+$' } }, /* response */);
+
+// Substring match
+await mockClient.GET({ url: { $contains: '/v2/users' } }, /* response */);
+```
+
+```txt
+// url: { $contains: '/v2/users' }
+https://example.com/v2/users            matches
+https://example.com/api/v2/users?page=1 matches
+https://example.com/v1/users            does not match
+```
+
+> [!NOTE]
+> The legacy `patternType: 'urlpattern' | 'regexp'` sibling field is still supported but deprecated — prefer the `url` matcher object above.
+
 ### Method
 
 Explicitly define the HTTP method to match:
@@ -428,6 +455,31 @@ await mockClient.POST({
   },
 }, /* response */);
 ```
+
+### Value Matchers
+
+By default query params, headers and body fields are matched by exact equality. To match more loosely, replace any value with a **matcher object**. The same matchers also power the [URL matcher object](#url-matcher-object).
+
+| Matcher | Meaning |
+|---|---|
+| `{ $contains: 'x' }` | value is a string that includes the substring `x` |
+| `{ $regex: 'x' }` | value is a string matching the regular expression `x` (plain pattern, or `'/pattern/flags'`) |
+
+```ts
+await mockClient.POST({
+  url: 'https://api.example.com/users',
+  query: { page: { $regex: '^\\d+$' } },
+  headers: { Authorization: { $contains: 'Bearer' } },
+  body: {
+    email: { $regex: '.+@acme\\.com$' },
+    role: 'admin', // still matched exactly
+  },
+}, /* response */);
+```
+
+In `body`, matchers work at any nesting depth; every other field keeps the existing subset (partial) matching behavior.
+
+> The `$` prefix marks a key as an operator rather than a literal field. Real HTTP/JSON values essentially never use `$`-prefixed keys, so this avoids colliding with actual field names.
 
 ### Combination
 

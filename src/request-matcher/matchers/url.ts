@@ -4,14 +4,16 @@
 import 'urlpattern-polyfill';
 import { MockRequestSchema } from '../../protocol';
 import { MatchingContext } from '../context';
+import { regexpFromString } from '../value-matcher';
+
+type ContainsMatcher = { $contains: string };
 
 export class UrlMatcher {
-  private matcher: URLPattern | RegExp;
+  private matcher: URLPattern | RegExp | ContainsMatcher;
   public hasQuery = false;
 
   constructor(private schema: MockRequestSchema) {
-    this.matcher =
-      this.schema.patternType === 'regexp' ? this.buildRegexpMatcher() : this.buildPatternMatcher();
+    this.matcher = this.buildMatcher();
   }
 
   match(ctx: MatchingContext) {
@@ -22,12 +24,20 @@ export class UrlMatcher {
     const shouldTrimSearchParams = this.schema.query !== undefined;
     const url = shouldTrimSearchParams ? trimSearchParams(req.url) : req.url;
 
-    const result =
-      this.matcher instanceof RegExp
-        ? this.matchRegexp(ctx, url, this.matcher)
-        : this.matchPattern(ctx, url, this.matcher);
+    let result: boolean;
+    if (this.matcher instanceof RegExp) {
+      result = this.matchRegexp(ctx, url, this.matcher);
+    } else if (this.matcher instanceof URLPattern) {
+      result = this.matchPattern(ctx, url, this.matcher);
+    } else {
+      result = url.includes(this.matcher.$contains);
+    }
 
-    ctx.logger?.log(`URL`, this.schema.url, `${url}${url !== req.url ? ' (query trimmed)' : ''}`);
+    ctx.logger?.log(
+      `URL`,
+      urlToLogString(this.schema.url),
+      `${url}${url !== req.url ? ' (query trimmed)' : ''}`,
+    );
 
     return result;
   }
@@ -51,24 +61,40 @@ export class UrlMatcher {
     return true;
   }
 
-  private buildRegexpMatcher() {
-    const { url } = this.schema;
+  private buildMatcher(): URLPattern | RegExp | ContainsMatcher {
+    const { url, patternType } = this.schema;
+
+    // Object syntax uses the same matcher vocabulary as other fields: { $regex } | { $contains }.
+    // A plain string is already a URLPattern (the default), so no explicit key is needed for it.
+    if (typeof url === 'object') {
+      return '$regex' in url
+        ? this.buildRegexpMatcher(url.$regex)
+        : this.buildContainsMatcher(url.$contains);
+    }
+
+    // Legacy string syntax with (deprecated) patternType.
+    return patternType === 'regexp' ? this.buildRegexpMatcher(url) : this.buildPatternMatcher(url);
+  }
+
+  private buildRegexpMatcher(url: string) {
     this.hasQuery = url.includes('\\?');
     return regexpFromString(url);
   }
 
-  private buildPatternMatcher() {
-    const { url } = this.schema;
+  private buildPatternMatcher(url: string) {
     const urlPattern = new URLPattern(url);
     this.hasQuery = urlPattern.search !== '*';
     return urlPattern;
   }
+
+  private buildContainsMatcher(value: string): ContainsMatcher {
+    this.hasQuery = value.includes('?');
+    return { $contains: value };
+  }
 }
 
-function regexpFromString(s: string) {
-  const source = s.slice(1, s.lastIndexOf('/'));
-  const flags = s.slice(s.lastIndexOf('/') + 1);
-  return new RegExp(source, flags);
+function urlToLogString(url: MockRequestSchema['url']) {
+  return typeof url === 'string' ? url : JSON.stringify(url);
 }
 
 function trimSearchParams(url: string) {

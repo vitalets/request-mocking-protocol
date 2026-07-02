@@ -103,6 +103,27 @@ test('with hostname slash, double asterisk', async () => {
   await match(matcher, 'https://example.com/foo/bar');
 });
 
+test('$regex object syntax', async () => {
+  const matcher = new SchemaMatcher(buildRequestSchema({ url: { $regex: '/users/\\d+$' } }));
+  await match(matcher, 'https://example.com/users/123');
+  await match(matcher, 'https://example.com/users/abc', false);
+});
+
+test('$contains object syntax', async () => {
+  const matcher = new SchemaMatcher(buildRequestSchema({ url: { $contains: '/users' } }));
+  await match(matcher, 'https://example.com/users');
+  await match(matcher, 'https://example.com/api/users?page=1');
+  await match(matcher, 'https://example.com/products', false);
+});
+
+test('legacy patternType regexp still works', async () => {
+  const matcher = new SchemaMatcher(
+    buildRequestSchema({ url: '/example\\.com\\/users/', patternType: 'regexp' }),
+  );
+  await match(matcher, 'https://example.com/users');
+  await match(matcher, 'https://example.io/users', false);
+});
+
 function createMatcher(url: string) {
   return new SchemaMatcher(buildRequestSchema(url));
 }

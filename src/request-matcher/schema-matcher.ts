@@ -38,7 +38,8 @@ export class SchemaMatcher {
 
   // eslint-disable-next-line visual/complexity
   async match(req: Request) {
-    this.logger?.addMock(this.schema.method, this.schema.url);
+    const { url } = this.schema;
+    this.logger?.addMock(this.schema.method, typeof url === 'string' ? url : JSON.stringify(url));
     const ctx = new MatchingContext(req, this.logger);
 
     const matched =
