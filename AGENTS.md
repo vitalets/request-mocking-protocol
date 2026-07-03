@@ -2,7 +2,7 @@
 
 ## Coding Guidelines
 
-- Add a concise JSDoc comment at the top of every file in src/ you create describing the purpose of the file.
+- When you create a new typescript file, add a concise JSDoc comment at the top of the file describing the purpose of the file.
 
 - After any change to TypeScript files, run `npm run tsc`.
 
