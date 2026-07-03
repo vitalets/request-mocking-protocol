@@ -20,9 +20,7 @@ export type MockClientOptions = {
 };
 
 export type MockRequestSchemaInitNoMethod =
-  | string
-  | RegExp
-  | Omit<MockRequestSchemaObjectInit, 'method'>;
+  string | RegExp | Omit<MockRequestSchemaObjectInit, 'method'>;
 
 export class MockClient {
   private mockSchemas: MockSchema[] = [];

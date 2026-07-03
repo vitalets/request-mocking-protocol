@@ -87,15 +87,7 @@ export function toRequestSchemaObjectInit<T extends Record<string, unknown>>(
 }
 
 export type HttpMethod =
-  | 'GET'
-  | 'HEAD'
-  | 'POST'
-  | 'PUT'
-  | 'PATCH'
-  | 'DELETE'
-  | 'CONNECT'
-  | 'OPTIONS'
-  | 'TRACE';
+  'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
 
 /**
  * Generic value matcher, used by query, headers and body fields.
@@ -117,8 +109,4 @@ export type UrlMatcher = Exclude<ValueMatcher, number>;
  * Recursive JSON value that may contain a `ValueMatcher` ({ $contains } / { $regex }) at any leaf.
  */
 export type JsonMatcherValue =
-  | ValueMatcher
-  | boolean
-  | null
-  | { [key: string]: JsonMatcherValue }
-  | JsonMatcherValue[];
+  ValueMatcher | boolean | null | { [key: string]: JsonMatcherValue } | JsonMatcherValue[];
