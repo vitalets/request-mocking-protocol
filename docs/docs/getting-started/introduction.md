@@ -13,20 +13,27 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   <h1 style={{marginTop: '1rem'}}>Request Mocking Protocol</h1>
 </div>
 
-**Request Mocking Protocol (RMP)** is a specification for HTTP requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both **client-side** and **server-side** mocking.
+**Request Mocking Protocol (RMP)** is a specification for network requests mocking in end-to-end tests. It uses declarative JSON schemas to define mocked request and response. These schemas can be serialized and sent over the network, enabling both **server-side** and **client-side** mocking.
 
-## How It Works
+## Server-Side Mocking
 
-![How RMP works](/img/rmp-schema.png)
+RMP lets you mock API calls made by your application server. Here's how it works:
+
+![How server-side mocking works](/img/rmp-schema.png)
 
 1. A test defines mock schemas and sends them to the app server in a custom HTTP header: `x-mock-request`.
 2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.
 3. The page is rendered with mocked data, and the test can assert the expected UI state.
 
-RMP supports two mocking modes:
+This is ideal for server-side rendered pages, where data is fetched on the server before the page reaches the browser. Learn how to set it up in **[Server-Side Mocking →](/docs/server-side-mocking/overview)**
 
-- **[Server-Side Mocking](/docs/server-side-mocking/overview)** — mock API calls made by your application server.
-- **[Client-Side Mocking](/docs/client-side-mocking/overview)** — mock requests made directly in the browser.
+## Client-Side Mocking
+
+RMP also lets you mock requests made directly in the browser, using the same declarative schemas. Instead of a framework interceptor, requests are intercepted right in the browser.
+
+This is ideal for single-page apps and any data fetched on the client. Learn how to set it up in **[Client-Side Mocking →](/docs/client-side-mocking/overview)**
+
+---
 
 Ready to try it out? Head over to [Installation](/docs/getting-started/installation) to get started, or dive into the [Concepts](/docs/concepts/mock-schema) to learn more.
 
