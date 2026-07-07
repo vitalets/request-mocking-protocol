@@ -1,4 +1,8 @@
-# Request Mocking Protocol
+<p align="center">
+  <img src="https://raw.githubusercontent.com/vitalets/request-mocking-protocol/main/docs/static/img/android-chrome-192x192.png" alt="Request Mocking Protocol logo" width="80" height="80" />
+</p>
+
+<h1 align="center">Request Mocking Protocol</h1>
 
 [![lint](https://github.com/vitalets/request-mocking-protocol/actions/workflows/lint.yaml/badge.svg)](https://github.com/vitalets/request-mocking-protocol/actions/workflows/lint.yaml)
 [![test](https://github.com/vitalets/request-mocking-protocol/actions/workflows/test.yaml/badge.svg)](https://github.com/vitalets/request-mocking-protocol/actions/workflows/test.yaml)
