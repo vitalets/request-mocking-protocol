@@ -245,6 +245,23 @@ await mockClient.GET({
 }, /* response */);
 ```
 
+Use a [value matcher](#value-matchers) to match a query param loosely. This matches any request whose `search` param contains `phone`:
+
+```ts
+await mockClient.GET({
+  url: 'https://api.example.com/users',
+  query: {
+    search: { $contains: 'phone' },
+  },
+}, /* response */);
+```
+
+```txt
+https://api.example.com/users?search=phone       matches
+https://api.example.com/users?search=smartphone  matches
+https://api.example.com/users?search=laptop      does not match
+```
+
 ## Headers
 
 Match requests by HTTP headers:
@@ -258,6 +275,17 @@ await mockClient.GET({
 }, /* response */);
 ```
 
+Use a [value matcher](#value-matchers) to match a header loosely. This matches any request whose `Authorization` header contains `Bearer`, regardless of the token:
+
+```ts
+await mockClient.GET({
+  url: 'https://api.example.com/users',
+  headers: {
+    Authorization: { $contains: 'Bearer' },
+  },
+}, /* response */);
+```
+
 ## Body
 
 Match requests by string or JSON request body.
@@ -266,6 +294,17 @@ await mockClient.POST({
   url: 'https://api.example.com/users',
   body: { 
     role: 'admin' 
+  },
+}, /* response */);
+```
+
+Use a [value matcher](#value-matchers) to match a body field loosely. This matches any request whose `email` field contains `@acme.com`:
+
+```ts
+await mockClient.POST({
+  url: 'https://api.example.com/users',
+  body: {
+    email: { $contains: '@acme.com' },
   },
 }, /* response */);
 ```
