@@ -35,7 +35,6 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Server-Side Mocking',
       collapsed: true,
-      link: { type: 'doc', id: 'server-side-mocking/overview' },
       items: [
         'server-side-mocking/overview',
         {
@@ -65,7 +64,6 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Client-Side Mocking',
       collapsed: true,
-      link: { type: 'doc', id: 'client-side-mocking/overview' },
       items: [
         'client-side-mocking/overview',
         'client-side-mocking/playwright',
