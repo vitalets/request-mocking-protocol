@@ -1,7 +1,7 @@
 ---
 id: cypress
 title: Cypress
-slug: /integrations/cypress
+slug: /server-side/test-runners/cypress
 sidebar_position: 2
 ---
 

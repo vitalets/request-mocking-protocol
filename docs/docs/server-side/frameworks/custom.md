@@ -1,7 +1,7 @@
 ---
 id: custom
 title: Custom
-slug: /integrations/framework/custom
+slug: /server-side/frameworks/custom
 sidebar_position: 3
 ---
 

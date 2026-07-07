@@ -1,7 +1,7 @@
 ---
 id: route-parameters
 title: Route Parameters
-slug: /guides/route-parameters
+slug: /writing-mocks/route-parameters
 sidebar_position: 4
 ---
 

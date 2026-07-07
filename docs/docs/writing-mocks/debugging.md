@@ -1,7 +1,7 @@
 ---
 id: debugging
 title: Debugging
-slug: /guides/debugging
+slug: /writing-mocks/debugging
 sidebar_position: 6
 ---
 

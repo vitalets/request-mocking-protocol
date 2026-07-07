@@ -1,7 +1,7 @@
 ---
 id: response-mocking
 title: Response Mocking
-slug: /guides/response-mocking
+slug: /writing-mocks/response-mocking
 sidebar_position: 2
 ---
 

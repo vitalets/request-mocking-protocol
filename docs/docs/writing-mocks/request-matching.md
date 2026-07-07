@@ -1,7 +1,7 @@
 ---
 id: request-matching
 title: Request Matching
-slug: /guides/request-matching
+slug: /writing-mocks/request-matching
 sidebar_position: 1
 ---
 
@@ -71,7 +71,7 @@ https://example.com/users/abc  matches  (id = "abc")
 https://example.com/users      does not match
 ```
 
-Named groups can be used in the response body via `{{ name }}` substitution — see [Route Parameters](/docs/guides/route-parameters).
+Named groups can be used in the response body via `{{ name }}` substitution — see [Route Parameters](/docs/writing-mocks/route-parameters).
 
 You can also use named groups in the hostname. In that case the group stops at `.` instead of `/`:
 

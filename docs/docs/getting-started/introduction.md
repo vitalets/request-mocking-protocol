@@ -17,4 +17,9 @@ sidebar_position: 1
 2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.
 3. The page is rendered with mocked data, and the test can assert the expected UI state.
 
+RMP supports two mocking modes:
+
+- **[Server-Side Mocking](/docs/server-side/overview)** — mock API calls made by your application server.
+- **[Client-Side Mocking](/docs/client-side/overview)** — mock requests made directly in the browser.
+
 Check out the [Concepts](/docs/concepts/mock-schema) and [Limitations](/docs/reference/limitations) for more details.

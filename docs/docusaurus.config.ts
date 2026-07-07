@@ -96,7 +96,7 @@ const config: Config = {
             },
             {
               label: 'Next.js Integration',
-              to: '/docs/integrations/nextjs',
+              to: '/docs/server-side/frameworks/nextjs',
             },
             {
               label: 'API Reference',

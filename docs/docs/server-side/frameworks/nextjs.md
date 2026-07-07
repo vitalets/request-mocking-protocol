@@ -1,11 +1,11 @@
 ---
 id: nextjs
-title: Next.js App Router
-slug: /integrations/nextjs
+title: Next.js
+slug: /server-side/frameworks/nextjs
 sidebar_position: 1
 ---
 
-# Next.js App Router
+# Next.js
 
 This guide shows how to enable server-side `fetch` interception in a Next.js App Router application, so that mocks defined in your tests are applied to the outgoing API calls.
 
@@ -55,14 +55,10 @@ Add interceptor to the `next dev` command, so it remains active across HMR reloa
 }
 ```
 
-:::caution
+:::tip
 This `next dev` command import should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
 :::
 
-:::caution
-Placing the fetch interceptor in `layout.tsx` is no longer recommended.
-:::
-
-Now your Next.js server is ready for testing. Combine it with a test runner integration such as [Playwright](/docs/integrations/playwright) or [Cypress](/docs/integrations/cypress) to define mocks in your tests.
+Now your Next.js server is ready for testing. Combine it with a test runner integration such as [Playwright](/docs/server-side/test-runners/playwright) or [Cypress](/docs/server-side/test-runners/cypress) to define mocks in your tests.
 
 See the full working example in [`examples/nextjs-playwright`](https://github.com/vitalets/request-mocking-protocol/tree/main/examples/nextjs-playwright).

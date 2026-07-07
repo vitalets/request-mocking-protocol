@@ -1,7 +1,7 @@
 ---
 id: response-patching
 title: Response Patching
-slug: /guides/response-patching
+slug: /writing-mocks/response-patching
 sidebar_position: 3
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: astro
 title: Astro
-slug: /integrations/astro
+slug: /server-side/frameworks/astro
 sidebar_position: 2
 ---
 

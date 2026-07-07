@@ -2,7 +2,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 /**
  * Sidebar for the Request Mocking Protocol documentation.
- * Grouped into Getting Started, Guides, Framework Integration, Test Runner Integration, Concepts and Reference.
+ * Grouped into Getting Started, Server-Side Mocking, Client-Side Mocking, Writing Mocks, Concepts and Reference.
  */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
@@ -17,35 +17,53 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Server-Side Mocking',
       collapsed: false,
+      link: { type: 'doc', id: 'server-side/overview' },
       items: [
-        'guides/request-matching',
-        'guides/response-mocking',
-        'guides/response-patching',
-        'guides/route-parameters',
-        'guides/client-side-mocks',
-        'guides/debugging',
+        'server-side/overview',
+        {
+          type: 'category',
+          label: 'Frameworks',
+          collapsed: false,
+          items: [
+            'server-side/frameworks/nextjs',
+            'server-side/frameworks/astro',
+            'server-side/frameworks/custom',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Test Runners',
+          collapsed: false,
+          items: [
+            'server-side/test-runners/playwright',
+            'server-side/test-runners/cypress',
+            'server-side/test-runners/custom',
+          ],
+        },
       ],
     },
     {
       type: 'category',
-      label: 'Framework Integration',
+      label: 'Client-Side Mocking',
       collapsed: false,
+      link: { type: 'doc', id: 'client-side/overview' },
       items: [
-        'integrations/frameworks/nextjs',
-        'integrations/frameworks/astro',
-        'integrations/frameworks/custom',
+        'client-side/overview',
+        'client-side/playwright',
       ],
     },
     {
       type: 'category',
-      label: 'Test Runner Integration',
+      label: 'Writing Mocks',
       collapsed: false,
       items: [
-        'integrations/test-runner/playwright',
-        'integrations/test-runner/cypress',
-        'integrations/test-runner/custom',
+        'writing-mocks/request-matching',
+        'writing-mocks/response-mocking',
+        'writing-mocks/response-patching',
+        'writing-mocks/route-parameters',
+        'writing-mocks/debugging',
       ],
     },
     {
