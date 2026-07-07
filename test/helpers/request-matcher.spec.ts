@@ -8,6 +8,21 @@ function createMatcher(inti: MockRequestSchemaInit) {
   return new SchemaMatcher(buildRequestSchema(inti));
 }
 
+test('buildRequestSchema converts RegExp to { $regex } string under the hood', () => {
+  const schema = buildRequestSchema({
+    method: 'POST',
+    url: /example\.com\/users$/,
+    query: { page: /^\d+$/ },
+    headers: { ['x-version']: { $regex: /^v\d+$/i } },
+    body: { user: { email: /.+@acme\.com$/ }, role: 'admin' },
+  });
+
+  expect(schema.url).toEqual({ $regex: '/example\\.com\\/users$/' });
+  expect(schema.query).toEqual({ page: { $regex: '/^\\d+$/' } });
+  expect(schema.headers).toEqual({ ['x-version']: { $regex: '/^v\\d+$/i' } });
+  expect(schema.body).toEqual({ user: { email: { $regex: '/.+@acme\\.com$/' } }, role: 'admin' });
+});
+
 test('match method', async () => {
   const matcher = createMatcher({ method: 'GET', url: 'https://example.com/' });
 
@@ -266,6 +281,114 @@ test('match headers ($regex)', async () => {
   expect(await matcher.match(req)).toBeTruthy();
 
   req = new Request('https://example.com', { headers: { ['x-version']: 'beta' } });
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match query ($regex) with RegExp', async () => {
+  const matcher = createMatcher({
+    url: 'https://example.com',
+    query: { page: { $regex: /^\d+$/ } },
+  });
+
+  req = new Request('https://example.com?page=42');
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com?page=abc');
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match headers ($regex) with RegExp and flags', async () => {
+  const matcher = createMatcher({
+    url: 'https://example.com',
+    headers: { ['x-version']: { $regex: /^V\d+$/i } },
+  });
+
+  req = new Request('https://example.com', { headers: { ['x-version']: 'v2' } });
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com', { headers: { ['x-version']: 'beta' } });
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match url ($regex) with RegExp', async () => {
+  const matcher = createMatcher({ url: { $regex: /example\.com\/users\/\d+$/ } });
+
+  req = new Request('https://example.com/users/123');
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com/users/abc');
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match body ($regex) with RegExp', async () => {
+  const matcher = createMatcher({
+    method: 'POST',
+    url: 'https://example.com',
+    body: {
+      user: { email: { $regex: /.+@acme\.com$/ } },
+      role: 'admin',
+    },
+  });
+
+  req = new Request('https://example.com', {
+    method: 'POST',
+    body: JSON.stringify({ user: { email: 'john@acme.com' }, role: 'admin' }),
+  });
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com', {
+    method: 'POST',
+    body: JSON.stringify({ user: { email: 'john@other.com' }, role: 'admin' }),
+  });
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match query with bare RegExp (shorthand for $regex)', async () => {
+  const matcher = createMatcher({
+    url: 'https://example.com',
+    query: { page: /^\d+$/ },
+  });
+
+  req = new Request('https://example.com?page=42');
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com?page=abc');
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match headers with bare RegExp (shorthand for $regex)', async () => {
+  const matcher = createMatcher({
+    url: 'https://example.com',
+    headers: { ['x-version']: /^v\d+$/ },
+  });
+
+  req = new Request('https://example.com', { headers: { ['x-version']: 'v2' } });
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com', { headers: { ['x-version']: 'beta' } });
+  expect(await matcher.match(req)).toEqual(null);
+});
+
+test('match body with bare RegExp (shorthand for $regex)', async () => {
+  const matcher = createMatcher({
+    method: 'POST',
+    url: 'https://example.com',
+    body: {
+      user: { email: /.+@acme\.com$/ },
+      role: 'admin',
+    },
+  });
+
+  req = new Request('https://example.com', {
+    method: 'POST',
+    body: JSON.stringify({ user: { email: 'john@acme.com' }, role: 'admin' }),
+  });
+  expect(await matcher.match(req)).toBeTruthy();
+
+  req = new Request('https://example.com', {
+    method: 'POST',
+    body: JSON.stringify({ user: { email: 'john@other.com' }, role: 'admin' }),
+  });
   expect(await matcher.match(req)).toEqual(null);
 });
 

@@ -11,6 +11,7 @@ import { MockResponseSchema, MockResponseSchemaInit, buildResponseSchema } from 
 
 export * from './request-schema';
 export * from './response-schema';
+export * from './value-matcher';
 
 export type MockSchema = {
   reqSchema: MockRequestSchema;

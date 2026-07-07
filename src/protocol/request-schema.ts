@@ -2,6 +2,14 @@
  * Request schema for the mocking protocol.
  * Must be serializable, to be transferred over the wire.
  */
+import {
+  JsonMatcherValue,
+  JsonMatcherValueInit,
+  ValueMatcher,
+  ValueMatcherInit,
+  serializeRegExps,
+} from './value-matcher';
+
 export type MockRequestSchema = {
   /**
    * The pattern to match the request URL.
@@ -51,15 +59,16 @@ export type MockRequestSchemaInit = string | RegExp | MockRequestSchemaObjectIni
 
 /**
  * Init data, passed as object.
+ * Accepts `RegExp` inside `$regex` matchers (converted to string when building the schema).
  */
 export type MockRequestSchemaObjectInit = {
-  url: string | RegExp | UrlMatcher;
+  url: UrlMatcherInit;
   /** @deprecated use the `url` object syntax instead, e.g. `{ $regex: '...' }` or `{ $contains: '...' }`. */
   patternType?: MockRequestSchema['patternType'];
   method?: MockRequestSchema['method'];
-  query?: MockRequestSchema['query'];
-  headers?: MockRequestSchema['headers'];
-  body?: MockRequestSchema['body'];
+  query?: Record<string, ValueMatcherInit | null> | null;
+  headers?: Record<string, ValueMatcherInit | null>;
+  body?: string | { [key: string]: JsonMatcherValueInit } | JsonMatcherValueInit[];
   debug?: MockRequestSchema['debug'];
 };
 
@@ -67,13 +76,10 @@ export type MockRequestSchemaObjectInit = {
  * Builds the request schema from init data.
  */
 export function buildRequestSchema(init: MockRequestSchemaInit): MockRequestSchema {
-  const { url, ...rest } = toRequestSchemaObjectInit(init);
-  return {
-    // convert RegExp shorthand to the modern { $regex } matcher object.
-    // plain strings and matcher objects ({ $regex } / { $contains }) are kept as-is.
-    url: url instanceof RegExp ? { $regex: url.toString() } : url,
-    ...rest,
-  };
+  const objInit = toRequestSchemaObjectInit(init);
+  // deep-convert any RegExp (bare shorthand or inside `{ $regex }`) to a serializable string.
+  // plain strings and matcher objects ({ $regex } / { $contains }) are kept as-is.
+  return serializeRegExps(objInit) as MockRequestSchema;
 }
 
 /**
@@ -90,14 +96,6 @@ export type HttpMethod =
   'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
 
 /**
- * Generic value matcher, used by query, headers and body fields.
- * - `string` | `number`: match by exact equality (default).
- * - `{ $contains }`: match strings that include the given substring.
- * - `{ $regex }`: match strings against the given regular expression.
- */
-export type ValueMatcher = string | number | { $contains: string } | { $regex: string };
-
-/**
  * URL matcher: a `ValueMatcher` without `number` (a plain string is matched via URLPattern).
  * - `string`: match request URL by URLPattern (default).
  * - `{ $regex }`: match request URL by regular expression.
@@ -106,7 +104,6 @@ export type ValueMatcher = string | number | { $contains: string } | { $regex: s
 export type UrlMatcher = Exclude<ValueMatcher, number>;
 
 /**
- * Recursive JSON value that may contain a `ValueMatcher` ({ $contains } / { $regex }) at any leaf.
+ * URL matcher accepted as input: a `ValueMatcherInit` without `number`.
  */
-export type JsonMatcherValue =
-  ValueMatcher | boolean | null | { [key: string]: JsonMatcherValue } | JsonMatcherValue[];
+export type UrlMatcherInit = Exclude<ValueMatcherInit, number>;

@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 * add `$contains` and `$regex` value matchers for request url, query, headers and body.
+* support `RegExp` directly in value matchers as a shorthand for `{ $regex }`.
 
 ## [0.4.0] - 2026-06-02
 * refactor and export response builder.
