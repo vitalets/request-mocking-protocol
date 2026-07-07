@@ -1,8 +1,10 @@
 import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 /**
- * Sidebar for the Request Mocking Protocol documentation.
- * Grouped into Getting Started, Server-Side Mocking, Client-Side Mocking, Writing Mocks, Concepts and Reference.
+ * Sidebars for the Request Mocking Protocol documentation.
+ * `docsSidebar` groups the Docs section (Getting Started, Server-Side Mocking,
+ * Client-Side Mocking, Writing Mocks, Concepts and Reference).
+ * `apiSidebar` groups the API section (MockClient and Interceptors).
  */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
@@ -19,17 +21,17 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Server-Side Mocking',
       collapsed: false,
-      link: { type: 'doc', id: 'server-side/overview' },
+      link: { type: 'doc', id: 'server-side-mocking/overview' },
       items: [
-        'server-side/overview',
+        'server-side-mocking/overview',
         {
           type: 'category',
           label: 'Frameworks',
           collapsed: false,
           items: [
-            'server-side/frameworks/nextjs',
-            'server-side/frameworks/astro',
-            'server-side/frameworks/custom',
+            'server-side-mocking/frameworks/nextjs',
+            'server-side-mocking/frameworks/astro',
+            'server-side-mocking/frameworks/custom',
           ],
         },
         {
@@ -37,21 +39,22 @@ const sidebars: SidebarsConfig = {
           label: 'Test Runners',
           collapsed: false,
           items: [
-            'server-side/test-runners/playwright',
-            'server-side/test-runners/cypress',
-            'server-side/test-runners/custom',
+            'server-side-mocking/test-runners/playwright',
+            'server-side-mocking/test-runners/cypress',
+            'server-side-mocking/test-runners/custom',
           ],
         },
+        'server-side-mocking/limitations',
       ],
     },
     {
       type: 'category',
       label: 'Client-Side Mocking',
       collapsed: false,
-      link: { type: 'doc', id: 'client-side/overview' },
+      link: { type: 'doc', id: 'client-side-mocking/overview' },
       items: [
-        'client-side/overview',
-        'client-side/playwright',
+        'client-side-mocking/overview',
+        'client-side-mocking/playwright',
       ],
     },
     {
@@ -77,15 +80,16 @@ const sidebars: SidebarsConfig = {
         'concepts/transport',
       ],
     },
+    'comparison-with-msw',
+  ],
+  apiSidebar: [
     {
       type: 'category',
-      label: 'Reference',
+      label: 'API',
       collapsed: false,
       items: [
-        'reference/mock-client',
-        'reference/interceptors',
-        'reference/limitations',
-        'reference/comparison-with-msw',
+        'api/mock-client',
+        'api/interceptors',
       ],
     },
   ],

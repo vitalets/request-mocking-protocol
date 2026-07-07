@@ -1,7 +1,7 @@
 ---
 id: mock-client
 title: MockClient
-slug: /reference/mock-client
+slug: /api/mock-client
 sidebar_position: 1
 ---
 
@@ -27,7 +27,7 @@ Creates a new instance of `MockClient`.
 ### `headers`
 
 ```ts
-headers: Record<string, string>
+readonly headers: Record<string, string>
 ```
 
 Returns HTTP headers that are built from the mock schemas. Should be sent to the server for mocking server-side requests.
@@ -68,18 +68,22 @@ If multiple mocks match the same request, the most recently added matching mock 
     - If defined as `number`, it is treated as an HTTP status code.
     - If defined as `object`, it is treated as [MockResponseSchema](https://github.com/vitalets/request-mocking-protocol/blob/main/src/protocol/response-schema.ts) type.
 
-Examples:
+**Examples**
+
+Mock `GET` requests to `https://example.com`:
 
 ```ts
-// mock any GET request to https://example.com
 await mockClient.GET('https://example.com/*', {
   body: {
     id: 1,
     name: 'John Smith'
   },
 });
+```
 
-// mock any POST request to https://example.com having foo=bar in query
+Mock `POST` requests to `https://example.com` having `foo=bar` in query:
+
+```ts
 await mockClient.POST({
   url: 'https://example.com/*',
   query: {

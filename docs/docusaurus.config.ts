@@ -73,6 +73,12 @@ const config: Config = {
           label: 'Docs',
         },
         {
+          type: 'docSidebar',
+          sidebarId: 'apiSidebar',
+          position: 'left',
+          label: 'API',
+        },
+        {
           href: 'https://www.npmjs.com/package/request-mocking-protocol',
           label: 'npm',
           position: 'right',
@@ -96,11 +102,11 @@ const config: Config = {
             },
             {
               label: 'Next.js Integration',
-              to: '/docs/server-side/frameworks/nextjs',
+              to: '/docs/server-side-mocking/frameworks/nextjs',
             },
             {
               label: 'API Reference',
-              to: '/docs/reference/mock-client',
+              to: '/docs/api/mock-client',
             },
           ],
         },

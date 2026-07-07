@@ -24,12 +24,16 @@ export type MockRequestSchemaInitNoMethod =
 
 export class MockClient {
   private mockSchemas: MockSchema[] = [];
-  public headers: Record<string, string> = {};
+  private _headers: Record<string, string> = {};
   public onChange?: (headers: Record<string, string>) => unknown;
 
   constructor(protected options?: MockClientOptions) {
     const debug = options?.debug ?? getEnvDebug();
     this.options = mergeOptions({ debug }, options);
+  }
+
+  get headers(): Readonly<Record<string, string>> {
+    return this._headers;
   }
 
   get schemas() {
@@ -88,8 +92,8 @@ export class MockClient {
   }
 
   private async rebuildHeaders() {
-    this.headers = buildMockHeaders(this.schemas);
-    await this.onChange?.(this.headers);
+    this._headers = buildMockHeaders(this.schemas);
+    await this.onChange?.({ ...this._headers });
   }
 
   private buildRequestSchema(init: MockRequestSchemaInit) {

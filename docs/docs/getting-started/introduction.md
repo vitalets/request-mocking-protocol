@@ -19,7 +19,7 @@ sidebar_position: 1
 
 RMP supports two mocking modes:
 
-- **[Server-Side Mocking](/docs/server-side/overview)** — mock API calls made by your application server.
-- **[Client-Side Mocking](/docs/client-side/overview)** — mock requests made directly in the browser.
+- **[Server-Side Mocking](/docs/server-side-mocking/overview)** — mock API calls made by your application server.
+- **[Client-Side Mocking](/docs/client-side-mocking/overview)** — mock requests made directly in the browser.
 
-Check out the [Concepts](/docs/concepts/mock-schema) and [Limitations](/docs/reference/limitations) for more details.
+Check out the [Concepts](/docs/concepts/mock-schema) and [Limitations](/docs/server-side-mocking/limitations) for more details.

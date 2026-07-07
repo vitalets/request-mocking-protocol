@@ -1,7 +1,7 @@
 ---
 id: custom
 title: Custom
-slug: /server-side/test-runners/custom
+slug: /server-side-mocking/test-runners/custom
 sidebar_position: 3
 ---
 

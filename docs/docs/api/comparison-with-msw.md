@@ -1,7 +1,7 @@
 ---
 id: comparison-with-msw
 title: Comparison with MSW
-slug: /reference/comparison-with-msw
+slug: /api/comparison-with-msw
 sidebar_position: 4
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: playwright
 title: Playwright
-slug: /server-side/test-runners/playwright
+slug: /server-side-mocking/test-runners/playwright
 sidebar_position: 1
 ---
 
@@ -9,7 +9,7 @@ sidebar_position: 1
 
 This guide shows how to define **server-side** mocks in Playwright tests. Mocks are sent to the app server through Playwright's browser context headers.
 
-Each test defines its own mocks using a [`MockClient`](/docs/reference/mock-client) class. Mocks are not shared across tests, enabling **per-test mock isolation** and **full parallelization**.
+Each test defines its own mocks using a [`MockClient`](/docs/api/mock-client) class. Mocks are not shared across tests, enabling **per-test mock isolation** and **full parallelization**.
 
 ## 1. Setup a custom fixture `mockServerRequest`
 
@@ -43,10 +43,10 @@ test('my test', async ({ page, mockServerRequest }) => {
 });
 ```
 
-Check out [`MockClient`](/docs/reference/mock-client) API for other methods.
+Check out [`MockClient`](/docs/api/mock-client) API for other methods.
 
-This integration requires a framework interceptor on the server side. See the [Next.js App Router](/docs/server-side/frameworks/nextjs) guide for a complete setup.
+This integration requires a framework interceptor on the server side. See the [Next.js App Router](/docs/server-side-mocking/frameworks/nextjs) guide for a complete setup.
 
-To mock requests made directly in the browser instead, see [Playwright — Browser-Side Mocks](/docs/client-side/playwright).
+To mock requests made directly in the browser instead, see [Playwright — Browser-Side Mocks](/docs/client-side-mocking/playwright).
 
 See the full working example in [`examples/nextjs-playwright`](https://github.com/vitalets/request-mocking-protocol/tree/main/examples/nextjs-playwright).

@@ -1,7 +1,7 @@
 ---
 id: custom
 title: Custom
-slug: /server-side/frameworks/custom
+slug: /server-side-mocking/frameworks/custom
 sidebar_position: 3
 ---
 

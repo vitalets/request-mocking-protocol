@@ -1,7 +1,7 @@
 ---
 id: astro
 title: Astro
-slug: /server-side/frameworks/astro
+slug: /server-side-mocking/frameworks/astro
 sidebar_position: 2
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: cypress
 title: Cypress
-slug: /server-side/test-runners/cypress
+slug: /server-side-mocking/test-runners/cypress
 sidebar_position: 2
 ---
 

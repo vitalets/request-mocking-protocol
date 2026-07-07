@@ -1,7 +1,7 @@
 ---
-id: custom
+id: custom-test-runner
 title: Custom
-slug: /server-side/test-runners/custom
+slug: /integrations/test-runner/custom
 sidebar_position: 3
 ---
 

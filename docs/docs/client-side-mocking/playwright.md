@@ -1,17 +1,17 @@
 ---
 id: playwright
 title: Playwright
-slug: /client-side/playwright
+slug: /client-side-mocking/playwright
 sidebar_position: 2
 ---
 
 # Playwright — Browser-Side Mocks
 
-You can mock requests made **in the browser** with the same syntax as [server-side mocks](/docs/server-side/test-runners/playwright). Browser requests are intercepted directly by Playwright, so no framework interceptor is required.
+You can mock requests made **in the browser** with the same syntax as [server-side mocks](/docs/server-side-mocking/test-runners/playwright). Browser requests are intercepted directly by Playwright, so no framework interceptor is required.
 
 ## 1. Setup a custom fixture
 
-Extend the base Playwright `test` with a `mockBrowserRequest` fixture. It creates a [`MockClient`](/docs/reference/mock-client) and wires it to the browser context via `setupPlaywrightInterceptor`, which registers the request interception. Exposing it as a fixture gives each test its own isolated `MockClient` instance, so mocks never leak between tests.
+Extend the base Playwright `test` with a `mockBrowserRequest` fixture. It creates a [`MockClient`](/docs/api/mock-client) and wires it to the browser context via `setupPlaywrightInterceptor`, which registers the request interception. Exposing it as a fixture gives each test its own isolated `MockClient` instance, so mocks never leak between tests.
 
 ```ts
 import { test as base } from '@playwright/test';
@@ -46,4 +46,4 @@ test('my test', async ({ page, mockBrowserRequest }) => {
 });
 ```
 
-To mock requests made by the app server instead, see [Playwright — Server-Side Mocks](/docs/server-side/test-runners/playwright).
+To mock requests made by the app server instead, see [Playwright — Server-Side Mocks](/docs/server-side-mocking/test-runners/playwright).
