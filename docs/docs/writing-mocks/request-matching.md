@@ -9,7 +9,9 @@ sidebar_position: 1
 
 RMP offers flexible matching options to ensure your mocks are applied exactly when you need them.
 
-## URL: String
+## URL
+
+### String
 
 URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern)-style syntax. URLPattern has a few matching rules that can differ from common glob or routing syntax, so review the URLPattern docs carefully when using wildcards or query-string patterns.
 
@@ -17,7 +19,7 @@ URL strings are matched with [URLPattern](https://developer.mozilla.org/en-US/do
 Use the [URL Pattern Checker](https://vitalets.github.io/url-pattern-checker/) to test and debug your URLPattern strings.
 :::
 
-### Full URL String
+#### Full URL String
 
 Match requests by providing a full URL string.
 
@@ -57,7 +59,7 @@ The URLPattern equivalent is a trailing `?`, which creates an explicit empty sea
 await mockClient.GET('https://example.com/users?', /* response */);
 ```
 
-#### Named Groups
+##### Named Groups
 
 Named groups capture a part of the matched URL under a given name using `:name` syntax. They match any character sequence that doesn't cross a path segment boundary (i.e. stops at `/`).
 
@@ -85,7 +87,7 @@ https://staging.example.com/users  matches  (env = "staging")
 https://example.com/users          does not match
 ```
 
-#### Regex in URLPattern
+##### Regex in URLPattern
 
 URLPattern strings can include regex matchers inside **parentheses**. It can be named `:name(regex)` or unnamed `(regex)`. Use them to define alternative URL parts or constraints.
 
@@ -114,7 +116,7 @@ https://example.com/users/abc  does not match
 
 > In JavaScript and TypeScript strings, escape regex backslashes as `\\`. For example, write `\\d+` instead of `\d+`.
 
-### Wildcard
+#### Wildcard
 
 In URLPattern syntax, `*` matches any character sequence, not a single path segment:
 
@@ -151,7 +153,7 @@ For any subdomain plus the root domain, use:
 await mockClient.GET('https://{*.}?example.com', /* response */);
 ```
 
-### Trailing Slash
+#### Trailing Slash
 
 URLPattern does not ignore trailing slashes by default. To match both `/users` and `/users/`, use an optional group as described in the [URLPattern pattern syntax docs](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#trailing_slashes_in_pathname_are_not_matched_by_default):
 
@@ -164,7 +166,7 @@ https://example.com/users   matches
 https://example.com/users/  matches
 ```
 
-## URL: Regex
+### Regex
 
 RMP accepts `RegExp` object instead of string, that is more predictable in some cases. This exmaple matches any URL with `/users/xxx` pathname:
 
@@ -172,7 +174,7 @@ RMP accepts `RegExp` object instead of string, that is more predictable in some 
 await mockClient.GET(/\/users\/\d+$/, /* response */);
 ```
 
-## URL: Matcher Object
+### Object
 
 Instead of a plain string, `url` can be a matcher object using the same `$regex` / `$contains` vocabulary shared with query, headers and body [value matchers](#value-matchers). A plain string is already a URLPattern (the default), so there's no separate key for it.
 
@@ -270,7 +272,7 @@ await mockClient.POST({
 
 ## Value Matchers
 
-By default query params, headers and body fields are matched by exact equality. To match more loosely, replace any value with a **matcher object**. The same matchers also power the [URL matcher object](#url-matcher-object).
+By default query params, headers and body fields are matched by exact equality. To match more loosely, replace any value with a **matcher object**. The same matchers also power the [URL matcher object](#matcher-object).
 
 | Matcher | Meaning |
 |---|---|
