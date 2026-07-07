@@ -95,8 +95,8 @@ const config: Config = {
               to: '/docs/getting-started/introduction',
             },
             {
-              label: 'Quick Start',
-              to: '/docs/getting-started/quick-start',
+              label: 'Next.js Integration',
+              to: '/docs/integrations/nextjs',
             },
             {
               label: 'API Reference',

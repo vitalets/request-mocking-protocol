@@ -2,7 +2,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 /**
  * Sidebar for the Request Mocking Protocol documentation.
- * Grouped into Getting Started, Guides, Integrations, Concepts and Reference.
+ * Grouped into Getting Started, Guides, Framework Integration, Test Runner Integration, Concepts and Reference.
  */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
@@ -13,7 +13,6 @@ const sidebars: SidebarsConfig = {
       items: [
         'getting-started/introduction',
         'getting-started/installation',
-        'getting-started/quick-start',
       ],
     },
     {
@@ -31,22 +30,34 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Integrations',
+      label: 'Framework Integration',
       collapsed: false,
       items: [
-        'integrations/nextjs',
-        'integrations/playwright',
-        'integrations/cypress',
-        'integrations/astro',
-        'integrations/custom-test-runner',
-        'integrations/custom-framework',
+        'integrations/frameworks/nextjs',
+        'integrations/frameworks/astro',
+        'integrations/frameworks/custom',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Test Runner Integration',
+      collapsed: false,
+      items: [
+        'integrations/test-runner/playwright',
+        'integrations/test-runner/cypress',
+        'integrations/test-runner/custom',
       ],
     },
     {
       type: 'category',
       label: 'Concepts',
       collapsed: false,
-      items: ['concepts/overview'],
+      items: [
+        'concepts/mock-schema',
+        'concepts/request-schema',
+        'concepts/response-schema',
+        'concepts/transport',
+      ],
     },
     {
       type: 'category',

@@ -44,7 +44,7 @@ mswServer.listen();
 > Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](/docs/reference/mock-client) class.
 
 The function for retrieving incoming HTTP headers depends on the application framework.
-For **Next.js**, use the [`instrumentation.ts` setup](/docs/getting-started/quick-start#setup-interception-in-nextjs) instead of `layout.tsx`.
+For **Next.js**, use the [`instrumentation.ts` setup](/docs/integrations/nextjs#1-setup-instrumentation) instead of `layout.tsx`.
 
 ## Playwright Interceptor
 
@@ -56,4 +56,4 @@ import { setupPlaywrightInterceptor } from 'request-mocking-protocol/playwright'
 await setupPlaywrightInterceptor(page, mockClient);
 ```
 
-Use it for in-browser requests. For server-side requests in Next.js, use the [`Global Fetch`](#global-fetch) interceptor through the [quick start setup](/docs/getting-started/quick-start).
+Use it for in-browser requests. For server-side requests in Next.js, use the [`Global Fetch`](#global-fetch) interceptor through the [Next.js integration setup](/docs/integrations/nextjs).

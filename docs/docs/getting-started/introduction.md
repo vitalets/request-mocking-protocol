@@ -17,4 +17,4 @@ sidebar_position: 1
 2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.
 3. The page is rendered with mocked data, and the test can assert the expected UI state.
 
-Check out the [Concepts](/docs/concepts/overview) and [Limitations](/docs/reference/limitations) for more details.
+Check out the [Concepts](/docs/concepts/mock-schema) and [Limitations](/docs/reference/limitations) for more details.

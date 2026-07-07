@@ -1,8 +1,8 @@
 ---
-id: custom-framework
-title: Custom Framework
-slug: /integrations/custom-framework
-sidebar_position: 6
+id: custom
+title: Custom
+slug: /integrations/framework/custom
+sidebar_position: 3
 ---
 
 # Custom Framework

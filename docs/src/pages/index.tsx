@@ -59,8 +59,8 @@ function HomepageHeader() {
           <Link className="button button--secondary button--lg" to="/docs/getting-started/introduction">
             Get Started
           </Link>
-          <Link className="button button--outline button--secondary button--lg" to="/docs/getting-started/quick-start">
-            Quick Start
+          <Link className="button button--outline button--secondary button--lg" to="/docs/integrations/nextjs">
+            Next.js Integration
           </Link>
         </div>
       </div>

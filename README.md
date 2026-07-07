@@ -13,7 +13,8 @@ Full documentation is available at **[vitalets.github.io/request-mocking-protoco
 
 - [Introduction](https://vitalets.github.io/request-mocking-protocol/docs/getting-started/introduction)
 - [Installation](https://vitalets.github.io/request-mocking-protocol/docs/getting-started/installation)
-- [Quick Start: Next.js + Playwright](https://vitalets.github.io/request-mocking-protocol/docs/getting-started/quick-start)
+- [Next.js Integration](https://vitalets.github.io/request-mocking-protocol/docs/integrations/nextjs)
+- [Playwright Integration](https://vitalets.github.io/request-mocking-protocol/docs/integrations/playwright)
 - [API Reference](https://vitalets.github.io/request-mocking-protocol/docs/reference/mock-client)
 
 ## Installation

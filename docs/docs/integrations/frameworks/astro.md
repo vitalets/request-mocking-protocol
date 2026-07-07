@@ -2,7 +2,7 @@
 id: astro
 title: Astro
 slug: /integrations/astro
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 # Astro

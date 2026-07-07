@@ -1,8 +1,8 @@
 ---
-id: custom-test-runner
-title: Custom Test Runner
-slug: /integrations/custom-test-runner
-sidebar_position: 5
+id: custom
+title: Custom
+slug: /integrations/test-runner/custom
+sidebar_position: 3
 ---
 
 # Custom Test Runner
