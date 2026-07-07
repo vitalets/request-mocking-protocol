@@ -54,7 +54,9 @@
     "pw:install": "PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium",
     "toc": "md-magic --files README.md",
     "deps": "npx npm-check-updates -i --format group,dep,repo --cooldown 3",
-    "build": "./scripts/build.sh"
+    "build": "./scripts/build.sh",
+    "docs": "npm --prefix docs start",
+    "docs:build": "npm --prefix docs run build"
   },
   "dependencies": {
     "lodash": "^4.18.1",

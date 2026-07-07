@@ -11,5 +11,5 @@
     "noEmit": true
   },
   "include": ["**/*.ts", "**/*.mts"],
-  "exclude": ["dist", "examples"]
+  "exclude": ["dist", "examples", "docs"]
 }
