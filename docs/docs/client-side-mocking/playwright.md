@@ -5,7 +5,7 @@ slug: /client-side-mocking/playwright
 sidebar_position: 2
 ---
 
-# Playwright — Browser-Side Mocks
+# Playwright
 
 You can mock requests made **in the browser** with the same syntax as [server-side mocks](/docs/server-side-mocking/test-runners/playwright). Browser requests are intercepted directly by Playwright, so no framework interceptor is required.
 
@@ -27,7 +27,7 @@ export const test = base.extend<{ mockBrowserRequest: MockClient }>({
 });
 ```
 
-## 2. Define and apply mocks in test
+## 2. Define and apply mocks
 
 Use the `mockBrowserRequest` fixture inside a test to declare mocks. Define them **before** navigating so they are active when the page fires its requests. Once set up, any matching browser request is intercepted and served the mocked response, letting you assert the resulting UI state.
 

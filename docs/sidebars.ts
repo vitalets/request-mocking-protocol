@@ -4,7 +4,8 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
  * Sidebars for the Request Mocking Protocol documentation.
  * `docsSidebar` groups the Docs section (Getting Started, Server-Side Mocking,
  * Client-Side Mocking, Writing Mocks, Concepts and Reference).
- * `apiSidebar` groups the API section (MockClient and Interceptors).
+ * `apiSidebar` groups the API section (MockClient, Server-Side Interceptors
+ * and Client-Side Interceptors).
  */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
@@ -19,15 +20,27 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Writing Mocks',
+      collapsed: true,
+      items: [
+        'writing-mocks/request-matching',
+        'writing-mocks/response-mocking',
+        'writing-mocks/response-patching',
+        'writing-mocks/route-parameters',
+        'writing-mocks/debugging',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Server-Side Mocking',
-      collapsed: false,
+      collapsed: true,
       link: { type: 'doc', id: 'server-side-mocking/overview' },
       items: [
         'server-side-mocking/overview',
         {
           type: 'category',
           label: 'Frameworks',
-          collapsed: false,
+          collapsed: true,
           items: [
             'server-side-mocking/frameworks/nextjs',
             'server-side-mocking/frameworks/astro',
@@ -37,7 +50,7 @@ const sidebars: SidebarsConfig = {
         {
           type: 'category',
           label: 'Test Runners',
-          collapsed: false,
+          collapsed: true,
           items: [
             'server-side-mocking/test-runners/playwright',
             'server-side-mocking/test-runners/cypress',
@@ -50,7 +63,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Client-Side Mocking',
-      collapsed: false,
+      collapsed: true,
       link: { type: 'doc', id: 'client-side-mocking/overview' },
       items: [
         'client-side-mocking/overview',
@@ -59,20 +72,8 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Writing Mocks',
-      collapsed: false,
-      items: [
-        'writing-mocks/request-matching',
-        'writing-mocks/response-mocking',
-        'writing-mocks/response-patching',
-        'writing-mocks/route-parameters',
-        'writing-mocks/debugging',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Concepts',
-      collapsed: false,
+      collapsed: true,
       items: [
         'concepts/mock-schema',
         'concepts/request-schema',
@@ -89,7 +90,16 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'api/mock-client',
-        'api/interceptors',
+        {
+          type: 'category',
+          label: 'Interceptors',
+          collapsed: false,
+          items: [
+            'api/interceptors/fetch',
+            'api/interceptors/msw',
+            'api/interceptors/playwright',
+          ],
+        },
       ],
     },
   ],

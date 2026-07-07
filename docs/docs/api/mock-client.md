@@ -14,7 +14,7 @@ The `MockClient` class is used on the test-runner side to define HTTP request mo
 ### `MockClient`
 
 ```ts
-constructor(options?: MockClientOptions)
+new MockClient(options?: MockClientOptions)
 ```
 
 Creates a new instance of `MockClient`.
