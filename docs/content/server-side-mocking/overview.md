@@ -9,7 +9,7 @@ sidebar_position: 1
 
 Server-side mocking intercepts HTTP requests made by your **application server** (for example, API calls during server-side rendering) and replaces them with mocked responses.
 
-![How RMP works](/img/rmp-schema.png)
+![How server-side mocking works](/img/server-side-mocking.png)
 
 1. A test defines mock schemas and sends them to the app server in a custom HTTP header: `x-mock-request`.
 2. A server-side interceptor reads that header and applies the mocks to the outgoing API calls.

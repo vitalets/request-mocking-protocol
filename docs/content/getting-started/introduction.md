@@ -19,7 +19,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 RMP lets you mock API calls made by your application server. Here's how it works:
 
-![How server-side mocking works](/img/rmp-schema.png)
+![How server-side mocking works](/img/server-side-mocking.png)
 
 1. A test defines mock schemas and sends them to the app server in a custom HTTP header: `x-mock-request`.
 2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.

@@ -16,7 +16,7 @@
 RMP lets you mock API calls made by your application server. Here's how it works:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/vitalets/request-mocking-protocol/main/docs/static/img/rmp-schema.png" alt="How server-side mocking works" width="100%" />
+  <img src="https://raw.githubusercontent.com/vitalets/request-mocking-protocol/main/docs/static/img/server-side-mocking.png" alt="How server-side mocking works" width="100%" />
 </p>
 
 1. A test defines mock schemas and sends them to the app server in a custom HTTP header: `x-mock-request`.

@@ -87,7 +87,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/rmp-schema.png',
+    image: 'img/server-side-mocking.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
