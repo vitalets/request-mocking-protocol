@@ -29,7 +29,7 @@ This is ideal for server-side rendered pages, where data is fetched on the serve
 
 ## Client-Side Mocking
 
-RMP also lets you mock requests made directly in the browser, using the same declarative schemas. Instead of a framework interceptor, requests are intercepted right in the browser.
+RMP also lets you mock requests made directly in the browser, using the same declarative schemas. It works with any framework, no special integration needed.
 
 This is ideal for single-page apps and any data fetched on the client. Learn how to set it up in **[Client-Side Mocking →](/docs/client-side-mocking/overview)**
 
