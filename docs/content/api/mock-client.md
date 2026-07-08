@@ -11,7 +11,7 @@ The `MockClient` class is used on the test-runner side to define HTTP request mo
 
 ## Constructor
 
-### `MockClient`
+### MockClient
 
 ```ts
 new MockClient(options?: MockClientOptions)
@@ -24,7 +24,7 @@ Creates a new instance of `MockClient`.
 
 ## Properties
 
-### `headers`
+### headers
 
 ```ts
 readonly headers: Record<string, string>
@@ -32,7 +32,7 @@ readonly headers: Record<string, string>
 
 Returns HTTP headers that are built from the mock schemas. Should be sent to the server for mocking server-side requests.
 
-### `onChange`
+### onChange
 
 ```ts
 onChange?: (headers: Record<string, string>) => void
@@ -42,7 +42,7 @@ A callback function that is called whenever the mocks are changed. Accepts `head
 
 ## Methods
 
-### `addMock` / `GET` / `POST` / `PUT` / `PATCH` / `DELETE` / `HEAD` / `ALL`
+### addMock / GET / POST / PUT / PATCH / DELETE / HEAD / ALL
 
 Adds a new mock for the corresponding HTTP method. All methods share the same signature:
 
@@ -97,7 +97,7 @@ await mockClient.POST({
 });
 ```
 
-### `reset`
+### reset
 
 ```ts
 async reset(): Promise<void>
