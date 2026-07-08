@@ -17,7 +17,7 @@ Server-side mocking intercepts HTTP requests made by your **application server**
 
 Server-side mocking requires two pieces of setup:
 
-- **[Framework integration](/docs/server-side-mocking/frameworks/nextjs)** — installs the interceptor that reads the header and captures outgoing requests on the server.
-- **[Test runner integration](/docs/server-side-mocking/test-runners/playwright)** — sends the mock header from your tests to the app server.
+- **[Framework integration](/server-side-mocking/frameworks/nextjs)** — installs the interceptor that reads the header and captures outgoing requests on the server.
+- **[Test runner integration](/server-side-mocking/test-runners/playwright)** — sends the mock header from your tests to the app server.
 
-To mock requests made directly in the browser, see [Client-Side Mocking](/docs/client-side-mocking/overview).
+To mock requests made directly in the browser, see [Client-Side Mocking](/client-side-mocking/overview).

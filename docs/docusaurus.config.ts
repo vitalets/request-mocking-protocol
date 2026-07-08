@@ -74,7 +74,7 @@ const config: Config = {
         docs: {
           path: 'content',
           sidebarPath: './sidebars.ts',
-          routeBasePath: 'docs',
+          routeBasePath: '/',
           editUrl: 'https://github.com/vitalets/request-mocking-protocol/tree/main/docs/',
           remarkPlugins: [[npm2yarn, { sync: true, converters: ['yarn', 'pnpm'] }]],
         },
@@ -130,15 +130,15 @@ const config: Config = {
           items: [
             {
               label: 'Introduction',
-              to: '/docs/getting-started/introduction',
+              to: '/getting-started/introduction',
             },
             {
               label: 'Next.js Integration',
-              to: '/docs/server-side-mocking/frameworks/nextjs',
+              to: '/server-side-mocking/frameworks/nextjs',
             },
             {
               label: 'API Reference',
-              to: '/docs/api/mock-client',
+              to: '/api/mock-client',
             },
           ],
         },

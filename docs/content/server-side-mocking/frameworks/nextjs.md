@@ -59,6 +59,6 @@ Add interceptor to the `next dev` command, so it remains active across HMR reloa
 This `next dev` command import should become unnecessary once Next.js preserves the instrumented `fetch` across HMR automatically (see [#92877](https://github.com/vercel/next.js/issues/92877)).
 :::
 
-Now your Next.js server is ready for testing. Combine it with a test runner integration such as [Playwright](/docs/server-side-mocking/test-runners/playwright) or [Cypress](/docs/server-side-mocking/test-runners/cypress) to define mocks in your tests.
+Now your Next.js server is ready for testing. Combine it with a test runner integration such as [Playwright](/server-side-mocking/test-runners/playwright) or [Cypress](/server-side-mocking/test-runners/cypress) to define mocks in your tests.
 
 See the full working example in [`examples/nextjs-playwright`](https://github.com/vitalets/request-mocking-protocol/tree/main/examples/nextjs-playwright).

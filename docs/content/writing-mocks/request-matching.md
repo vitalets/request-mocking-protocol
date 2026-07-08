@@ -73,7 +73,7 @@ https://example.com/users/abc  matches  (id = "abc")
 https://example.com/users      does not match
 ```
 
-Named groups can be used in the response body via `{{ name }}` substitution — see [Route Parameters](/docs/writing-mocks/route-parameters).
+Named groups can be used in the response body via `{{ name }}` substitution — see [Route Parameters](/writing-mocks/route-parameters).
 
 You can also use named groups in the hostname. In that case the group stops at `.` instead of `/`:
 

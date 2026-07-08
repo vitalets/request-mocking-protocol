@@ -7,5 +7,5 @@ import { Redirect } from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export default function Home(): ReactNode {
-  return <Redirect to={useBaseUrl('/docs/getting-started/introduction')} />;
+  return <Redirect to={useBaseUrl('/getting-started/introduction')} />;
 }

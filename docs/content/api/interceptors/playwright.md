@@ -15,4 +15,4 @@ import { setupPlaywrightInterceptor } from 'request-mocking-protocol/playwright'
 await setupPlaywrightInterceptor(page, mockClient);
 ```
 
-See [Playwright — Setup a custom fixture](/docs/client-side-mocking/playwright#1-setup-a-custom-fixture) for an example of usage.
+See [Playwright — Setup a custom fixture](/client-side-mocking/playwright#1-setup-a-custom-fixture) for an example of usage.

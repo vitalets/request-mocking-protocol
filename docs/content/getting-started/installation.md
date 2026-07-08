@@ -13,4 +13,4 @@ Install with your package manager of choice:
 npm install --save-dev request-mocking-protocol
 ```
 
-Once installed, head over to [Usage](/docs/getting-started/usage) to set up mocking in your tests.
+Once installed, head over to [Usage](/getting-started/usage) to set up mocking in your tests.

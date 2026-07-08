@@ -7,7 +7,7 @@ sidebar_position: 1
 
 # Mock Schema
 
-A mock schema is a serializable object that describes one HTTP mock. It consists of a [`reqSchema`](/docs/concepts/request-schema), which defines the request to match, and a [`resSchema`](/docs/concepts/response-schema), which defines the mocked response to return.
+A mock schema is a serializable object that describes one HTTP mock. It consists of a [`reqSchema`](/concepts/request-schema), which defines the request to match, and a [`resSchema`](/concepts/response-schema), which defines the mocked response to return.
 
 Example:
 
@@ -35,4 +35,4 @@ HTTP 200 OK
 Hello world
 ```
 
-See the [Request Schema](/docs/concepts/request-schema) and [Response Schema](/docs/concepts/response-schema) pages for the full set of available options.
+See the [Request Schema](/concepts/request-schema) and [Response Schema](/concepts/response-schema) pages for the full set of available options.

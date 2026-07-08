@@ -20,6 +20,6 @@ const mswServer = setupServer(mockHandler);
 mswServer.listen();
 ```
 
-> Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](/docs/api/mock-client) class.
+> Note that MSW is used **only** to capture the request, while the mocks should be declaratively defined using the [MockClient](/api/mock-client) class.
 
 The function for retrieving incoming HTTP headers depends on the application framework.

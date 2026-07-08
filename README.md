@@ -23,23 +23,23 @@ RMP lets you mock API calls made by your application server. Here's how it works
 2. The server-side interceptor reads that header and applies the mocks to the outgoing API calls.
 3. The page is rendered with mocked data, and the test can assert the expected UI state.
 
-This is ideal for server-side rendered pages, where data is fetched on the server before the page reaches the browser. Learn how to set it up in **[Server-Side Mocking →](https://vitalets.github.io/request-mocking-protocol/docs/server-side-mocking/overview)**
+This is ideal for server-side rendered pages, where data is fetched on the server before the page reaches the browser. Learn how to set it up in **[Server-Side Mocking →](https://vitalets.github.io/request-mocking-protocol/server-side-mocking/overview)**
 
 ## Client-Side Mocking
 
 RMP also lets you mock requests made directly in the browser, using the same declarative schemas. It works with any framework, no special integration needed.
 
-This is ideal for single-page apps and any data fetched on the client. Learn how to set it up in **[Client-Side Mocking →](https://vitalets.github.io/request-mocking-protocol/docs/client-side-mocking/overview)**
+This is ideal for single-page apps and any data fetched on the client. Learn how to set it up in **[Client-Side Mocking →](https://vitalets.github.io/request-mocking-protocol/client-side-mocking/overview)**
 
 ## 📖 Documentation
 
 Full documentation is available at **[vitalets.github.io/request-mocking-protocol](https://vitalets.github.io/request-mocking-protocol/)**.
 
-- [Introduction](https://vitalets.github.io/request-mocking-protocol/docs/getting-started/introduction)
-- [Installation](https://vitalets.github.io/request-mocking-protocol/docs/getting-started/installation)
-- [Next.js Integration](https://vitalets.github.io/request-mocking-protocol/docs/integrations/nextjs)
-- [Playwright Integration](https://vitalets.github.io/request-mocking-protocol/docs/integrations/playwright)
-- [API Reference](https://vitalets.github.io/request-mocking-protocol/docs/reference/mock-client)
+- [Introduction](https://vitalets.github.io/request-mocking-protocol/getting-started/introduction)
+- [Installation](https://vitalets.github.io/request-mocking-protocol/getting-started/installation)
+- [Next.js Integration](https://vitalets.github.io/request-mocking-protocol/server-side-mocking/frameworks/nextjs)
+- [Playwright Integration](https://vitalets.github.io/request-mocking-protocol/server-side-mocking/test-runners/playwright)
+- [API Reference](https://vitalets.github.io/request-mocking-protocol/api/mock-client)
 
 ## License
 
