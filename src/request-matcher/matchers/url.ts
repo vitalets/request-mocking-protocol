@@ -6,7 +6,7 @@ import { MockRequestSchema } from '../../protocol';
 import { MatchingContext } from '../context';
 import { regexpFromString } from '../value-matcher';
 
-type ContainsMatcher = { $contains: string };
+type ContainsMatcher = { $$contains: string };
 
 export class UrlMatcher {
   private matcher: URLPattern | RegExp | ContainsMatcher;
@@ -30,7 +30,7 @@ export class UrlMatcher {
     } else if (this.matcher instanceof URLPattern) {
       result = this.matchPattern(ctx, url, this.matcher);
     } else {
-      result = url.includes(this.matcher.$contains);
+      result = url.includes(this.matcher.$$contains);
     }
 
     ctx.logger?.log(
@@ -64,12 +64,12 @@ export class UrlMatcher {
   private buildMatcher(): URLPattern | RegExp | ContainsMatcher {
     const { url, patternType } = this.schema;
 
-    // Object syntax uses the same matcher vocabulary as other fields: { $regex } | { $contains }.
+    // Object syntax uses the same matcher vocabulary as other fields: { $$regex } | { $$contains }.
     // A plain string is already a URLPattern (the default), so no explicit key is needed for it.
     if (typeof url === 'object') {
-      return '$regex' in url
-        ? this.buildRegexpMatcher(url.$regex)
-        : this.buildContainsMatcher(url.$contains);
+      return '$$regex' in url
+        ? this.buildRegexpMatcher(url.$$regex)
+        : this.buildContainsMatcher(url.$$contains);
     }
 
     // Legacy string syntax with (deprecated) patternType.
@@ -89,7 +89,7 @@ export class UrlMatcher {
 
   private buildContainsMatcher(value: string): ContainsMatcher {
     this.hasQuery = value.includes('?');
-    return { $contains: value };
+    return { $$contains: value };
   }
 }
 

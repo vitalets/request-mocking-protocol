@@ -176,21 +176,13 @@ await mockClient.GET(/\/users\/\d+$/, /* response */);
 
 ### Object
 
-Instead of a plain string, `url` can be a matcher object using the same `$regex` / `$contains` vocabulary shared with query, headers and body [value matchers](#value-matchers). A plain string is already a URLPattern (the default), so there's no separate key for it.
+The `url` field also accepts a **matcher object** — the same [value matchers](#value-matchers) used for query, headers and body. This lets you match the URL by substring instead of a URLPattern:
 
 ```ts
-// URLPattern (default) — just a plain string
-await mockClient.GET('https://example.com/users/*', /* response */);
-
-// Regular expression
-await mockClient.GET({ url: { $regex: /\/users\/\d+$/ } }, /* response */);
-
-// Substring match
-await mockClient.GET({ url: { $contains: '/v2/users' } }, /* response */);
+await mockClient.GET({ url: { $$contains: '/v2/users' } }, /* response */);
 ```
 
 ```txt
-// url: { $contains: '/v2/users' }
 https://example.com/v2/users            matches
 https://example.com/api/v2/users?page=1 matches
 https://example.com/v1/users            does not match
@@ -251,7 +243,7 @@ Use a [value matcher](#value-matchers) to match a query param loosely. This matc
 await mockClient.GET({
   url: 'https://api.example.com/users',
   query: {
-    search: { $contains: 'phone' },
+    search: { $$contains: 'phone' },
   },
 }, /* response */);
 ```
@@ -281,7 +273,7 @@ Use a [value matcher](#value-matchers) to match a header loosely. This matches a
 await mockClient.GET({
   url: 'https://api.example.com/users',
   headers: {
-    Authorization: { $contains: 'Bearer' },
+    Authorization: { $$contains: 'Bearer' },
   },
 }, /* response */);
 ```
@@ -304,7 +296,7 @@ Use a [value matcher](#value-matchers) to match a body field loosely. This match
 await mockClient.POST({
   url: 'https://api.example.com/users',
   body: {
-    email: { $contains: '@acme.com' },
+    email: { $$contains: '@acme.com' },
   },
 }, /* response */);
 ```
@@ -332,37 +324,30 @@ If multiple mocks match the same request, the most recently added matching mock 
 
 ## Value Matchers
 
-By default query params, headers and body fields are matched by exact equality. To match more loosely, replace any value with a **matcher object**. The same matchers also power the [URL matcher object](#object).
+By default query params, headers and body fields are matched by exact equality. To match more loosely, replace any value with a `RegExp` or a **matcher object**. The same values also power the [URL matcher object](#object).
 
-| Matcher | Meaning |
-|---|---|
-| <code>&#123;&nbsp;$contains:&nbsp;'x'&nbsp;&#125;</code> | value is a string that includes the substring `x` |
-| <code>&#123;&nbsp;$regex:&nbsp;/x/&nbsp;&#125;</code> | value is a string matching the regular expression `x` (a `RegExp`, or a string pattern) |
+| Value | Example | Matches when |
+|---|---|---|
+| `string` | `'admin'` | value **equals** `admin` (exact match, the default) |
+| `RegExp` | `/admin/` | value matches the regular expression. A `RegExp` is converted under the hood to its serializable form <code>&#123;&nbsp;$$regex:&nbsp;'/admin/'&nbsp;&#125;</code>, so the schema stays JSON‑transferable. |
+| `$$contains` | <code>&#123;&nbsp;$$contains:&nbsp;'admin'&nbsp;&#125;</code> | value is a string that **includes** the substring `admin` |
+
+#### Example code
 
 ```ts
 await mockClient.POST({
   url: 'https://api.example.com/users',
-  query: { page: { $regex: /^\d+$/ } },
-  headers: { Authorization: { $contains: 'Bearer' } },
+  query: { page: /^\d+$/ },                             // regular expression
+  headers: { Authorization: { $$contains: 'Bearer' } }, // substring
   body: {
-    email: { $regex: /.+@acme\.com$/ },
-    role: 'admin', // still matched exactly
+    email: /.+@acme\.com$/,                             // regular expression
+    role: 'admin',                                      // exact match
   },
 }, /* response */);
 ```
 
 In `body`, matchers work at any nesting depth; every other field keeps the existing subset (partial) matching behavior.
 
-A bare `RegExp` is a shorthand for the `{ $regex }` matcher — it's converted under the hood:
-
-```ts
-await mockClient.POST({
-  url: 'https://api.example.com/users',
-  query: { page: /^\d+$/ },        // same as { $regex: /^\d+$/ }
-  body: {
-    email: /.+@acme\.com$/,        // same as { $regex: /.+@acme\.com$/ }
-  },
-}, /* response */);
-```
-
-> The `$` prefix marks a key as an operator rather than a literal field. Real HTTP/JSON values essentially never use `$`-prefixed keys, so this avoids colliding with actual field names.
+:::note
+The `$$` prefix is intentional. It keeps matcher keys distinct from ordinary data, so pasting a real request/response payload that happens to contain a `$contains` or `$regex` field is matched **literally** and never silently turned into a fuzzy matcher.
+:::

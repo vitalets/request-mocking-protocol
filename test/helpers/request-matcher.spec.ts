@@ -8,19 +8,19 @@ function createMatcher(inti: MockRequestSchemaInit) {
   return new SchemaMatcher(buildRequestSchema(inti));
 }
 
-test('buildRequestSchema converts RegExp to { $regex } string under the hood', () => {
+test('buildRequestSchema converts RegExp to { $$regex } string under the hood', () => {
   const schema = buildRequestSchema({
     method: 'POST',
     url: /example\.com\/users$/,
     query: { page: /^\d+$/ },
-    headers: { ['x-version']: { $regex: /^v\d+$/i } },
+    headers: { ['x-version']: /^v\d+$/i },
     body: { user: { email: /.+@acme\.com$/ }, role: 'admin' },
   });
 
-  expect(schema.url).toEqual({ $regex: '/example\\.com\\/users$/' });
-  expect(schema.query).toEqual({ page: { $regex: '/^\\d+$/' } });
-  expect(schema.headers).toEqual({ ['x-version']: { $regex: '/^v\\d+$/i' } });
-  expect(schema.body).toEqual({ user: { email: { $regex: '/.+@acme\\.com$/' } }, role: 'admin' });
+  expect(schema.url).toEqual({ $$regex: '/example\\.com\\/users$/' });
+  expect(schema.query).toEqual({ page: { $$regex: '/^\\d+$/' } });
+  expect(schema.headers).toEqual({ ['x-version']: { $$regex: '/^v\\d+$/i' } });
+  expect(schema.body).toEqual({ user: { email: { $$regex: '/.+@acme\\.com$/' } }, role: 'admin' });
 });
 
 test('match method', async () => {
@@ -180,8 +180,8 @@ test('match body (json)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match url ($regex object)', async () => {
-  const matcher = createMatcher({ url: { $regex: 'example\\.com/users/\\d+$' } });
+test('match url ($$regex object)', async () => {
+  const matcher = createMatcher({ url: { $$regex: 'example\\.com/users/\\d+$' } });
 
   req = new Request('https://example.com/users/123');
   expect(await matcher.match(req)).toBeTruthy();
@@ -190,8 +190,8 @@ test('match url ($regex object)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match url ($contains object)', async () => {
-  const matcher = createMatcher({ url: { $contains: '/v2/users' } });
+test('match url ($$contains object)', async () => {
+  const matcher = createMatcher({ url: { $$contains: '/v2/users' } });
 
   req = new Request('https://example.com/v2/users');
   expect(await matcher.match(req)).toBeTruthy();
@@ -203,9 +203,9 @@ test('match url ($contains object)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match url ($contains object) with separate query', async () => {
+test('match url ($$contains object) with separate query', async () => {
   const matcher = createMatcher({
-    url: { $contains: 'https://example.com/users' },
+    url: { $$contains: 'https://example.com/users' },
     query: { page: '1' },
   });
 
@@ -216,10 +216,10 @@ test('match url ($contains object) with separate query', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match query ($contains)', async () => {
+test('match query ($$contains)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    query: { token: { $contains: 'abc' } },
+    query: { token: { $$contains: 'abc' } },
   });
 
   req = new Request('https://example.com?token=xxabcxx');
@@ -229,10 +229,10 @@ test('match query ($contains)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match query ($regex)', async () => {
+test('match query ($$regex)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    query: { page: { $regex: '^\\d+$' } },
+    query: { page: { $$regex: '^\\d+$' } },
   });
 
   req = new Request('https://example.com?page=42');
@@ -242,10 +242,10 @@ test('match query ($regex)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match query ($contains) multi-value param', async () => {
+test('match query ($$contains) multi-value param', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    query: { tag: { $contains: 'foo' } },
+    query: { tag: { $$contains: 'foo' } },
   });
 
   req = new Request('https://example.com?tag=bar&tag=xfooy');
@@ -255,10 +255,10 @@ test('match query ($contains) multi-value param', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match headers ($contains)', async () => {
+test('match headers ($$contains)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    headers: { Authorization: { $contains: 'Bearer' } },
+    headers: { Authorization: { $$contains: 'Bearer' } },
   });
 
   req = new Request('https://example.com', { headers: { Authorization: 'Bearer test-token' } });
@@ -271,10 +271,10 @@ test('match headers ($contains)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match headers ($regex)', async () => {
+test('match headers ($$regex)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    headers: { ['x-version']: { $regex: '^v\\d+$' } },
+    headers: { ['x-version']: { $$regex: '^v\\d+$' } },
   });
 
   req = new Request('https://example.com', { headers: { ['x-version']: 'v2' } });
@@ -284,23 +284,10 @@ test('match headers ($regex)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match query ($regex) with RegExp', async () => {
+test('match headers with bare RegExp and flags', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
-    query: { page: { $regex: /^\d+$/ } },
-  });
-
-  req = new Request('https://example.com?page=42');
-  expect(await matcher.match(req)).toBeTruthy();
-
-  req = new Request('https://example.com?page=abc');
-  expect(await matcher.match(req)).toEqual(null);
-});
-
-test('match headers ($regex) with RegExp and flags', async () => {
-  const matcher = createMatcher({
-    url: 'https://example.com',
-    headers: { ['x-version']: { $regex: /^V\d+$/i } },
+    headers: { ['x-version']: /^V\d+$/i },
   });
 
   req = new Request('https://example.com', { headers: { ['x-version']: 'v2' } });
@@ -310,8 +297,8 @@ test('match headers ($regex) with RegExp and flags', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match url ($regex) with RegExp', async () => {
-  const matcher = createMatcher({ url: { $regex: /example\.com\/users\/\d+$/ } });
+test('match url with bare RegExp', async () => {
+  const matcher = createMatcher({ url: /example\.com\/users\/\d+$/ });
 
   req = new Request('https://example.com/users/123');
   expect(await matcher.match(req)).toBeTruthy();
@@ -320,30 +307,7 @@ test('match url ($regex) with RegExp', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match body ($regex) with RegExp', async () => {
-  const matcher = createMatcher({
-    method: 'POST',
-    url: 'https://example.com',
-    body: {
-      user: { email: { $regex: /.+@acme\.com$/ } },
-      role: 'admin',
-    },
-  });
-
-  req = new Request('https://example.com', {
-    method: 'POST',
-    body: JSON.stringify({ user: { email: 'john@acme.com' }, role: 'admin' }),
-  });
-  expect(await matcher.match(req)).toBeTruthy();
-
-  req = new Request('https://example.com', {
-    method: 'POST',
-    body: JSON.stringify({ user: { email: 'john@other.com' }, role: 'admin' }),
-  });
-  expect(await matcher.match(req)).toEqual(null);
-});
-
-test('match query with bare RegExp (shorthand for $regex)', async () => {
+test('match query with bare RegExp (shorthand for $$regex)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
     query: { page: /^\d+$/ },
@@ -356,7 +320,7 @@ test('match query with bare RegExp (shorthand for $regex)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match headers with bare RegExp (shorthand for $regex)', async () => {
+test('match headers with bare RegExp (shorthand for $$regex)', async () => {
   const matcher = createMatcher({
     url: 'https://example.com',
     headers: { ['x-version']: /^v\d+$/ },
@@ -369,7 +333,7 @@ test('match headers with bare RegExp (shorthand for $regex)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match body with bare RegExp (shorthand for $regex)', async () => {
+test('match body with bare RegExp (shorthand for $$regex)', async () => {
   const matcher = createMatcher({
     method: 'POST',
     url: 'https://example.com',
@@ -392,11 +356,11 @@ test('match body with bare RegExp (shorthand for $regex)', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match body ($contains) at top level', async () => {
+test('match body ($$contains) at top level', async () => {
   const matcher = createMatcher({
     method: 'POST',
     url: 'https://example.com',
-    body: { email: { $contains: '@acme.com' } },
+    body: { email: { $$contains: '@acme.com' } },
   });
 
   req = new Request('https://example.com', {
@@ -412,12 +376,12 @@ test('match body ($contains) at top level', async () => {
   expect(await matcher.match(req)).toEqual(null);
 });
 
-test('match body ($regex) in nested object, exact sibling still works', async () => {
+test('match body ($$regex) in nested object, exact sibling still works', async () => {
   const matcher = createMatcher({
     method: 'POST',
     url: 'https://example.com',
     body: {
-      user: { email: { $regex: '.+@acme\\.com$' } },
+      user: { email: { $$regex: '.+@acme\\.com$' } },
       role: 'admin',
     },
   });
@@ -447,7 +411,7 @@ test('match body array still subset-matches', async () => {
   const matcher = createMatcher({
     method: 'POST',
     url: 'https://example.com',
-    body: { items: [{ id: { $contains: 'a' } }] },
+    body: { items: [{ id: { $$contains: 'a' } }] },
   });
 
   req = new Request('https://example.com', {

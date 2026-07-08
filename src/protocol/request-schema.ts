@@ -13,14 +13,14 @@ import {
 export type MockRequestSchema = {
   /**
    * The pattern to match the request URL.
-   * Either a plain string (URLPattern), or a matcher object: `{ $regex }`, `{ $contains }`.
+   * Either a plain string (URLPattern), or a matcher object: `{ $$regex }`, `{ $$contains }`.
    */
   url: UrlMatcher;
   /**
    * Pattern type:
    * - 'urlpattern': match request URL by URLPattern (default).
    * - 'regexp': match request URL by regular expression.
-   * @deprecated use the `url` object syntax instead, e.g. `{ $regex: '...' }` or `{ $contains: '...' }`.
+   * @deprecated use the `url` object syntax instead, e.g. `{ $$regex: '...' }` or `{ $$contains: '...' }`.
    */
   patternType?: 'urlpattern' | 'regexp';
   /**
@@ -29,20 +29,20 @@ export type MockRequestSchema = {
   method?: HttpMethod;
   /**
    * The query parameters for matching, defined as key-value pairs.
-   * Each value can be an exact string/number or a matcher object ({ $contains } / { $regex }).
+   * Each value can be an exact string/number or a matcher object ({ $$contains } / { $$regex }).
    * Set a value to null to match requests without that parameter.
    * Set the whole field to null to match requests without any query parameters.
    */
   query?: Record<string, ValueMatcher | null> | null;
   /**
    * The request headers for matching, defined as key-value pairs.
-   * Each value can be an exact string or a matcher object ({ $contains } / { $regex }).
+   * Each value can be an exact string or a matcher object ({ $$contains } / { $$regex }).
    * Set a value to null to match requests without that header.
    */
   headers?: Record<string, ValueMatcher | null>;
   /**
    * The request body for matching, defined as a string or JSON.
-   * Any JSON leaf can be a matcher object ({ $contains } / { $regex }).
+   * Any JSON leaf can be a matcher object ({ $$contains } / { $$regex }).
    */
   body?: string | { [key: string]: JsonMatcherValue } | JsonMatcherValue[];
   /**
@@ -59,11 +59,12 @@ export type MockRequestSchemaInit = string | RegExp | MockRequestSchemaObjectIni
 
 /**
  * Init data, passed as object.
- * Accepts `RegExp` inside `$regex` matchers (converted to string when building the schema).
+ * Accepts a bare `RegExp` as a shorthand for `{ $$regex }`
+ * (converted to a serializable string when building the schema).
  */
 export type MockRequestSchemaObjectInit = {
   url: UrlMatcherInit;
-  /** @deprecated use the `url` object syntax instead, e.g. `{ $regex: '...' }` or `{ $contains: '...' }`. */
+  /** @deprecated use the `url` object syntax instead, e.g. `{ $$regex: '...' }` or `{ $$contains: '...' }`. */
   patternType?: MockRequestSchema['patternType'];
   method?: MockRequestSchema['method'];
   query?: Record<string, ValueMatcherInit | null> | null;
@@ -77,8 +78,8 @@ export type MockRequestSchemaObjectInit = {
  */
 export function buildRequestSchema(init: MockRequestSchemaInit): MockRequestSchema {
   const objInit = toRequestSchemaObjectInit(init);
-  // deep-convert any RegExp (bare shorthand or inside `{ $regex }`) to a serializable string.
-  // plain strings and matcher objects ({ $regex } / { $contains }) are kept as-is.
+  // deep-convert any RegExp (bare shorthand or inside `{ $$regex }`) to a serializable string.
+  // plain strings and matcher objects ({ $$regex } / { $$contains }) are kept as-is.
   return serializeRegExps(objInit) as MockRequestSchema;
 }
 
@@ -98,8 +99,8 @@ export type HttpMethod =
 /**
  * URL matcher: a `ValueMatcher` without `number` (a plain string is matched via URLPattern).
  * - `string`: match request URL by URLPattern (default).
- * - `{ $regex }`: match request URL by regular expression.
- * - `{ $contains }`: match request URL by substring.
+ * - `{ $$regex }`: match request URL by regular expression.
+ * - `{ $$contains }`: match request URL by substring.
  */
 export type UrlMatcher = Exclude<ValueMatcher, number>;
 

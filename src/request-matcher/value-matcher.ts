@@ -3,10 +3,10 @@
  */
 import type { ValueMatcher } from '../protocol';
 
-export function isValueMatcher(v: unknown): v is { $contains: string } | { $regex: string } {
+export function isValueMatcher(v: unknown): v is { $$contains: string } | { $$regex: string } {
   if (!v || typeof v !== 'object') return false;
   const keys = Object.keys(v);
-  return keys.length === 1 && (keys[0] === '$contains' || keys[0] === '$regex');
+  return keys.length === 1 && (keys[0] === '$$contains' || keys[0] === '$$regex');
 }
 
 export function matchValue(expected: ValueMatcher, actual: unknown): boolean {
@@ -15,11 +15,11 @@ export function matchValue(expected: ValueMatcher, actual: unknown): boolean {
   return String(actual) === String(expected);
 }
 
-function matchOperator(matcher: { $contains: string } | { $regex: string }, actual: unknown) {
+function matchOperator(matcher: { $$contains: string } | { $$regex: string }, actual: unknown) {
   if (typeof actual !== 'string') return false;
-  return '$contains' in matcher
-    ? actual.includes(matcher.$contains)
-    : regexpFromString(matcher.$regex).test(actual);
+  return '$$contains' in matcher
+    ? actual.includes(matcher.$$contains)
+    : regexpFromString(matcher.$$regex).test(actual);
 }
 
 /**
