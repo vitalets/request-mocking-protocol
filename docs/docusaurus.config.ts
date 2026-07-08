@@ -72,6 +72,7 @@ const config: Config = {
       'classic',
       {
         docs: {
+          path: 'content',
           sidebarPath: './sidebars.ts',
           routeBasePath: 'docs',
           editUrl: 'https://github.com/vitalets/request-mocking-protocol/tree/main/docs/',
