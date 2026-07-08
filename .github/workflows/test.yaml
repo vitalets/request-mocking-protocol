@@ -4,7 +4,7 @@ on:
   push:
     branches: ['**']
     paths:
-      - '.github/workflows/test.yml'
+      - '.github/workflows/test.yaml'
       - 'src/**'
       - 'test/**'
       - 'package*.json'
@@ -14,7 +14,7 @@ on:
     branches: [main]
     paths:
       # no way to avoid repeating the paths here
-      - '.github/workflows/test.yml'
+      - '.github/workflows/test.yaml'
       - 'src/**'
       - 'test/**'
       - 'package*.json'
@@ -28,7 +28,7 @@ jobs:
         os: [ubuntu-22.04, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 24
