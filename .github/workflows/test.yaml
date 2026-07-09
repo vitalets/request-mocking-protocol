@@ -2,7 +2,7 @@ name: test
 
 on:
   push:
-    branches: ['**']
+    branches: ['**', '!docs']
     paths:
       - '.github/workflows/test.yaml'
       - 'src/**'
