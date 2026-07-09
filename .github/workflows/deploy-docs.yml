@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ vars.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
     defaults:
       run:
         working-directory: docs

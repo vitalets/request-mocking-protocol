@@ -5,6 +5,8 @@ import npm2yarn from '@docusaurus/remark-plugin-npm2yarn';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const googleAnalyticsMeasurementId = process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID;
+
 const config: Config = {
   title: 'Request Mocking Protocol',
   tagline: 'Declarative HTTP request mocking for end-to-end tests',
@@ -82,6 +84,12 @@ const config: Config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        gtag: googleAnalyticsMeasurementId
+          ? {
+              trackingID: googleAnalyticsMeasurementId,
+              anonymizeIP: true,
+            }
+          : undefined,
       } satisfies Preset.Options,
     ],
   ],

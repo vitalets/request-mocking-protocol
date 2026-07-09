@@ -39,3 +39,10 @@ git push origin HEAD:docs
 The workflow builds this Docusaurus site and deploys the generated output to
 GitHub Pages. GitHub Pages should be configured to use **GitHub Actions** as its
 source.
+
+## Google Analytics
+
+Set the repository variable `GOOGLE_ANALYTICS_MEASUREMENT_ID` to the Google
+Analytics 4 measurement ID, for example `G-XXXXXXXXXX`. When the variable is
+present, the docs build includes Docusaurus' Google gtag integration. When it is
+unset, analytics is omitted.
