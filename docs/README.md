@@ -28,4 +28,14 @@ npm run serve
 
 ## Deployment
 
-The site is deployed automatically via the [`deploy-docs`](../.github/workflows/deploy-docs.yml) GitHub Actions workflow on every push to `main` that touches `docs/`.
+The site is released separately from package releases via the
+[`deploy-docs`](../.github/workflows/deploy-docs.yml) GitHub Actions workflow.
+Push the docs source to the `docs` branch to publish it:
+
+```sh
+git push origin HEAD:docs
+```
+
+The workflow builds this Docusaurus site and deploys the generated output to
+GitHub Pages. GitHub Pages should be configured to use **GitHub Actions** as its
+source.
