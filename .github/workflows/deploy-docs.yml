@@ -3,6 +3,7 @@ name: deploy-docs
 on:
   push:
     branches: [docs]
+  workflow_dispatch:
 
 # Allow the GITHUB_TOKEN to deploy to GitHub Pages
 permissions:
