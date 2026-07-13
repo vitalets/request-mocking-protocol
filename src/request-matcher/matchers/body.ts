@@ -1,10 +1,9 @@
 /**
  * Body matcher.
  */
-import isMatchWith from 'lodash/isMatchWith';
+import isMatch from 'lodash/isMatch';
 import { MockRequestSchema } from '../../protocol';
 import { MatchingContext } from '../context';
-import { isValueMatcher, matchValue } from '../value-matcher';
 
 export class BodyMatcher {
   constructor(private schema: MockRequestSchema) {}
@@ -55,9 +54,7 @@ export class BodyMatcher {
       return false;
     }
 
-    const result = isMatchWith(actualBodyParsed, expectedBody, (objValue, srcValue) =>
-      isValueMatcher(srcValue) ? matchValue(srcValue, objValue) : undefined,
-    );
+    const result = isMatch(actualBodyParsed, expectedBody);
     ctx.logger?.log(`body`, this.expectedBodyStr, trimLongString(actualBody));
 
     return result;

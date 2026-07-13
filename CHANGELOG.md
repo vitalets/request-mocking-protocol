@@ -3,6 +3,7 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+* rename value matchers `$$contains` / `$$regex` to `$contains` / `$regex`, now applicable to url, query and headers only.
 
 ## [0.5.0] - 2026-07-09
 * add `$$contains` and `$$regex` value matchers for request url, query, headers and body.

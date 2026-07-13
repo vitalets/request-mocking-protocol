@@ -1,9 +1,8 @@
 /**
  * Query matcher.
  */
-import { MockRequestSchema } from '../../protocol';
+import { MockRequestSchema, matchValue } from '../../protocol';
 import { MatchingContext } from '../context';
-import { matchValue } from '../value-matcher';
 
 export class QueryMatcher {
   private expectedQuery: MockRequestSchema['query'];

@@ -1,9 +1,8 @@
 /**
  * Headers matcher.
  */
-import { MockRequestSchema } from '../../protocol';
+import { MockRequestSchema, matchValue } from '../../protocol';
 import { MatchingContext } from '../context';
-import { matchValue } from '../value-matcher';
 
 export class HeadersMatcher {
   private expectedHeaders: NonNullable<MockRequestSchema['headers']>;
