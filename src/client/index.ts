@@ -7,6 +7,7 @@ import {
   MockRequestSchemaObjectInit,
   MockResponseSchemaInit,
   MockSchema,
+  UrlPatternObj,
   buildRequestSchema,
   buildResponseSchema,
   toRequestSchemaObjectInit,
@@ -20,7 +21,7 @@ export type MockClientOptions = {
 };
 
 export type MockRequestSchemaInitNoMethod =
-  string | RegExp | Omit<MockRequestSchemaObjectInit, 'method'>;
+  string | RegExp | UrlPatternObj | URLPattern | Omit<MockRequestSchemaObjectInit, 'method'>;
 
 export class MockClient {
   private mockSchemas: MockSchema[] = [];

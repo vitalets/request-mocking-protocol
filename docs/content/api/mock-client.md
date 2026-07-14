@@ -59,10 +59,11 @@ async ALL(reqSchema, resSchema): Promise<void>
 
 If multiple mocks match the same request, the most recently added matching mock is used. Mock precedence is based on registration order, not URL specificity.
 
-- `reqSchema: string | RegExp | object` – The request matching schema for the mock.
+- `reqSchema: string | RegExp | URLPattern | object` – The request matching schema for the mock.
     - If defined as `string`, it is treated as [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) for matching the request only by URL. A URL string without an explicit search component matches any query string.
     - If defined as `RegExp`, it is treated as [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) for matching the request only by URL.
-    - If defined as `object`, it is treated as [MockRequestSchemaInit](https://github.com/vitalets/request-mocking-protocol/blob/main/src/protocol/request-schema.ts) type.
+    - If defined as `URLPattern` or a component object such as `{ hostname, pathname, port }`, it matches the selected URL components.
+    - If defined as a request schema object with a `url` field, it is treated as [MockRequestSchemaInit](https://github.com/vitalets/request-mocking-protocol/blob/main/src/protocol/request-schema.ts) type.
 
 - `resSchema: number | object`: The response schema for the mock.
     - If defined as `number`, it is treated as an HTTP status code.

@@ -2,7 +2,12 @@
  * URL matcher.
  */
 import 'urlpattern-polyfill';
-import { ContainsMatcher, MockRequestSchema, regexpFromString } from '../../protocol';
+import {
+  ContainsMatcher,
+  MockRequestSchema,
+  UrlPatternObj,
+  regexpFromString,
+} from '../../protocol';
 import { MatchingContext } from '../context';
 
 export class UrlMatcher {
@@ -61,12 +66,11 @@ export class UrlMatcher {
   private buildMatcher(): URLPattern | RegExp | ContainsMatcher {
     const { url, patternType } = this.schema;
 
-    // Object syntax uses the same matcher vocabulary as other fields: { $regex } | { $contains }.
-    // A plain string is already a URLPattern (the default), so no explicit key is needed for it.
+    // Object syntax can be a value matcher or a serializable URLPattern component object.
     if (typeof url === 'object') {
-      return '$regex' in url
-        ? this.buildRegexpMatcher(url.$regex)
-        : this.buildContainsMatcher(url.$contains);
+      if ('$regex' in url) return this.buildRegexpMatcher(url.$regex);
+      if ('$contains' in url) return this.buildContainsMatcher(url.$contains);
+      return this.buildPatternMatcher(url);
     }
 
     // Legacy string syntax with (deprecated) patternType.
@@ -78,7 +82,7 @@ export class UrlMatcher {
     return regexpFromString(url);
   }
 
-  private buildPatternMatcher(url: string) {
+  private buildPatternMatcher(url: string | UrlPatternObj) {
     const urlPattern = new URLPattern(url);
     this.hasQuery = urlPattern.search !== '*';
     return urlPattern;

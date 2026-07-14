@@ -7,7 +7,7 @@ import { JsonValue, ValueMatcher, ValueMatcherInit } from './value-matcher';
 export type MockRequestSchema = {
   /**
    * The pattern to match the request URL.
-   * Either a plain string (URLPattern), or a matcher object: `{ $regex }`, `{ $contains }`.
+   * A URLPattern string/component object, or a matcher object: `{ $regex }`, `{ $contains }`.
    */
   url: UrlMatcher;
   /**
@@ -49,7 +49,8 @@ export type MockRequestSchema = {
  * Init data, used to build the request schema.
  * Allows to provide `string` | `RegExp` as a shortcut for url.
  */
-export type MockRequestSchemaInit = string | RegExp | MockRequestSchemaObjectInit;
+export type MockRequestSchemaInit =
+  string | RegExp | UrlPatternObj | URLPattern | MockRequestSchemaObjectInit;
 
 /**
  * Init data, passed as object.
@@ -71,14 +72,32 @@ export type HttpMethod =
   'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
 
 /**
- * URL matcher: a `ValueMatcher` without `number` (a plain string is matched via URLPattern).
+ * URL matcher stored in the serializable protocol schema.
  * - `string`: match request URL by URLPattern (default).
  * - `{ $regex }`: match request URL by regular expression.
  * - `{ $contains }`: match request URL by substring.
+ * - `UrlPatternObj`: match selected URL components such as hostname, pathname, or port.
  */
-export type UrlMatcher = Exclude<ValueMatcher, number>;
+export type UrlMatcher = Exclude<ValueMatcher, number> | UrlPatternObj;
 
 /**
- * URL matcher accepted as input: a `ValueMatcherInit` without `number`.
+ * URL matcher accepted as input. URLPattern instances are converted to a serializable
+ * component object when the request schema is built.
  */
-export type UrlMatcherInit = Exclude<ValueMatcherInit, number>;
+export type UrlMatcherInit = Exclude<ValueMatcherInit, number> | UrlPatternObj | URLPattern;
+
+/**
+ * Serializable URLPattern components supported by the protocol.
+ * Component fields mirror URLPatternInit, excluding the construction-only `baseURL`.
+ * Omitted components match any value.
+ */
+export type UrlPatternObj = {
+  protocol?: string;
+  username?: string;
+  password?: string;
+  hostname?: string;
+  port?: string;
+  pathname?: string;
+  search?: string;
+  hash?: string;
+};

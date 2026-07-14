@@ -176,7 +176,33 @@ await mockClient.GET(/\/users\/\d+$/, /* response */);
 
 ### Object
 
-The `url` field also accepts a **matcher object** — the same [value matchers](#value-matchers) used for query and headers. This lets you match the URL by substring instead of a URLPattern:
+You can pass individual `URLPattern` components when that is clearer than a full URL string:
+
+```ts
+await mockClient.GET({
+  hostname: 'api.example.com',
+  pathname: '/users/:id',
+  port: '8443',
+}, /* response */);
+```
+
+The same component object can be assigned to the `url` field when matching other request data, and a full `URLPattern` instance is also accepted:
+
+```ts
+await mockClient.GET({
+  url: { hostname: 'api.example.com', pathname: '/users/:id' },
+  headers: { authorization: 'Bearer token' },
+}, /* response */);
+
+await mockClient.GET(
+  new URLPattern({ hostname: 'api.example.com', pathname: '/users/:id' }),
+  /* response */,
+);
+```
+
+Unspecified URL components match any value. `URLPattern` instances are converted to plain component data so mocks remain serializable between the client and interceptor.
+
+The `url` field also accepts a **value matcher object** — the same [value matchers](#value-matchers) used for query and headers. This lets you match the URL by substring instead of a URLPattern:
 
 ```ts
 await mockClient.GET({ url: { $contains: '/v2/users' } }, /* response */);

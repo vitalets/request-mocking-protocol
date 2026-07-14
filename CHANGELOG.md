@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 * rename value matchers `$$contains` / `$$regex` to `$contains` / `$regex`, now applicable to url, query and headers only.
+* support URLPattern component objects and instances as request URL matchers.
 
 ## [0.5.0] - 2026-07-09
 * add `$$contains` and `$$regex` value matchers for request url, query, headers and body.

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { SchemaMatcher } from '../../src/request-matcher/schema-matcher';
-import { buildRequestSchema } from '../../src/protocol';
+import { UrlPatternObj, buildRequestSchema } from '../../src/protocol';
 
 test('no hostname slash', async () => {
   const matcher = createMatcher('https://example.com');
@@ -92,6 +92,27 @@ test('match named path regex in URLPattern string', async () => {
   await match(matcher, 'https://example.com/users/abc', false);
 });
 
+test('match URLPattern component object', async () => {
+  const matcher = createMatcher({ hostname: 'example.com', pathname: '/users/:id' });
+  await match(matcher, 'https://example.com/users/123');
+  await match(matcher, 'http://example.com/users/456');
+  await match(matcher, 'https://example.org/users/123', false);
+  await match(matcher, 'https://example.com/products/123', false);
+});
+
+test('match URLPattern instance', async () => {
+  const matcher = createMatcher(
+    new URLPattern({
+      protocol: 'https',
+      hostname: 'example.com',
+      port: '8443',
+      pathname: '/users/:id',
+    }),
+  );
+  await match(matcher, 'https://example.com:8443/users/123');
+  await match(matcher, 'https://example.com/users/123', false);
+});
+
 // '**' does not make sense in URLPattern, but users may use it.
 test('with hostname slash, double asterisk', async () => {
   const matcher = createMatcher('https://example.com/**');
@@ -124,7 +145,7 @@ test('legacy patternType regexp still works', async () => {
   await match(matcher, 'https://example.io/users', false);
 });
 
-function createMatcher(url: string) {
+function createMatcher(url: string | UrlPatternObj | URLPattern) {
   return new SchemaMatcher(buildRequestSchema(url));
 }
 

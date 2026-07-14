@@ -23,6 +23,21 @@ test('buildRequestSchema converts RegExp to { $regex } string under the hood', (
   expect(schema.body).toEqual({ user: { email: 'john@acme.com' }, role: 'admin' });
 });
 
+test('buildRequestSchema converts URLPattern instances to serializable components', () => {
+  const schema = buildRequestSchema(new URLPattern('https://example.com/users/:id'));
+
+  expect(schema.url).toEqual({
+    protocol: 'https',
+    username: '*',
+    password: '*',
+    hostname: 'example.com',
+    port: '',
+    pathname: '/users/:id',
+    search: '*',
+    hash: '*',
+  });
+});
+
 test('match method', async () => {
   const matcher = createMatcher({ method: 'GET', url: 'https://example.com/' });
 

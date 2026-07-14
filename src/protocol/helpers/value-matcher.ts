@@ -1,22 +1,12 @@
 /**
  * Generic value matcher implementation, shared by url, query and headers matchers.
  */
-import type { ContainsMatcher, RegexMatcher, ValueMatcher } from '../value-matcher';
-
-/**
- * Recursively converts bare `RegExp` values to the serializable `{ $regex }` matcher
- * (string form `/pattern/flags`), so a matcher schema stays serializable over the wire.
- */
-export function serializeRegExps(value: unknown): unknown {
-  if (value instanceof RegExp) return { $regex: value.toString() };
-  if (Array.isArray(value)) return value.map(serializeRegExps);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, val]) => [key, serializeRegExps(val)]),
-    );
-  }
-  return value;
-}
+import type {
+  ContainsMatcher,
+  RegexMatcher,
+  ValueMatcher,
+  ValueMatcherInit,
+} from '../value-matcher';
 
 export function isValueMatcher(v: unknown): v is ContainsMatcher | RegexMatcher {
   if (!v || typeof v !== 'object') return false;
@@ -35,6 +25,29 @@ function matchOperator(matcher: ContainsMatcher | RegexMatcher, actual: unknown)
   return '$contains' in matcher
     ? actual.includes(matcher.$contains)
     : regexpFromString(matcher.$regex).test(actual);
+}
+
+/**
+ * Converts a bare `RegExp` to a serializable `{ $regex }` matcher.
+ * Passes through null and undefined.
+ */
+export function serializeRegexp<T>(value: T) {
+  return (value instanceof RegExp ? { $regex: value.toString() } : value) as T extends RegExp
+    ? RegexMatcher
+    : T;
+}
+
+/**
+ * Serializes bare regular expressions in a matcher record.
+ * Passes through null and undefined.
+ */
+export function serializeRegexpInRecord(
+  record: Record<string, ValueMatcherInit | null> | null | undefined,
+) {
+  if (record === null || record === undefined) return record;
+  return Object.fromEntries(
+    Object.entries(record).map(([key, value]) => [key, serializeRegexp(value)]),
+  );
 }
 
 /**
