@@ -3,6 +3,8 @@
 > This project follows the [Keep a Changelog](https://keepachangelog.com) format.
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-07-15
 * rename value matchers `$$contains` / `$$regex` to `$contains` / `$regex`, now applicable to url, query and headers only.
 * support URLPattern component objects and instances as request URL matchers.
 
@@ -43,7 +45,8 @@
 
 * Initial release.
 
-[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/vitalets/request-mocking-protocol/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/vitalets/request-mocking-protocol/compare/v0.2.1...v0.3.0
